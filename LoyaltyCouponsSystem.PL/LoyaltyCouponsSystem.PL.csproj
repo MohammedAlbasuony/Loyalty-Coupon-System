@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LoyaltyCouponsSystem.DAL\LoyaltyCouponsSystem.DAL.csproj" />
+    <ProjectReference Include="..\LoyaltyCouponsSystem.BLL\LoyaltyCouponsSystem.BLL.csproj" />
   </ItemGroup>
 
 </Project>
