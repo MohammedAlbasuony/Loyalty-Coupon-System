@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.DAL.Entity
 {
-    public class Admin
+    public class Admin 
     {
         public int AdminID { get; set; }
         public string Name { get; set; }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.DAL.DB
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : DbContext
     {
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -17,16 +17,16 @@ namespace LoyaltyCouponsSystem.DAL.DB
 
 
         }
-        public DbSet<Customer> Customers { get; set; } = null!;
-        public DbSet<Transaction> Transactions { get; set; } = null!;
-        public DbSet<Coupon> Coupons { get; set; } = null!;
-        public DbSet<StoreKeeper> StoreKeepers { get; set; } = null!;
-        public DbSet<CouponTemplate> CouponTemplates { get; set; } = null!;
-        public DbSet<Technician> Technicians { get; set; } = null!;
-        public DbSet<Employee> Employees { get; set; } = null!;
-        public DbSet<Admin> Admins { get; set; } = null!;
-        public DbSet<AuditLog> AuditLogs { get; set; } = null!;
-        public DbSet<Representative> Representatives { get; set; } = null!;
+        public DbSet<Customer> Customers { get; set; } 
+        public DbSet<Transaction> Transactions { get; set; } 
+        public DbSet<Coupon> Coupons { get; set; } 
+        public DbSet<StoreKeeper> StoreKeepers { get; set; } 
+        public DbSet<CouponTemplate> CouponTemplates { get; set; }
+        public DbSet<Technician> Technicians { get; set; }
+        public DbSet<Employee> Employees { get; set; } 
+        public DbSet<Admin> Admins { get; set; } 
+        public DbSet<AuditLog> AuditLogs { get; set; } 
+        public DbSet<Representative> Representatives { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
