@@ -1,35 +1,50 @@
 ﻿using LoyaltyCouponsSystem.DAL.Entity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.DAL.DB
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
-
         }
-        public DbSet<Customer> Customers { get; set; } 
-        public DbSet<Transaction> Transactions { get; set; } 
-        public DbSet<Coupon> Coupons { get; set; } 
-        public DbSet<StoreKeeper> StoreKeepers { get; set; } 
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Coupon> Coupons { get; set; }
+        public DbSet<StoreKeeper> StoreKeepers { get; set; }
         public DbSet<CouponTemplate> CouponTemplates { get; set; }
         public DbSet<Technician> Technicians { get; set; }
-        public DbSet<Employee> Employees { get; set; } 
-        public DbSet<Admin> Admins { get; set; } 
-        public DbSet<AuditLog> AuditLogs { get; set; } 
-        public DbSet<Representative> Representatives { get; set; } 
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Admin> Admins { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<Representative> Representatives { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder); // Always call base first for Identity configuration
+
+            // Ensure primary key for IdentityUserLogin<string>
+            modelBuilder.Entity<IdentityUserLogin<string>>(entity =>
+            {
+                entity.HasKey(l => new { l.LoginProvider, l.ProviderKey });
+            });
+
+            modelBuilder.Entity<Admin>()
+               .HasOne(d => d.ApplicationUser)
+               .WithOne(au => au.Admin)
+               .HasForeignKey<Admin>(d => d.ApplicationUserId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Representative>()
+               .HasOne(d => d.ApplicationUser)
+               .WithOne(au => au.Representative)
+               .HasForeignKey<Representative>(d => d.ApplicationUserId)
+               .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Customer>(entity =>
             {
                 entity.HasKey(e => e.CustomerID);
@@ -78,24 +93,27 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             });
 
-            modelBuilder.Entity<Admin>(entity =>
-            {
-                entity.HasKey(e => e.AdminID);
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            });
-
+            
             modelBuilder.Entity<AuditLog>(entity =>
             {
                 entity.HasKey(e => e.AuditLogID);
                 entity.Property(e => e.Action).IsRequired().HasMaxLength(200);
             });
 
-            modelBuilder.Entity<Representative>(entity =>
-            {
-                entity.HasKey(e => e.RepresentativeID);
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            });
+           
         }
+        public override int SaveChanges()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.Entity is ApplicationUser && e.State == EntityState.Deleted);
 
+            foreach (var entry in entries)
+            {
+                entry.State = EntityState.Modified;
+                ((ApplicationUser)entry.Entity).IsDeleted = true;
+            }
+
+            return base.SaveChanges();
+        }
     }
 }
