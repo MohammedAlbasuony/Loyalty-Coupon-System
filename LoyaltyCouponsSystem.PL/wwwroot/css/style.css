@@ -1,13 +1,83 @@
-/* General Styling */
+
 body {
+    margin: 0; 
+}
+
+.animated-heading {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #0060af;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;
+    animation: revealText 3s ease forwards;
+    margin: 0 auto;
+    padding: 0;
+}
+
+@keyframes revealText {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+.container-fluid {
+    padding: 0; 
+}
+
+.card {
+    height: 450px; 
+}
+
+.card-img-container {
+    height: 320px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; 
+}
+
+.card-image {
+    width: 100%;
+    object-fit: contain; 
+}
+
+.transition-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.transition-card:hover {
+    transform: scale(1.05); 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
+}
+
+.card-title {
+    font-size: 1.4rem; 
+    font-weight: bold;
+    color: #0060af;
+}
+
+.card-body {
+    padding-top: 0; 
+    padding-bottom: 10px; 
+    margin-bottom: 0; 
+}
+
+h6 {
+    color: #003663;
+}
+
+.dashboard-container {
+    display: flex;
     margin: 0;
     font-family: 'Arial', sans-serif;
     background-color: #121212;
     color: #f1f1f1;
-  }
-  .dashboard-container {
-    display: flex;
-  }
+}
   
   /* Sidebar Styling */
   .sidebar {
