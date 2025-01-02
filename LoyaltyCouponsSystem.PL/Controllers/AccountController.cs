@@ -1,7 +1,9 @@
 ﻿namespace LoyaltyCouponsSystem.PL.Controllers
 {
+    using Loyality_Copoun_System.Models;
     using LoyaltyCouponsSystem.BLL.ViewModel.Account;
     using LoyaltyCouponsSystem.DAL.DB;
+    using LoyaltyCouponsSystem.DAL.Migrations;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
 
@@ -64,6 +66,9 @@
 
                     if (result.Succeeded)
                     {
+                          
+                            var resultrole = await userManager.AddToRoleAsync(users, "REPRESENTATIVE");
+                         
                         return RedirectToAction("Login", "Account");
                     }
                     else

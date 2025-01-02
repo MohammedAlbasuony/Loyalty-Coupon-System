@@ -32,8 +32,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             Id = user.Id,
             UserName = user.UserName,
             Email = user.Email,
+            EmailConfirmed = user.EmailConfirmed,
             Role = user.Role,        
-            IsDeleted = user.IsDeleted // Make sure IsDeleted is included in the view model
+            IsDeleted = user.IsDeleted 
         }).ToListAsync();
 
             return users;
@@ -61,8 +62,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             user.Email = model.Email;
             user.UserName = model.UserName;
-
-            var currentRoles = await _userManager.GetRolesAsync(user);
+             var currentRoles = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, currentRoles);
             var addRoleResult = await _userManager.AddToRoleAsync(user, model.Role);
 

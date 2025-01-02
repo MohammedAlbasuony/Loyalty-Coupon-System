@@ -32,7 +32,7 @@ namespace LoyaltyCouponsSystem.PL
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 ConfigurePasswordOptions(options);
-                options.SignIn.RequireConfirmedAccount = false; // Email confirmation
+                options.SignIn.RequireConfirmedAccount = true; // Email confirmation
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
@@ -80,7 +80,7 @@ namespace LoyaltyCouponsSystem.PL
         }
         private static async Task CreateRoles(RoleManager<IdentityRole> roleManager)
         {
-            string[] roleNames = { "Representative", "Admin" };
+            string[] roleNames = { "Representative", "Admin" ,"StoreKeeper" , "SuperAdmin" , "Accountant" };
             foreach (var roleName in roleNames)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))
