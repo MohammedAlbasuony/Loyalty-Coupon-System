@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2 class="sidebar-title">LifeCare</h2>
+            <ul class="sidebar-menu">
+                <li><i class="fas fa-home"></i> Dashboard</li>
+                
+                <li><i class="fas fa-cogs"></i> Settings</li>
+            </ul>
+            <form action="/Account/Logout" method="post" style="display:inline;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Log Out
+                </button>
+            </form>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <h1>Hello, @User.Identity.Name 👋</h1>
+                <p>Welcome to the Hospital Management Dashboard.</p>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search patients by name or ID..." id="search">
+                    <i class="fas fa-search"></i>
+                </div>
+            </header>
+
+            <!-- Patients Management Section -->
+            <section class="patients-management">
+                <h2>Patients Management</h2>
+                <div class="patients-table">
+                    @RenderBody()
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="~/js/net.js"></script>
+</body>
+</html>

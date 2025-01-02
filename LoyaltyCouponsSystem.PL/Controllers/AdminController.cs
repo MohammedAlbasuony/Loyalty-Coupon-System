@@ -1,7 +1,11 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.BLL.ViewModel.Admin;
-using Microsoft.AspNetCore.Authorization;
+using LoyaltyCouponsSystem.DAL.DB;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace LoyaltyCouponsSystem.PL.Controllers
 {
@@ -9,17 +13,52 @@ namespace LoyaltyCouponsSystem.PL.Controllers
     public class AdminController : Controller
     {
         private readonly IAdminService _adminService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AdminController(IAdminService adminService)
+        public AdminController(IAdminService adminService,UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
+            _userManager = userManager;
+            _roleManager = roleManager;
             _adminService = adminService;
         }
+       
 
-        // View all users
+
         public async Task<IActionResult> ManageUsers()
         {
-            var users = await _adminService.GetAllUsersAsync();
-            return View(users); ;
+
+            var allUsers = await _userManager.Users.ToListAsync();
+            var confirmedUsers = allUsers.Where(u => u.EmailConfirmed == true).ToList();
+            var unconfirmedUsers = allUsers.Where(u => u.EmailConfirmed == false).ToList();
+
+            var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
+
+            var model = new ManageUsersViewModel
+            {
+                ConfirmedUsers = confirmedUsers.Select(u => new AdminUserViewModel
+                {
+                    Id = u.Id,
+                    UserName = u.UserName,
+                    Email = u.Email,
+                    EmailConfirmed = u.EmailConfirmed,
+                    Role = u.Role
+                }).ToList(),
+
+                UnconfirmedUsers = unconfirmedUsers.Select(u => new AdminUserViewModel
+                {
+                    Id = u.Id,
+                    UserName = u.UserName,
+                    Email = u.Email,
+                    EmailConfirmed = u.EmailConfirmed,
+                    Role = u.Role
+                }).ToList(),
+
+                AllRoles = roles
+            };
+
+            return View(model);
+
         }
 
         // Edit user
@@ -27,7 +66,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         {
             var user = await _adminService.GetUserByIdAsync(id);
             if (user == null) return NotFound();
-
+            user.EmailConfirmed = true;
             return View(user);
         }
 
@@ -64,33 +103,79 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
         }
 
-        
-        // Assign Role 
+
+        [HttpGet]
+        public async Task<IActionResult> AssignRoleForm()
+        {
+            var users = await _adminService.GetAllUsersAsync();
+            var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();     
+            foreach (var user in users)
+            {
+                user.Roles = roles;
+                user.SelectedRole = user.Role; 
+            }
+
+            return View(users);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AssignRole(string userId, string roleName)
         {
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(roleName))
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
             {
-                return BadRequest("User ID and role name are required.");
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("ManageUsers");
             }
 
-            var result = await _adminService.AssignRoleToUserAsync(userId, roleName);
-            if (result)
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            var resultRemove = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            if (!resultRemove.Succeeded)
             {
-                return Ok("Role assigned successfully.");
+                TempData["ErrorMessage"] = "Failed to remove existing roles.";
+                return RedirectToAction("ManageUsers");
+            }
+
+            var result = await _userManager.AddToRoleAsync(user, roleName);
+            if (result.Succeeded)
+            {
+                TempData["SuccessMessage"] = $"Role '{roleName}' has been assigned to user.";
             }
             else
             {
-                return BadRequest("Failed to assign role.");
+                TempData["ErrorMessage"] = "Failed to assign the role.";
             }
-        }
-        public async Task<IActionResult> AssignRole()
-        {
-            // Fetch all users from the admin service
-            var users = await _adminService.GetAllUsersAsync();
 
-            // Return the view, passing the list of users
-            return View(users);
+            return RedirectToAction("ManageUsers");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmAccount(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("ManageUsers");
+            }
+
+            user.EmailConfirmed = true;  
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                TempData["SuccessMessage"] = "User's account has been confirmed.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Failed to confirm the account.";
+            }
+
+            return RedirectToAction("ManageUsers");
+        }
+
+
+
     }
 }
+
