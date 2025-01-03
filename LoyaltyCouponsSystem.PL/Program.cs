@@ -3,6 +3,7 @@ using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
 namespace LoyaltyCouponsSystem.PL
 {
     public class Program
@@ -15,10 +16,15 @@ namespace LoyaltyCouponsSystem.PL
             options.Password.RequireUppercase = false;
             options.Password.RequiredLength = 8;
             options.Password.RequiredUniqueChars = 0;
-        }
-        public static void Main(string[] args)
-        {
 
+            // Allow spaces in UserName
+            options.User.AllowedUserNameCharacters =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
+
+        }
+
+        public static async Task Main(string[] args)
+        {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -26,7 +32,7 @@ namespace LoyaltyCouponsSystem.PL
 
             // Register the DbContext service
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Identity configuration
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -36,27 +42,21 @@ namespace LoyaltyCouponsSystem.PL
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
-            
 
-
-           
             // Register repositories and services
-
-            builder.Services.AddScoped<IAdminService, AdminService>(); 
-            
+            builder.Services.AddScoped<IAdminService, AdminService>();
 
             var app = builder.Build();
+
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.MapStaticAssets();
@@ -64,30 +64,26 @@ namespace LoyaltyCouponsSystem.PL
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
-            // Ensure roles exist
+
+            // Ensure roles exist at startup
             using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                CreateRoles(roleManager).Wait(); // Ensure roles are created
+                await CreateRolesAsync(roleManager);
             }
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
-
             app.Run();
-
         }
-        private static async Task CreateRoles(RoleManager<IdentityRole> roleManager)
+
+        private static async Task CreateRolesAsync(RoleManager<IdentityRole> roleManager)
         {
-            string[] roleNames = { "Representative", "Admin" ,"StoreKeeper" , "SuperAdmin" , "Accountant" };
+            string[] roleNames = { "Admin", "HR", "Representative", "Storekeeper", "Accountant", "SuperAdmin" };
             foreach (var roleName in roleNames)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))
                 {
                     await roleManager.CreateAsync(new IdentityRole(roleName));
                 }
-
             }
         }
     }

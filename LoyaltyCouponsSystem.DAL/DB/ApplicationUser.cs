@@ -10,7 +10,7 @@ namespace LoyaltyCouponsSystem.DAL.DB
 {
     public class ApplicationUser : IdentityUser
     {
-        public string? FullName { get; set ; }
+        public string FullName { get; set; }         // This will also be used as the UserName.
         public string? Role { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Governorate { get; set; }

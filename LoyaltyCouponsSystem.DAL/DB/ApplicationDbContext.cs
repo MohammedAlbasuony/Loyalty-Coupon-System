@@ -7,11 +7,8 @@ namespace LoyaltyCouponsSystem.DAL.DB
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-
-        }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
@@ -33,17 +30,22 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.HasKey(l => new { l.LoginProvider, l.ProviderKey });
             });
 
+            // Ensure NationalID is unique
+            modelBuilder.Entity<ApplicationUser>()
+                .HasIndex(u => u.NationalID)
+                .IsUnique();
+
             modelBuilder.Entity<Admin>()
-               .HasOne(d => d.ApplicationUser)
-               .WithOne(au => au.Admin)
-               .HasForeignKey<Admin>(d => d.ApplicationUserId)
-               .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(d => d.ApplicationUser)
+                .WithOne(au => au.Admin)
+                .HasForeignKey<Admin>(d => d.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Representative>()
-               .HasOne(d => d.ApplicationUser)
-               .WithOne(au => au.Representative)
-               .HasForeignKey<Representative>(d => d.ApplicationUserId)
-               .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(d => d.ApplicationUser)
+                .WithOne(au => au.Representative)
+                .HasForeignKey<Representative>(d => d.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Customer>(entity =>
             {
@@ -58,8 +60,8 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.Property(e => e.TransactionType).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.PurchaseAmount).HasColumnType("decimal(18,2)");
                 entity.HasOne(e => e.Customer)
-                      .WithMany(c => c.Transactions)
-                      .HasForeignKey(e => e.CustomerID);
+                    .WithMany(c => c.Transactions)
+                    .HasForeignKey(e => e.CustomerID);
             });
 
             modelBuilder.Entity<Coupon>(entity =>
@@ -93,15 +95,13 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             });
 
-            
             modelBuilder.Entity<AuditLog>(entity =>
             {
                 entity.HasKey(e => e.AuditLogID);
                 entity.Property(e => e.Action).IsRequired().HasMaxLength(200);
             });
-
-           
         }
+
         public override int SaveChanges()
         {
             var entries = ChangeTracker.Entries()
