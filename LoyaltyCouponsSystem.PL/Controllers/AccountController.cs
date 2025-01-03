@@ -55,21 +55,33 @@
             {
                 if (ModelState.IsValid)
                 {
-                    ApplicationUser users = new ApplicationUser
+                    ApplicationUser user = new ApplicationUser
                     {
                         FullName = model.Name,
-                        Email = model.Email,
-                        UserName = model.Email,
+                        PhoneNumber = model.PhoneNumber,
+                        UserName = model.PhoneNumber, // Using PhoneNumber as UserName
+                        Governorate = model.Governorate,
+                        City = model.City,
+                        NationalID = model.NationalID
                     };
 
-                    var result = await userManager.CreateAsync(users, model.Password);
+                    var result = await userManager.CreateAsync(user, model.Password);
 
                     if (result.Succeeded)
                     {
-                          
-                            var resultrole = await userManager.AddToRoleAsync(users, "REPRESENTATIVE");
-                         
-                        return RedirectToAction("Login", "Account");
+                        var roleResult = await userManager.AddToRoleAsync(user, "REPRESENTATIVE");
+
+                        if (roleResult.Succeeded)
+                        {
+                            return RedirectToAction("Login", "Account");
+                        }
+                        else
+                        {
+                            foreach (var error in roleResult.Errors)
+                            {
+                                ModelState.AddModelError("", error.Description);
+                            }
+                        }
                     }
                     else
                     {
@@ -77,12 +89,12 @@
                         {
                             ModelState.AddModelError("", error.Description);
                         }
-
-                        return View(model);
                     }
                 }
+
                 return View(model);
             }
+
 
             public IActionResult VerifyEmail()
             {
