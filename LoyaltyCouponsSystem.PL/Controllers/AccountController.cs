@@ -6,6 +6,7 @@
     using LoyaltyCouponsSystem.DAL.Migrations;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
 
     namespace UsersApp.Controllers
     {
@@ -55,46 +56,53 @@
             {
                 if (ModelState.IsValid)
                 {
-                    ApplicationUser user = new ApplicationUser
+                    // Check if NationalID already exists
+                    var existingUser = await userManager.Users.FirstOrDefaultAsync(u => u.NationalID == model.NationalID);
+                    if (existingUser != null)
+                    {
+                        ModelState.AddModelError("NationalID", "The National ID is already in use.");
+                        return View(model);
+                    }
+
+                    var user = new ApplicationUser
                     {
                         FullName = model.Name,
                         PhoneNumber = model.PhoneNumber,
-                        UserName = model.PhoneNumber, // Using PhoneNumber as UserName
                         Governorate = model.Governorate,
                         City = model.City,
-                        NationalID = model.NationalID
+                        NationalID = model.NationalID,
+                        Role = model.Role,
+                        UserName = model.Name // or any desired logic
                     };
 
                     var result = await userManager.CreateAsync(user, model.Password);
 
                     if (result.Succeeded)
                     {
-                        var roleResult = await userManager.AddToRoleAsync(user, "REPRESENTATIVE");
+                        await userManager.AddToRoleAsync(user, model.Role);
 
-                        if (roleResult.Succeeded)
-                        {
-                            return RedirectToAction("Login", "Account");
-                        }
-                        else
-                        {
-                            foreach (var error in roleResult.Errors)
-                            {
-                                ModelState.AddModelError("", error.Description);
-                            }
-                        }
+                        ViewBag.RegistrationSuccess = true;
+                        return View("Register");
                     }
                     else
                     {
                         foreach (var error in result.Errors)
                         {
-                            ModelState.AddModelError("", error.Description);
+                            ModelState.AddModelError(string.Empty, error.Description);
                         }
                     }
                 }
 
+                ViewBag.RegistrationSuccess = false;
                 return View(model);
             }
 
+            [HttpGet]
+            public async Task<IActionResult> CheckNationalID(string nationalID)
+            {
+                var exists = await userManager.Users.AnyAsync(u => u.NationalID == nationalID);
+                return Json(new { isUnique = !exists });
+            }
 
             public IActionResult VerifyEmail()
             {

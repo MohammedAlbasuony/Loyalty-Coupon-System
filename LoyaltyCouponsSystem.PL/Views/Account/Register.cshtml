@@ -15,79 +15,175 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label asp-for="Name" class="form-label" style="font-weight: 600; color: #333;"></label>
-                        <input asp-for="Name" class="form-control" style="border: 1px solid #ddd; border-radius: 10px; padding: 8px;" />
+                        <label asp-for="Name" class="form-label">Name</label>
+                        <input asp-for="Name" class="form-control" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
-
                     <div class="col-md-6 mb-3">
-                        <label asp-for="PhoneNumber" class="form-label" style="font-weight: 600; color: #333;"></label>
+                        <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
                         <div class="input-group">
-                            <span class="input-group-text" style="background-color: #f8f9fa; border: 1px solid #ddd; border-radius: 10px 0 0 10px;">+20</span>
-                            <input asp-for="PhoneNumber" class="form-control" style="border: 1px solid #ddd; border-radius: 0 10px 10px 0; padding: 8px;" />
+                            <span class="input-group-text">+20</span>
+                            <input asp-for="PhoneNumber" class="form-control" />
                         </div>
                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                     </div>
-
                     <div class="col-md-6 mb-3">
-                        <label asp-for="Governorate" class="form-label" style="font-weight: 600; color: #333;"></label>
-                        <input asp-for="Governorate" class="form-control" style="border: 1px solid #ddd; border-radius: 10px; padding: 8px;" />
+                        <label asp-for="Governorate" class="form-label">Governorate</label>
+                        <input asp-for="Governorate" class="form-control" />
                         <span asp-validation-for="Governorate" class="text-danger"></span>
                     </div>
-
                     <div class="col-md-6 mb-3">
-                        <label asp-for="City" class="form-label" style="font-weight: 600; color: #333;"></label>
-                        <input asp-for="City" class="form-control" style="border: 1px solid #ddd; border-radius: 10px; padding: 8px;" />
+                        <label asp-for="City" class="form-label">City</label>
+                        <input asp-for="City" class="form-control" />
                         <span asp-validation-for="City" class="text-danger"></span>
                     </div>
-
                     <div class="col-md-6 mb-3">
-                        <label asp-for="NationalID" class="form-label" style="font-weight: 600; color: #333;"></label>
-                        <input asp-for="NationalID" class="form-control" style="border: 1px solid #ddd; border-radius: 10px; padding: 8px;" />
+                        <label asp-for="NationalID" class="form-label">National ID</label>
+                        <input asp-for="NationalID" class="form-control" />
                         <span asp-validation-for="NationalID" class="text-danger"></span>
                     </div>
-
                     <div class="col-md-6 mb-3">
-                        <label asp-for="Password" class="form-label" style="font-weight: 600; color: #333;"></label>
-                        <input asp-for="Password" class="form-control" type="password" style="border: 1px solid #ddd; border-radius: 10px; padding: 8px;" />
+                        <label asp-for="Role" class="form-label">Role</label>
+                        <select asp-for="Role" class="form-select" required>
+                            <option value="" disabled selected>Select Role</option>
+                            <option value="Admin">Admin</option>
+                            <option value="HR">HR</option>
+                            <option value="Representative">Representative</option>
+                            <option value="Storekeeper">Storekeeper</option>
+                            <option value="Accountant">Accountant</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <input asp-for="Password" class="form-control" type="password" />
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
-
-                    <div class="col-md-12 mb-3">
-                        <label asp-for="ConfirmPassword" class="form-label" style="font-weight: 600; color: #333;"></label>
-                        <input asp-for="ConfirmPassword" class="form-control" type="password" style="border: 1px solid #ddd; border-radius: 10px; padding: 8px;" />
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+                        <input asp-for="ConfirmPassword" class="form-control" type="password" />
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 py-2 mt-3" style="border-radius: 20px; font-size: 1rem; background-color: #1b6ec2; border: none;">
-                    Register
-                </button>
+                <button type="submit" class="btn btn-primary w-100 py-2 mt-3">Register</button>
+
                 <div class="text-center mt-4">
                     <p style="font-size: 0.9rem; font-weight: 600; color: #333;">
                         Already have an account?
                         <a asp-controller="Account" asp-action="Login" class="text-decoration-none"
-                           style="color: #1b6ec2; font-weight: bold; transition: color 0.3s;"
-                           onmouseover="this.style.color='#004a91';"
-                           onmouseout="this.style.color='#1b6ec2';">
+                           style="color: #1b6ec2; font-weight: bold; transition: color 0.3s;">
                             Login
                         </a>
                     </p>
                     <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary mt-2"
-                       style="font-size: 0.85rem; font-weight: 600; border-radius: 30px; padding: 8px 20px; transition: all 0.3s;"
-                       onmouseover="this.style.backgroundColor='#1b6ec2'; this.style.color='white';"
-                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#1b6ec2';">
+                       style="font-size: 0.85rem; font-weight: 600; border-radius: 30px; padding: 8px 20px;">
                         Back
                     </a>
                 </div>
-
             </form>
         </div>
     </div>
 </div>
 
-
+@if (ViewBag.RegistrationSuccess == true)
+{
+    <div class="modal fade show" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-modal="true" role="dialog" style="display: block;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="checkmark-circle">
+                        <div class="checkmark"></div>
+                    </div>
+                    <h5 class="mb-3" style="color: #1b6ec2; font-weight: bold;">Registration Pending</h5>
+                    <p>Your registration request has been successfully submitted and is pending approval by the super admin.</p>
+                </div>
+                <div class="modal-footer">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">OK</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial.cshtml")
+    <style>
+        .modal-content {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: none;
+        }
+
+        .checkmark-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #28a745;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .checkmark-circle:after {
+            content: '';
+            width: 20px;
+            height: 40px;
+            border: solid white;
+            border-width: 0 5px 5px 0;
+            position: absolute;
+            transform: rotate(45deg);
+        }
+
+        .btn-primary {
+            background-color: #1b6ec2;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 10px 30px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #14548a;
+        }
+
+        .modal-body {
+            padding: 20px 30px;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .modal-footer {
+            border: none;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (@ViewBag.RegistrationSuccess == true) {
+                const modal = new bootstrap.Modal(document.getElementById("successModal"));
+                modal.show();
+            }
+        });
+
+         document.getElementById("NationalID").addEventListener("blur", function() {
+        const nationalID = this.value;
+
+        fetch(`/api/check-national-id?nationalID=${nationalID}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.isUnique) {
+                    alert("This National ID is already in use.");
+                }
+            });
+    });
+
+    </script>
 }
