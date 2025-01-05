@@ -22,20 +22,36 @@
                 </button>
                 <div class="collapse navbar-collapse justify-content-end">
                     <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="btn btn-outline-primary me-2" href="@Url.Action("Login", "Account")"
-                               style="color: #0060af; border-color: #0060af; font-size: 16px; height: 45px; padding: 0 25px; border-radius: 30px; line-height: 42px; font-weight: 500;"
-                               onmouseover="this.style.backgroundColor='#0060af'; this.style.color='white';"
-                               onmouseout="this.style.backgroundColor='transparent'; this.style.color='#0060af';">
-                                Login
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-primary" href="@Url.Action("Register", "Account")"
-                               style="background-color: #0060af; border-color: #0060af; font-size: 16px; height: 45px; padding: 0 25px; border-radius: 30px; line-height: 42px; font-weight: 500; color: white;">
-                                Register
-                            </a>
-                        </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <!-- Show Log Out Button if Logged In -->
+                            <li class="nav-item">
+                                <form action="/Account/Logout" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger"
+                                            style="background-color: #dc3545; font-size: 16px; height: 45px; padding: 0 25px; border-radius: 30px; line-height: 42px; font-weight: 500; color: white;">
+                                        <i class="fas fa-sign-out-alt"></i> Log Out
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- Show Login and Register Buttons if Not Logged In -->
+                            <li class="nav-item">
+                                <a class="btn btn-outline-primary me-2" href="@Url.Action("Login", "Account")"
+                                   style="color: #0060af; border-color: #0060af; font-size: 16px; height: 45px; padding: 0 25px; border-radius: 30px; line-height: 42px; font-weight: 500;"
+                                   onmouseover="this.style.backgroundColor='#0060af'; this.style.color='white';"
+                                   onmouseout="this.style.backgroundColor='transparent'; this.style.color='#0060af';">
+                                    Login
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary" href="@Url.Action("Register", "Account")"
+                                   style="background-color: #0060af; border-color: #0060af; font-size: 16px; height: 45px; padding: 0 25px; border-radius: 30px; line-height: 42px; font-weight: 500; color: white;">
+                                    Register
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
