@@ -4,9 +4,8 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Account
 {
     public class VerifyEmailViewModel
     {
-        [Required(ErrorMessage = "Email is required.")]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Required(ErrorMessage = "Name is required.")]
+        public string Name { get; set; }
     }
 }
 

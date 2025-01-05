@@ -31,7 +31,7 @@
             {
                 if (ModelState.IsValid)
                 {
-                    var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                    var result = await signInManager.PasswordSignInAsync(model.Name, model.Password, model.RememberMe, false);
 
                     if (result.Succeeded)
                     {
@@ -39,7 +39,7 @@
                     }
                     else
                     {
-                        ModelState.AddModelError("", "Email or password is incorrect.");
+                        ModelState.AddModelError("", "Invalid login credentials. Please try again!");
                         return View(model);
                     }
                 }
@@ -114,7 +114,7 @@
             {
                 if (ModelState.IsValid)
                 {
-                    var user = await userManager.FindByNameAsync(model.Email);
+                    var user = await userManager.FindByNameAsync(model.Name);
 
                     if (user == null)
                     {
@@ -135,7 +135,7 @@
                 {
                     return RedirectToAction("VerifyEmail", "Account");
                 }
-                return View(new ChangePasswordViewModel { Email = username });
+                return View(new ChangePasswordViewModel { Name = username });
             }
 
             [HttpPost]
@@ -143,7 +143,7 @@
             {
                 if (ModelState.IsValid)
                 {
-                    var user = await userManager.FindByNameAsync(model.Email);
+                    var user = await userManager.FindByNameAsync(model.Name);
                     if (user != null)
                     {
                         var result = await userManager.RemovePasswordAsync(user);
