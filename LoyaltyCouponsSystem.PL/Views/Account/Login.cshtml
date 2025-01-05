@@ -6,39 +6,50 @@
     Layout = "~/Views/Shared/_AccountLayout.cshtml";
 }
 
-<div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center" style="background-image: url('/images/account-bg.jpg'); background-size: cover; background-position: center; background-repeat: repeat-y;">
-    <div class="card shadow-lg border-0" style="max-width: 500px; width: 100%; opacity: 0.9;">
+<div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center" style="background: linear-gradient(135deg, #1b6ec2, #87ceeb);">
+    <div class="card shadow border-0" style="max-width: 600px; width: 100%; background-color: rgba(255, 255, 255, 0.95); border-radius: 15px;">
         <div class="card-body p-4">
-            <h2 class="text-center mb-4">Login</h2>
+            <h2 class="text-center mb-4" style="color: #1b6ec2; font-weight: 700;">Login</h2>
             <form asp-action="Login" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="mb-3">
-                    <label asp-for="Email" class="form-label"></label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Name" class="form-label">Name</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <input asp-for="Password" class="form-control" type="password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <div class="form-check">
+                            <input asp-for="RememberMe" class="form-check-input" />
+                            <label asp-for="RememberMe" class="form-check-label">Remember me?</label>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label asp-for="Password" class="form-label"></label>
-                    <input asp-for="Password" class="form-control" type="password" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
+
+                <input type="submit" value="Login" class="btn btn-primary btn-login w-100 py-2 mt-3" />
+
+                <div class="text-center mt-4">
+                    <a asp-controller="Account" asp-action="VerifyEmail" class="text-decoration-none" style="color: #1b6ec2; font-weight: bold;">Forgot password?</a>
                 </div>
-                <div class="float-end">
-                    <a asp-controller="Account" asp-action="VerifyEmail" class="text-decoration-none">
-                        Forgot password?
+
+                <div class="text-center mt-4">
+                    <p style="font-size: 0.9rem; font-weight: 600; color: #333;">
+                        Don't have an account?
+                        <a asp-controller="Account" asp-action="Register" class="text-decoration-none"
+                           style="color: #1b6ec2; font-weight: bold; transition: color 0.3s;">
+                            Register
+                        </a>
+                    </p>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary mt-2"
+                       style="font-size: 0.85rem; font-weight: 600; border-radius: 30px; padding: 8px 20px;">
+                        Back
                     </a>
-                </div>
-                <div class="form-check mb-3">
-                    <label class="form-check-label">
-                        <input asp-for="RememberMe" class="form-check-input" />
-                        @Html.DisplayNameFor(a => a.RememberMe)
-                    </label>
-                </div>
-                <input type="submit" value="Login" class="btn btn-success w-100 p-2" />
-                <p class="text-center mt-2">
-                    Don't have an account? <a asp-controller="Account" asp-action="Register" class="text-decoration-none">Register</a>
-                </p>
-                <div class="text-center">
-                    <a asp-controller="Home" asp-action="Index" class="text-decoration-none mt-3">Back</a>
                 </div>
             </form>
         </div>
