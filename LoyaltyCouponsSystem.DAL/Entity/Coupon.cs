@@ -10,7 +10,9 @@ namespace LoyaltyCouponsSystem.DAL.Entity
     {
         public int CouponID { get; set; }
         public string UniqueIdentifier { get; set; } 
-        public string Status { get; set; } 
+        public string Status { get; set; }
+        public string? CouponSort { get; set; }  
+        public string? CouponType { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime? ClosureDate { get; set; }
         public ICollection<Representative> Representatives { get; set; } 
