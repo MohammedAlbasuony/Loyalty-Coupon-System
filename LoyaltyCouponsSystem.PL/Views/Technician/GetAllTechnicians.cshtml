@@ -1,0 +1,34 @@
+﻿@using LoyaltyCouponsSystem.BLL.ViewModel.Technician
+@model List<TechnicianViewModel>
+
+@{
+    ViewData["Title"] = "All Technicians";
+}
+
+<h1>All Technicians</h1>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Contact Details</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var technician in Model)
+        {
+            <tr>
+                <td>@technician.Code</td>
+                <td>@technician.Name</td>
+                <td>@technician.ContactDetails</td>
+                <td>
+                    <a href="@Url.Action("GetTechnicianById", "Technician", new { id = technician.Code })" class="btn btn-info">View</a>
+                    <a href="@Url.Action("UpdateTechnician", "Technician", new { id = technician.Code })" class="btn btn-warning">Edit</a>
+                    <a href="@Url.Action("DeleteTechnician", "Technician", new { id = technician.Code })" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

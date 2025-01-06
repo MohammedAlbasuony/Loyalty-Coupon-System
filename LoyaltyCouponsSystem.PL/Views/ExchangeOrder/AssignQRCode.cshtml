@@ -1,0 +1,98 @@
+﻿@using LoyaltyCouponsSystem.BLL.ViewModel.Customer_and_Technician
+@model AssignmentViewModel
+
+@{
+    ViewData["Title"] = "Assign QR Codes";
+}
+
+<form asp-action="AssignQRCode" method="post">
+    <!-- Customer Dropdown -->
+    <div class="form-group">
+        <label for="CustomerCodeOrName">Select Customer</label>
+        <select name="SelectedCustomerCode" class="form-control">
+            <option value="">Select Customer</option>
+            @foreach (var customer in Model.Customers)
+            {
+                <option value="@customer.Value">@customer.Text</option>
+            }
+        </select>
+    </div>
+
+    <!-- Technician Dropdown -->
+    <div class="form-group">
+        <label for="TechnicianCodeOrName">Select Technician</label>
+        <select name="SelectedTechnicianCode" class="form-control">
+            <option value="">Select Technician</option>
+            @foreach (var technician in Model.Technicians)
+            {
+                <option value="@technician.Value">@technician.Text</option>
+            }
+        </select>
+    </div>
+
+    <!-- Governate Dropdown -->
+    <div class="form-group">
+        <label for="Governate">Select Governate</label>
+        <select name="SelectedGovernate" class="form-control" id="Governate">
+            <option value="">Select Governate</option>
+            @foreach (var governate in Model.Governates)
+            {
+                <option value="@governate.Value">@governate.Text</option>
+            }
+        </select>
+    </div>
+
+    <!-- City Dropdown -->
+    <div class="form-group">
+        <label for="City">Select City</label>
+        <select name="SelectedCity" class="form-control" id="City">
+            <option value="">Select City</option>
+            @foreach (var city in Model.Cities)
+            {
+                <option value="@city.Value">@city.Text</option>
+            }
+        </select>
+    </div>
+
+    <!-- Coupon Sort Dropdown -->
+    <div class="form-group">
+        <label for="CouponSort">Coupon Sort</label>
+        <select name="CouponSort" class="form-control">
+            <option value="">Select Coupon Sort</option>
+            @foreach (var sort in Model.CouponSorts)
+            {
+                <option value="@sort.Value">@sort.Text</option>
+            }
+        </select>
+    </div>
+
+    <!-- Coupon Type Dropdown -->
+    <div class="form-group">
+        <label for="CouponType">Coupon Type</label>
+        <select name="CouponType" class="form-control">
+            <option value="">Select Coupon Type</option>
+            @foreach (var type in Model.CouponTypes)
+            {
+                <option value="@type.Value">@type.Text</option>
+            }
+        </select>
+    </div>
+
+    <!-- Sequence Number Inputs -->
+    <div class="form-group">
+        <label for="StartSequenceNumber">Start Sequence Number</label>
+        <input type="number" name="StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" />
+    </div>
+    <div class="form-group">
+        <label for="EndSequenceNumber">End Sequence Number</label>
+        <input type="number" name="EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" />
+    </div>
+
+    <!-- Exchange Permission Input -->
+    <div class="form-group">
+        <label for="ExchangePermission">Exchange Permission</label>
+        <input type="text" name="ExchangePermission" class="form-control" placeholder="Enter exchange permission" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Assign</button>
+</form>
