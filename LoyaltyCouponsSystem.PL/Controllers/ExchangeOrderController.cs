@@ -64,8 +64,8 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             // Fetch all customers, technicians, governates, and cities
             var customers = await _context.Customers.ToListAsync();
             var technicians = await _context.Technicians.ToListAsync();
-            var governates = await _context.Governates.ToListAsync(); // Assuming you have a Governates table
-            var cities = await _context.Cities.ToListAsync(); // Assuming you have a Cities table
+            //var governates = await _context.Governates.ToListAsync(); // Assuming you have a Governates table
+            //var cities = await _context.Cities.ToListAsync(); // Assuming you have a Cities table
 
             // Create and populate the model
             var model = new AssignmentViewModel
@@ -80,16 +80,16 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     Value = t.Code,
                     Text = $"{t.Name} ({t.Code})"
                 }).ToList(),
-                Governates = governates.Select(g => new SelectListItem
-                {
-                    Value = g.Code,
-                    Text = g.Name
-                }).ToList(),
-                Cities = cities.Select(ci => new SelectListItem
-                {
-                    Value = ci.Code,
-                    Text = ci.Name
-                }).ToList(),
+                //Governates = governates.Select(g => new SelectListItem
+                //{
+                //    Value = g.Code,
+                //    Text = g.Name
+                //}).ToList(),
+                //Cities = cities.Select(ci => new SelectListItem
+                //{
+                //    Value = ci.Code,
+                //    Text = ci.Name
+                //}).ToList(),
                 CouponSorts = new List<SelectListItem>
         {
             new SelectListItem { Value = "اختبار", Text = "كعب إختبار" },
