@@ -1,7 +1,6 @@
-﻿
-
-using LoyaltyCouponsSystem.DAL.DB;
+﻿using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,13 +18,14 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             _context = context;
         }
 
-        public long GetNextNumInYear()
+        // تحويل هذه الدالة لتعمل بشكل غير متزامن
+        public async Task<long> GetNextNumInYearAsync()
         {
             int currentYear = DateTime.Now.Year;
 
             // Check if the year exists
-            var globalCounter = _context.GlobalCounters
-                .SingleOrDefault(gc => gc.YearNotId == currentYear);
+            var globalCounter = await _context.GlobalCounters
+                .SingleOrDefaultAsync(gc => gc.YearNotId == currentYear);
 
             if (globalCounter == null)
             {
@@ -33,11 +33,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 globalCounter = new GlobalCounter
                 {
                     YearNotId = currentYear,
-                    MaXNumberInYear=1
-                    
-                     
+                    MaXNumberInYear = 1
                 };
-                _context.GlobalCounters.Add(globalCounter);
+                await _context.GlobalCounters.AddAsync(globalCounter);
             }
             else
             {
@@ -45,17 +43,19 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 globalCounter.MaXNumberInYear++;
             }
 
-            _context.SaveChanges(); // Save changes to the database
+            await _context.SaveChangesAsync(); // Save changes to the database asynchronously
 
             return globalCounter.MaXNumberInYear;
         }
-        public long GetNextSerialNumInYear()
+
+        // تحويل هذه الدالة لتعمل بشكل غير متزامن
+        public async Task<long> GetNextSerialNumInYearAsync()
         {
             int currentYear = DateTime.Now.Year;
 
             // Check if the year exists
-            var globalCounter = _context.GlobalCounters
-                .SingleOrDefault(gc => gc.YearNotId == currentYear);
+            var globalCounter = await _context.GlobalCounters
+                .SingleOrDefaultAsync(gc => gc.YearNotId == currentYear);
 
             if (globalCounter == null)
             {
@@ -63,11 +63,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 globalCounter = new GlobalCounter
                 {
                     YearNotId = currentYear,
-              
                     MaxSerialNumber = 1
-
                 };
-                _context.GlobalCounters.Add(globalCounter);
+                await _context.GlobalCounters.AddAsync(globalCounter);
             }
             else
             {
@@ -75,27 +73,28 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 globalCounter.MaxSerialNumber++;
             }
 
-            _context.SaveChanges(); // Save changes to the database
+            await _context.SaveChangesAsync(); // Save changes to the database asynchronously
 
             return globalCounter.MaxSerialNumber;
         }
-        public long UpdateMaxSerialNum(int Count)
+
+        // تحويل هذه الدالة لتعمل بشكل غير متزامن
+        public async Task<long> UpdateMaxSerialNumAsync(int count)
         {
             int currentYear = DateTime.Now.Year;
 
             // Check if the year exists
-            var globalCounter = _context.GlobalCounters
-                .SingleOrDefault(gc => gc.YearNotId == currentYear);
+            var globalCounter = await _context.GlobalCounters
+                .SingleOrDefaultAsync(gc => gc.YearNotId == currentYear);
 
-           // Increment the counter
-              globalCounter.MaxSerialNumber+=Count;
-           
+            if (globalCounter != null)
+            {
+                // Increment the counter
+                globalCounter.MaxSerialNumber += count;
+                await _context.SaveChangesAsync(); // Save changes to the database asynchronously
+            }
 
-            _context.SaveChanges(); // Save changes to the database
-
-            return globalCounter.MaxSerialNumber;
+            return globalCounter?.MaxSerialNumber ?? 0; // Ensure we return a valid number
         }
-
-
     }
 }

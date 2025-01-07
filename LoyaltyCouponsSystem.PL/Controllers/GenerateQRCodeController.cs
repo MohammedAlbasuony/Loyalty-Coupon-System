@@ -7,7 +7,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.PL.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
@@ -18,44 +18,39 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         private readonly IQRCodeGeneratorHelper _QRCodeGeneratorHelper;
         private readonly ApplicationDbContext _context;
 
-
-        public GenerateQRCodeController(ILogger<GenerateQRCodeController> logger, IQRCodeGeneratorHelper QRCodeGeneratorHelper, ApplicationDbContext context)
+        public GenerateQRCodeController(
+            ILogger<GenerateQRCodeController> logger,
+            IQRCodeGeneratorHelper QRCodeGeneratorHelper,
+            ApplicationDbContext context)
         {
             _logger = logger;
             _QRCodeGeneratorHelper = QRCodeGeneratorHelper;
             _context = context;
         }
-      
-      
 
-
-        public IActionResult GetAreas(int governorateId)
+        public async Task<IActionResult> GetAreas(int governorateId)
         {
-            var Areas = _context.Areas
+            var areas = await _context.Areas
+                .Where(d => d.GovernateId == governorateId)
+                .Select(d => new { d.Id, d.Name })
+                .ToListAsync();
 
-                                    .Where(d => d.GovernateId == governorateId)
-                                    .Select(d => new { d.Id, d.Name })
-                                    .ToList();
-            return Ok(Areas);
+            return Ok(areas);
         }
 
-        public IActionResult GetAllCupones()
+        public async Task<IActionResult> GetAllCupones()
         {
-
-            var Result = _context.Coupons.ToList();
-            return View(Result);
+            var result = await _context.Coupons.ToListAsync();
+            return View(result);
         }
-
-      
 
         [HttpGet]
-        public IActionResult GenerateCouponsPDF(
-    List<(byte[], string)> couponImages,
-    int couponsPerRow,
-    float horizontalSpacing,
-    float verticalSpacing,
-    float couponSize
-    )
+        public async Task<IActionResult> GenerateCouponsPDF(
+            List<(byte[], string)> couponImages,
+            int couponsPerRow,
+            float horizontalSpacing,
+            float verticalSpacing,
+            float couponSize)
         {
             if (couponImages == null || !couponImages.Any())
             {
@@ -64,11 +59,9 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             try
             {
-                clsGeneratePdfWithCupones generatePdfWithCupones = new clsGeneratePdfWithCupones();
-
-
-
-                byte[] pdfData = generatePdfWithCupones.GeneratePDFWithCoupons(couponImages, couponsPerRow, horizontalSpacing, verticalSpacing, couponSize);
+                var generatePdfWithCupones = new clsGeneratePdfWithCupones();
+                byte[] pdfData = await generatePdfWithCupones.GeneratePDFWithCouponsAsync(
+                    couponImages, couponsPerRow, horizontalSpacing, verticalSpacing, couponSize);
 
                 return File(pdfData, "application/pdf", "Coupons.pdf");
             }
@@ -78,124 +71,71 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
         }
 
-
-
-
-
         [HttpGet]
-        public IActionResult GetMaxSerialNumber()
+        public async Task<IActionResult> GetMaxSerialNumber()
         {
-            ServiceToMangeCounters serviceToMangeCounters = new ServiceToMangeCounters(_context);
+            var serviceToMangeCounters = new ServiceToMangeCounters(_context);
+            var maxSerialNumber = await serviceToMangeCounters.GetNextSerialNumInYearAsync();
 
-            var MaxSerialNumber = serviceToMangeCounters.GetNextSerialNumInYear();
-           
-
-            return Json(MaxSerialNumber);
+            return Json(maxSerialNumber);
         }
 
-        public IActionResult DetailsOfCoupones()
-        
-        
-        
+        public async Task<IActionResult> DetailsOfCoupones()
         {
-            var ViewModel = new QRCodeDetailsViewModel
+            var viewModel = new QRCodeDetailsViewModel
             {
-                governorates = _context.Governorates.ToList()
-
-
+                governorates = await _context.Governorates.ToListAsync()
             };
-            return View(ViewModel);
-        }
 
+            return View(viewModel);
+        }
 
         [HttpPost]
-        public IActionResult DetailsOfCoupones(QRCodeDetailsViewModel DetailsVM)
+        public async Task<IActionResult> DetailsOfCoupones(QRCodeDetailsViewModel detailsVM)
         {
-
-            if (DetailsVM == null)
+            if (detailsVM == null)
             {
                 return BadRequest("Details are missing.");
             }
 
-            //List Of QRCodes Model
-            List<(Coupon, string)> QRCodesList = new List<(Coupon, string)>();
-            
-            ServiceToMangeCounters serviceToMangeCounters = new ServiceToMangeCounters(_context);
-
+            // قائمة الـ QR Codes
+            var qrCodesList = new List<(Coupon, string)>();
+            var serviceToMangeCounters = new ServiceToMangeCounters(_context);
             int currentYear = DateTime.Now.Year;
 
-            //Mapping 
-
-            for (int i = 0; i < DetailsVM.Count; i++)
+            // إنشاء الكوبونات
+            for (int i = 0; i < detailsVM.Count; i++)
             {
-                Coupon CouponDetails = new Coupon
+                var couponDetails = new Coupon
                 {
-                    TypeOfCoupone = DetailsVM.TypeOfCoupon,
-                    
-                    Value = DetailsVM.Value,
-                    GovernorateId = DetailsVM.GovernorateId,
-                    AreaId = DetailsVM.AreaId,
-                    NumInYear = serviceToMangeCounters.GetNextNumInYear(),
-                    SerialNumber = DetailsVM.SerialNumber + i
-
+                    TypeOfCoupone = detailsVM.TypeOfCoupon,
+                    Value = detailsVM.Value,
+                    GovernorateId = detailsVM.GovernorateId,
+                    AreaId = detailsVM.AreaId,
+                    NumInYear = await serviceToMangeCounters.GetNextNumInYearAsync(),
+                    SerialNumber = detailsVM.SerialNumber + i
                 };
 
-                
-                _context.Coupons.Add(CouponDetails);
-                _context.SaveChanges();
-                QRCodesList.Add((CouponDetails, (Convert.ToString(currentYear) + Convert.ToString(DetailsVM.SerialNumber + i))));
-
+                await _context.Coupons.AddAsync(couponDetails);
+                await _context.SaveChangesAsync();
+                qrCodesList.Add((couponDetails, $"{currentYear}{detailsVM.SerialNumber + i}"));
             }
-            serviceToMangeCounters.UpdateMaxSerialNum(DetailsVM.Count);
 
+            await serviceToMangeCounters.UpdateMaxSerialNumAsync(detailsVM.Count);
 
-
-           // Build Base URL
-           GenerateListOfCoupons generateListOfCoupons = new GenerateListOfCoupons();
-
+            // إنشاء QR Codes
+            var generateListOfCoupons = new GenerateListOfCoupons();
             string baseUrl = $"{Request.Scheme}://{Request.Host}";
-            List<(byte[], string)> QRCodesAsBytes = generateListOfCoupons.GenerateQRCodes(QRCodesList, baseUrl);
+            var qrCodesAsBytes = generateListOfCoupons.GenerateQRCodesAsync(qrCodesList, baseUrl);
 
-
-            //var CodesAsPDF= GenerateCouponsPDF(QRCodesAsBytes,DetailsVM.CouponsPerRow, DetailsVM.HorizontalSpacing, DetailsVM.VerticalSpacing, DetailsVM.CouponWidth, DetailsVM.CouponHeight);
-
-
-            return GenerateCouponsPDF(QRCodesAsBytes, DetailsVM.CouponsPerRow, DetailsVM.HorizontalSpacing, DetailsVM.VerticalSpacing, DetailsVM.CouponSize);
-            
+            // إنشاء ملف PDF من QR Codes
+            return await GenerateCouponsPDF(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
         }
-
 
         public IActionResult Index()
         {
             return View();
         }
-        // Endpoint To Can Trake QR 
-        //[HttpGet("track")]
-        //public IActionResult Track(string ID)
-        //{
-        //    var scanLog = new QRScanLog
-        //    {
-        //        QR_ID = ID,
-        //        ScanTime = DateTime.UtcNow,
-        //        UserIP = HttpContext.Connection.RemoteIpAddress.ToString(),
-        //        UserAgent = Request.Headers["User-Agent"].ToString(),
-        //        NumberOfScans = _context.QRScanLogs.Count(q => q.QR_ID == ID) + 1 //we want to handel this ==>done
-
-        //    };
-
-        //    _context.QRScanLogs.Add(scanLog);
-        //    _context.SaveChanges();
-
-        //    return Redirect("https://example.com"); //Redirect To What You Need
-        //}
-
-        //// Show Stats
-        //public IActionResult Stats()
-        //{
-        //    var logs = _context.QRScanLogs.ToList();
-        //    return View(logs);
-        //}
-
 
         public IActionResult Privacy()
         {

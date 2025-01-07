@@ -9,11 +9,10 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
 {
     public interface IQRCodeGeneratorHelper
     {
-        //This take Details of QrCode like,IdUniqe with guid value,Region,
-        //year,number in year description
-        //and return qrcode as array of byte  
-        //and this QRCode contain on URL this when you Scan will open it 
-        //this URL is BaseUrl +Id
-        byte[] GenerateQRCode(Coupon Details, string baseUrl);
+        // This method generates a QR Code asynchronously.
+        // It takes details of the QR Code (like Id, region, year, number in the year) and returns the QR Code as a byte array.
+        // The QR Code contains a URL that when scanned opens a page.
+        // This URL is the BaseUrl + Id.
+        Task<byte[]> GenerateQRCodeAsync(Coupon Details, string baseUrl);
     }
 }
