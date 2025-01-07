@@ -19,7 +19,6 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public DateTime CreationDateTime { get; set; } = DateTime.Now;
         public int CouponID { get; set; }
         public string UniqueIdentifier { get; set; } 
-        public string Status { get; set; }
         public string? CouponSort { get; set; }  
         public string? CouponType { get; set; }
         public DateTime CreationDate { get; set; }
