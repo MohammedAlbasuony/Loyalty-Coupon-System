@@ -1,0 +1,39 @@
+﻿@model List<LoyaltyCouponsSystem.DAL.Entity.Transaction> 
+
+@{
+    ViewData["Title"] = "All Transactions";
+}
+
+<h1>All Transactions</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Transaction ID</th>
+            <th>Customer Name</th>
+            <th>Technician Name</th>
+            <th>Coupon Type</th>
+            <th>Coupon Sort</th>
+            <th>Sequence Number</th>
+            <th>Governate</th>
+            <th>City</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transaction in Model)
+        {
+            <tr>
+                <td>@transaction.TransactionID</td>
+                <td>@transaction.Customer.Name</td> <!-- Assuming Customer has a Name property -->
+                <td>@transaction.Technician.Name</td> <!-- Assuming Technician has a Name property -->
+                <td>@transaction.CouponType</td>
+                <td>@transaction.CouponSort</td>
+                <td>@transaction.SequenceNumber</td>
+                <td>@transaction.Governate</td>
+                <td>@transaction.City</td>
+                <td>@transaction.Timestamp</td>
+            </tr>
+        }
+    </tbody>
+</table>
