@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class AddIdentityToAdminAndRepresentative : Migration
+    public partial class WithNewAttriputeForCouponeAndTemplete : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,10 +30,13 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Role_Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Governorate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NationalID = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     Imagepath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -43,7 +46,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -56,18 +58,27 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CouponTemplates",
+                name: "Coupons",
                 columns: table => new
                 {
-                    TemplateID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Branding = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DesignDetails = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CouponeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SerialNumber = table.Column<long>(type: "bigint", nullable: false),
+                    TypeOfCoupone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreationDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClosureDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    RepresentativeId = table.Column<int>(type: "int", nullable: true),
+                    TechnicianId = table.Column<int>(type: "int", nullable: true),
+                    StorekeeperID = table.Column<int>(type: "int", nullable: true),
+                    EmployeWhoGenerateID = table.Column<int>(type: "int", nullable: true),
+                    Value = table.Column<int>(type: "int", nullable: false),
+                    GovernorateId = table.Column<int>(type: "int", nullable: true),
+                    AreaId = table.Column<int>(type: "int", nullable: true),
+                    NumInYear = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CouponTemplates", x => x.TemplateID);
+                    table.PrimaryKey("PK_Coupons", x => x.CouponeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -96,6 +107,20 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Employees", x => x.EmployeeID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GlobalCounters",
+                columns: table => new
+                {
+                    Year = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MaxSerialNumber = table.Column<long>(type: "bigint", nullable: false),
+                    MaXNumberInYear = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GlobalCounters", x => x.Year);
                 });
 
             migrationBuilder.CreateTable(
@@ -269,28 +294,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Coupons",
-                columns: table => new
-                {
-                    CouponID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UniqueIdentifier = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClosureDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CouponTemplateTemplateID = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Coupons", x => x.CouponID);
-                    table.ForeignKey(
-                        name: "FK_Coupons_CouponTemplates_CouponTemplateTemplateID",
-                        column: x => x.CouponTemplateTemplateID,
-                        principalTable: "CouponTemplates",
-                        principalColumn: "TemplateID");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Transactions",
                 columns: table => new
                 {
@@ -309,6 +312,54 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         column: x => x.CustomerID,
                         principalTable: "Customers",
                         principalColumn: "CustomerID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CouponStoreKeeper",
+                columns: table => new
+                {
+                    CouponsCouponeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StoreKeepersStoreKeeperID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CouponStoreKeeper", x => new { x.CouponsCouponeId, x.StoreKeepersStoreKeeperID });
+                    table.ForeignKey(
+                        name: "FK_CouponStoreKeeper_Coupons_CouponsCouponeId",
+                        column: x => x.CouponsCouponeId,
+                        principalTable: "Coupons",
+                        principalColumn: "CouponeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CouponStoreKeeper_StoreKeepers_StoreKeepersStoreKeeperID",
+                        column: x => x.StoreKeepersStoreKeeperID,
+                        principalTable: "StoreKeepers",
+                        principalColumn: "StoreKeeperID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CouponTechnician",
+                columns: table => new
+                {
+                    CouponsCouponeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    TechniciansTechnicianID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CouponTechnician", x => new { x.CouponsCouponeId, x.TechniciansTechnicianID });
+                    table.ForeignKey(
+                        name: "FK_CouponTechnician_Coupons_CouponsCouponeId",
+                        column: x => x.CouponsCouponeId,
+                        principalTable: "Coupons",
+                        principalColumn: "CouponeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CouponTechnician_Technicians_TechniciansTechnicianID",
+                        column: x => x.TechniciansTechnicianID,
+                        principalTable: "Technicians",
+                        principalColumn: "TechnicianID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -343,71 +394,23 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 name: "CouponRepresentative",
                 columns: table => new
                 {
-                    CouponsCouponID = table.Column<int>(type: "int", nullable: false),
+                    CouponsCouponeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     RepresentativesApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CouponRepresentative", x => new { x.CouponsCouponID, x.RepresentativesApplicationUserId });
+                    table.PrimaryKey("PK_CouponRepresentative", x => new { x.CouponsCouponeId, x.RepresentativesApplicationUserId });
                     table.ForeignKey(
-                        name: "FK_CouponRepresentative_Coupons_CouponsCouponID",
-                        column: x => x.CouponsCouponID,
+                        name: "FK_CouponRepresentative_Coupons_CouponsCouponeId",
+                        column: x => x.CouponsCouponeId,
                         principalTable: "Coupons",
-                        principalColumn: "CouponID",
+                        principalColumn: "CouponeId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_CouponRepresentative_Representatives_RepresentativesApplicationUserId",
                         column: x => x.RepresentativesApplicationUserId,
                         principalTable: "Representatives",
                         principalColumn: "ApplicationUserId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CouponStoreKeeper",
-                columns: table => new
-                {
-                    CouponsCouponID = table.Column<int>(type: "int", nullable: false),
-                    StoreKeepersStoreKeeperID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CouponStoreKeeper", x => new { x.CouponsCouponID, x.StoreKeepersStoreKeeperID });
-                    table.ForeignKey(
-                        name: "FK_CouponStoreKeeper_Coupons_CouponsCouponID",
-                        column: x => x.CouponsCouponID,
-                        principalTable: "Coupons",
-                        principalColumn: "CouponID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CouponStoreKeeper_StoreKeepers_StoreKeepersStoreKeeperID",
-                        column: x => x.StoreKeepersStoreKeeperID,
-                        principalTable: "StoreKeepers",
-                        principalColumn: "StoreKeeperID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CouponTechnician",
-                columns: table => new
-                {
-                    CouponsCouponID = table.Column<int>(type: "int", nullable: false),
-                    TechniciansTechnicianID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CouponTechnician", x => new { x.CouponsCouponID, x.TechniciansTechnicianID });
-                    table.ForeignKey(
-                        name: "FK_CouponTechnician_Coupons_CouponsCouponID",
-                        column: x => x.CouponsCouponID,
-                        principalTable: "Coupons",
-                        principalColumn: "CouponID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CouponTechnician_Technicians_TechniciansTechnicianID",
-                        column: x => x.TechniciansTechnicianID,
-                        principalTable: "Technicians",
-                        principalColumn: "TechnicianID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -444,6 +447,13 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_NationalID",
+                table: "AspNetUsers",
+                column: "NationalID",
+                unique: true,
+                filter: "[NationalID] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -464,11 +474,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 name: "IX_CouponRepresentative_RepresentativesApplicationUserId",
                 table: "CouponRepresentative",
                 column: "RepresentativesApplicationUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Coupons_CouponTemplateTemplateID",
-                table: "Coupons",
-                column: "CouponTemplateTemplateID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CouponStoreKeeper_StoreKeepersStoreKeeperID",
@@ -517,6 +522,9 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 name: "CouponTechnician");
 
             migrationBuilder.DropTable(
+                name: "GlobalCounters");
+
+            migrationBuilder.DropTable(
                 name: "Transactions");
 
             migrationBuilder.DropTable(
@@ -545,9 +553,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "CouponTemplates");
         }
     }
 }

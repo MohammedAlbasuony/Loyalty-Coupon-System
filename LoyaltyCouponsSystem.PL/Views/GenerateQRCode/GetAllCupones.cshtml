@@ -1,0 +1,67 @@
+﻿@using LoyaltyCouponsSystem.DAL.Entity;
+@model IEnumerable<Coupon>
+
+@{
+    ViewData["Title"] = "GetAllCupones";
+}
+
+<h1>GetAllCupones</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TypeOfCoupone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GovernorateId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AreaId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Value)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NumInYear)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreationDateTime)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TypeOfCoupone)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.GovernorateId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AreaId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Value)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NumInYear)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreationDateTime)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.CouponeId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.CouponeId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.CouponeId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

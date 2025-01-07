@@ -1,5 +1,6 @@
 using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.Service.Implementation;
+using LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateQR;
 using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +46,10 @@ namespace LoyaltyCouponsSystem.PL
 
             // Register repositories and services
             builder.Services.AddScoped<IAdminService, AdminService>();
+
+
+            //Add service make QRCode to the container
+            builder.Services.AddScoped<IQRCodeGeneratorHelper, QRCodeGeneratorHelper>();
 
             var app = builder.Build();
 
