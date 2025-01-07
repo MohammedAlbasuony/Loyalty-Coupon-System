@@ -1,0 +1,181 @@
+﻿@using LoyaltyCouponsSystem.BLL.ViewModel.Customer_and_Technician
+@model AssignmentViewModel
+
+@{
+    ViewData["Title"] = "Assign QR Codes";
+}
+
+<form asp-action="AssignQRCode" method="post" id="assignForm">
+    <!-- Customer Dropdown -->
+    <div class="form-group">
+        <label for="CustomerCodeOrName">Select Customer</label>
+        <select name="SelectedCustomerCode" class="form-control" required>
+            <option value="">Select Customer</option>
+            @foreach (var customer in Model.Customers)
+            {
+                <option value="@customer.Value">@customer.Text</option>
+            }
+        </select>
+    </div>
+
+    <!-- Technician Dropdown -->
+    <div class="form-group">
+        <label for="TechnicianCodeOrName">Select Technician</label>
+        <select name="SelectedTechnicianCode" class="form-control" required>
+            <option value="">Select Technician</option>
+            @foreach (var technician in Model.Technicians)
+            {
+                <option value="@technician.Value">@technician.Text</option>
+            }
+        </select>
+    </div>
+
+    <!-- Governate Dropdown -->
+    <div class="form-group">
+        <label for="Governate">Select Governate</label>
+        <select name="SelectedGovernate" class="form-control" id="Governate" required>
+            <option value="">Select Governate</option>
+            @foreach (var governate in Model.Governates)
+            {
+                <option value="@governate.Value">@governate.Text</option>
+            }
+        </select>
+    </div>
+
+    <!-- City Dropdown (populated dynamically based on Governate) -->
+    <div class="form-group">
+        <label for="City">Select City</label>
+        <select name="SelectedCity" class="form-control" id="City" required>
+            <option value="">Select City</option>
+        </select>
+    </div>
+
+    <!-- Initial Coupon Sort and Type Dropdowns -->
+    <div id="couponFieldsContainer">
+        <div class="couponFields">
+            <div class="form-group">
+                <label for="CouponSort">Coupon Sort</label>
+                <select name="CouponSort" class="form-control">
+                    <option value="">Select Coupon Sort</option>
+                    @foreach (var sort in Model.CouponSorts)
+                    {
+                        <option value="@sort.Value">@sort.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="CouponType">Coupon Type</label>
+                <select name="CouponType" class="form-control">
+                    <option value="">Select Coupon Type</option>
+                    @foreach (var type in Model.CouponTypes)
+                    {
+                        <option value="@type.Value">@type.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="StartSequenceNumber">Start Sequence Number</label>
+                <input type="number" name="StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
+            </div>
+
+            <div class="form-group">
+                <label for="EndSequenceNumber">End Sequence Number</label>
+                <input type="number" name="EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
+            </div>
+        </div>
+    </div>
+
+    <!-- Button to Add Another Set of Fields -->
+    <button type="button" class="btn btn-secondary" id="addFieldsButton">Add Another</button>
+
+    <!-- Exchange Permission Input -->
+    <div class="form-group">
+        <label for="ExchangePermission">Exchange Permission</label>
+        <input type="text" name="ExchangePermission" class="form-control" placeholder="Enter exchange permission" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Assign</button>
+</form>
+
+@section Scripts {
+    <script>
+        // Handle dynamic addition of fields for coupon sort, coupon type, and sequence numbers
+        document.getElementById("addFieldsButton").addEventListener("click", function() {
+            var container = document.getElementById("couponFieldsContainer");
+
+            var newFields = document.createElement("div");
+            newFields.classList.add("couponFields");
+
+            // Coupon Sort Dropdown
+            newFields.innerHTML += `
+                <div class="form-group">
+                    <label for="CouponSort">Coupon Sort</label>
+                    <select name="CouponSort" class="form-control">
+                        <option value="">Select Coupon Sort</option>
+        @foreach (var sort in Model.CouponSorts)
+        {
+                                <option value="@sort.Value">@sort.Text</option>
+        }
+                    </select>
+                </div>
+            `;
+
+            // Coupon Type Dropdown
+            newFields.innerHTML += `
+                <div class="form-group">
+                    <label for="CouponType">Coupon Type</label>
+                    <select name="CouponType" class="form-control">
+                        <option value="">Select Coupon Type</option>
+        @foreach (var type in Model.CouponTypes)
+        {
+                                <option value="@type.Value">@type.Text</option>
+        }
+                    </select>
+                </div>
+            `;
+
+            // Sequence Number Fields
+            newFields.innerHTML += `
+                <div class="form-group">
+                    <label for="StartSequenceNumber">Start Sequence Number</label>
+                    <input type="number" name="StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="EndSequenceNumber">End Sequence Number</label>
+                    <input type="number" name="EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
+                </div>
+            `;
+
+            container.appendChild(newFields);
+        });
+
+        // Make the city dropdown dynamic based on selected governate
+        document.getElementById("Governate").addEventListener("change", function() {
+            var governate = this.value;
+            var citySelect = document.getElementById("City");
+
+            // Clear existing options
+            citySelect.innerHTML = "<option value=''>Select City</option>";
+
+            // Fetch cities for the selected governate (simulated with static data for now)
+            var cities = {
+                "Cairo": ["City1", "City2"],
+                "Gharbeia": ["City3", "City4"],
+                "Sharqeia": ["City5", "City6"],
+                "Alexandria": ["City7", "City8"]
+            };
+
+            if (cities[governate]) {
+                cities[governate].forEach(function(city) {
+                    var option = document.createElement("option");
+                    option.value = city;
+                    option.text = city;
+                    citySelect.appendChild(option);
+                });
+            }
+        });
+    </script>
+}

@@ -9,6 +9,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity
     public class Coupon
     {
 
+
         
         public string CouponeId { get; private set; } = Guid.NewGuid().ToString();
         public long SerialNumber { get; set; }
@@ -16,6 +17,12 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public string TypeOfCoupone { get; set; }
         public string Status { get; set; } = "Created";
         public DateTime CreationDateTime { get; set; } = DateTime.Now;
+        public int CouponID { get; set; }
+        public string UniqueIdentifier { get; set; } 
+        public string Status { get; set; }
+        public string? CouponSort { get; set; }  
+        public string? CouponType { get; set; }
+        public DateTime CreationDate { get; set; }
         public DateTime? ClosureDate { get; set; }
         public ICollection<Representative> Representatives { get; set; } 
         public int? RepresentativeId { get; set; }
