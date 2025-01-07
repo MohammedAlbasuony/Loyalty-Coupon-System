@@ -1,5 +1,6 @@
 using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.Service.Implementation;
+using LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateQR;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
 using LoyaltyCouponsSystem.DAL.Repo.Implementation;
@@ -51,6 +52,10 @@ namespace LoyaltyCouponsSystem.PL
             builder.Services.AddScoped<ICustomerService, CustomerService>();
             builder.Services.AddScoped<ITechnicianRepo, TechnicianRepo>();
             builder.Services.AddScoped<ITechnicianService, TechnicianService>();
+
+
+            //Add service make QRCode to the container
+            builder.Services.AddScoped<IQRCodeGeneratorHelper, QRCodeGeneratorHelper>();
 
             var app = builder.Build();
 

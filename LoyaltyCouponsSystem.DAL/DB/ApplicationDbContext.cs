@@ -9,16 +9,23 @@ namespace LoyaltyCouponsSystem.DAL.DB
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
+        public DbSet<GlobalCounter> GlobalCounters { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<StoreKeeper> StoreKeepers { get; set; }
-        public DbSet<CouponTemplate> CouponTemplates { get; set; }
+       
         public DbSet<Technician> Technicians { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<Representative> Representatives { get; set; }
+
+        public DbSet<Governorate> Governorates { get; set; }
+
+        public DbSet<Area> Areas { get; set; }
+
+        public DbSet<QRScanLog> QRScanLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,8 +37,17 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.HasKey(l => new { l.LoginProvider, l.ProviderKey });
             });
 
-            // Ensure NationalID is unique
-            modelBuilder.Entity<ApplicationUser>()
+            //Governate and Area
+            modelBuilder.Entity<Governorate>()
+                .HasMany(g => g.Areas)
+                .WithOne(a => a.Governorate)
+                .HasForeignKey(a => a.GovernateId)
+                .OnDelete(DeleteBehavior.Cascade); // عند حذف المحافظة يتم حذف المناطق
+       
+
+
+        // Ensure NationalID is unique
+        modelBuilder.Entity<ApplicationUser>()
                 .HasIndex(u => u.NationalID)
                 .IsUnique();
 
@@ -64,10 +80,16 @@ namespace LoyaltyCouponsSystem.DAL.DB
                     .HasForeignKey(e => e.CustomerID);
             });
 
+
+            modelBuilder.Entity<GlobalCounter>(entity => {
+                entity.HasKey(GC => GC.Year);
+                });
+
+
             modelBuilder.Entity<Coupon>(entity =>
             {
-                entity.HasKey(e => e.CouponID);
-                entity.Property(e => e.UniqueIdentifier).IsRequired().HasMaxLength(100);
+                entity.HasKey(e => e.CouponeId);
+                
                 entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
             });
 
@@ -77,11 +99,10 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.Property(e => e.NameAttribute).IsRequired().HasMaxLength(100);
             });
 
-            modelBuilder.Entity<CouponTemplate>(entity =>
-            {
-                entity.HasKey(e => e.TemplateID);
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            });
+           
+           
+
+           
 
             modelBuilder.Entity<Technician>(entity =>
             {
