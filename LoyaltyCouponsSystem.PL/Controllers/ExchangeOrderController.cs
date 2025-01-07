@@ -6,6 +6,9 @@ using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
 {
@@ -18,7 +21,6 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _context = context;
         }
 
-       
         // Get customer details based on code or name search
         public IActionResult GetCustomerDetails(string customerCodeOrName)
         {
@@ -58,16 +60,15 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             return PartialView("_TechnicianDetails", model);
         }
+
         [HttpGet]
         public async Task<IActionResult> AssignQRCode()
         {
-            // Fetch all customers, technicians, governates, and cities
+            // Fetch all customers, technicians, governates
             var customers = await _context.Customers.ToListAsync();
             var technicians = await _context.Technicians.ToListAsync();
-            //var governates = await _context.Governates.ToListAsync(); // Assuming you have a Governates table
-            //var cities = await _context.Cities.ToListAsync(); // Assuming you have a Cities table
 
-            // Create and populate the model
+            // Create and populate the model for dropdowns
             var model = new AssignmentViewModel
             {
                 Customers = customers.Select(c => new SelectListItem
@@ -80,40 +81,64 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     Value = t.Code,
                     Text = $"{t.Name} ({t.Code})"
                 }).ToList(),
-                //Governates = governates.Select(g => new SelectListItem
-                //{
-                //    Value = g.Code,
-                //    Text = g.Name
-                //}).ToList(),
-                //Cities = cities.Select(ci => new SelectListItem
-                //{
-                //    Value = ci.Code,
-                //    Text = ci.Name
-                //}).ToList(),
+
+                Governates = new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "Cairo", Text = "Cairo" },
+                    new SelectListItem { Value = "Gharbeia", Text = "Gharbeia" },
+                    new SelectListItem { Value = "Sharqeia", Text = "Sharqeia" },
+                    new SelectListItem { Value = "Alexandria", Text = "Alexandria" }
+                },
+
                 CouponSorts = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "اختبار", Text = "كعب إختبار" },
-            new SelectListItem { Value = "عادي", Text = "كوبون عادي" },
-            new SelectListItem { Value = "حافز", Text = "كوبون حافز" },
-            new SelectListItem { Value = "مرتجع", Text = "كوبون مرتجع" }
-        },
+                {
+                    new SelectListItem { Value = "اختبار", Text = "كعب إختبار" },
+                    new SelectListItem { Value = "عادي", Text = "كوبون عادي" },
+                    new SelectListItem { Value = "حافز", Text = "كوبون حافز" },
+                    new SelectListItem { Value = "مرتجع", Text = "كوبون مرتجع" }
+                },
+
                 CouponTypes = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "راك ثيرم", Text = "راك ثيرم" },
-            new SelectListItem { Value = "صرف جي تكس", Text = "صرف جي تكس" },
-            new SelectListItem { Value = "اقطار كبيرة وهودذا", Text = "اقطار كبيرة وهودذا" },
-            new SelectListItem { Value = "كعب راك ثيرم", Text = "كعب راك ثيرم" },
-            new SelectListItem { Value = "كعب صرف جي تكس", Text = "كعب صرف جي تكس" },
-            new SelectListItem { Value = "كعب اقطار كبيرة وهودذا", Text = "كعب اقطار كبيرة وهودذا" }
-        }
+                {
+                    new SelectListItem { Value = "راك ثيرم", Text = "راك ثيرم" },
+                    new SelectListItem { Value = "صرف جي تكس", Text = "صرف جي تكس" },
+                    new SelectListItem { Value = "اقطار كبيرة وهودذا", Text = "اقطار كبيرة وهودذا" },
+                    new SelectListItem { Value = "كعب راك ثيرم", Text = "كعب راك ثيرم" },
+                    new SelectListItem { Value = "كعب صرف جي تكس", Text = "كعب صرف جي تكس" },
+                    new SelectListItem { Value = "كعب اقطار كبيرة وهودذا", Text = "كعب اقطار كبيرة وهودذا" }
+                }
             };
 
             return View(model);
         }
+
+        // AJAX GET action to load cities based on the selected governate
+        [HttpGet]
+        public JsonResult GetCitiesByGovernate(string governate)
+        {
+            // Simulate the cities based on the selected governate (replace with actual logic)
+            var cities = governate switch
+            {
+                "Cairo" => new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "CairoCity1", Text = "Cairo City 1" },
+                    new SelectListItem { Value = "CairoCity2", Text = "Cairo City 2" }
+                },
+                "Gharbeia" => new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "GharbeiaCity1", Text = "Gharbeia City 1" },
+                    new SelectListItem { Value = "GharbeiaCity2", Text = "Gharbeia City 2" }
+                },
+                _ => new List<SelectListItem>()
+            };
+
+            return Json(cities);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AssignQRCode(
             string SelectedCustomerCode,
-            string SelectedTechnicianCode,  
+            string SelectedTechnicianCode,
             string SelectedGovernate,
             string SelectedCity,
             List<AssignmentViewModel> Transactions)
@@ -155,8 +180,5 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             return RedirectToAction(nameof(AssignQRCode));
         }
-
-
-
     }
 }
