@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Aspose.Words" Version="25.1.0" />
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Grid.Mvc" Version="3.0.0" />
     <PackageReference Include="IronWord" Version="2025.1.2" />
     <PackageReference Include="iTextSharp" Version="5.5.13.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />

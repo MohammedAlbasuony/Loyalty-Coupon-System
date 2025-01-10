@@ -2,6 +2,7 @@
 {
     using LoyaltyCouponsSystem.BLL.ViewModel.Account;
     using LoyaltyCouponsSystem.DAL.DB;
+    using LoyaltyCouponsSystem.DAL.Migrations;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
