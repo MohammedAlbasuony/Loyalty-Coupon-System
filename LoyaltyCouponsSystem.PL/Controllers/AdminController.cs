@@ -16,14 +16,12 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AdminController(IAdminService adminService,UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public AdminController(IAdminService adminService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _adminService = adminService;
         }
-       
-
 
         public async Task<IActionResult> ManageUsers()
         {
@@ -83,8 +81,6 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
 
         [HttpPost]
-        // Delete user
-        [HttpPost]
         public async Task<IActionResult> DeleteUser(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -108,11 +104,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         public async Task<IActionResult> AssignRoleForm()
         {
             var users = await _adminService.GetAllUsersAsync();
-            var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();     
+            var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
             foreach (var user in users)
             {
                 user.Roles = roles;
-                user.SelectedRole = user.Role; 
+                user.SelectedRole = user.Role;
             }
 
             return View(users);
@@ -138,13 +134,13 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             var result = await _userManager.AddToRoleAsync(user, roleName);
             if (result.Succeeded)
-            {
                 TempData["SuccessMessage"] = $"Role '{roleName}' has been assigned to user.";
-            }
+
             else
-            {
                 TempData["ErrorMessage"] = "Failed to assign the role.";
-            }
+
+
+            var userRoleName = await _adminService.UpdateUserRoleName(userId, roleName);
 
             return RedirectToAction("ManageUsers");
         }
@@ -159,7 +155,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 return RedirectToAction("ManageUsers");
             }
 
-            user.EmailConfirmed = true;  
+            user.EmailConfirmed = true;
             var result = await _userManager.UpdateAsync(user);
 
             if (result.Succeeded)
@@ -173,9 +169,6 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             return RedirectToAction("ManageUsers");
         }
-
-
-
     }
 }
 

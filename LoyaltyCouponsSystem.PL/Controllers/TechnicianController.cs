@@ -13,7 +13,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         {
             _technicianService = technicianService;
         }
-        
+
         public IActionResult Index()
         {
             return View();
@@ -50,17 +50,26 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [HttpPost]
         public async Task<IActionResult> AddTechnician(TechnicianViewModel technicianViewModel)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var result = await _technicianService.AddAsync(technicianViewModel);
-                if (result)
+                if (ModelState.IsValid)
                 {
-                    return RedirectToAction("GetAllTechnicians");
+                    var result = await _technicianService.AddAsync(technicianViewModel);
+                    if (result)
+                    {
+                        return RedirectToAction("GetAllTechnicians");
+                    }
+                    ModelState.AddModelError("", "Unable to add technician. Please try again.");
                 }
-                ModelState.AddModelError("", "Unable to add technician. Please try again.");
-            }
 
-            return View(technicianViewModel);
+                return View(technicianViewModel);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
         }
 
         public async Task<IActionResult> DeleteTechnician(string id)
