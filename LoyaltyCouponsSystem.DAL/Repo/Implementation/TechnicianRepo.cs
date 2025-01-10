@@ -14,7 +14,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             _DBcontext = context;
         }
 
-        //  add method
+        // Add method
         public async Task<bool> AddAsync(Technician technician)
         {
             try
@@ -25,21 +25,20 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error adding doctor: {ex.Message}");
+                Console.WriteLine($"Error adding technician: {ex.Message}");
                 return false;
             }
         }
 
-        //  delete method
+        // Delete method
         public async Task<bool> DeleteAsync(string id)
         {
             try
             {
-
-                var user = await _DBcontext.Users.FindAsync(id);
-                if (user != null)
+                var technician = await _DBcontext.Technicians.Where(t => t.Code == id).FirstOrDefaultAsync();
+                if (technician != null)
                 {
-                    user.IsDeleted = true;
+                    _DBcontext.Technicians.Remove(technician);
                     await _DBcontext.SaveChangesAsync();
                     return true;
                 }
@@ -47,13 +46,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
             catch (Exception ex)
             {
-
-                Console.WriteLine($"Error deleting user: {ex.Message}");
+                Console.WriteLine($"Error deleting technician: {ex.Message}");
                 return false;
             }
         }
 
-        //  get all method
+        // Get all method
         public async Task<List<Technician>> GetAllAsync()
         {
             try
@@ -62,33 +60,32 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching doctors: {ex.Message}");
+                Console.WriteLine($"Error fetching technicians: {ex.Message}");
                 return new List<Technician>();
             }
         }
 
-        //  get by ID method
+        // Get by ID method
         public async Task<Technician> GetByIdAsync(string id)
         {
             try
             {
-                return await _DBcontext.Technicians.Where(p => p.Code == id).FirstOrDefaultAsync();
-
+                return await _DBcontext.Technicians.Where(t => t.Code == id).FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching doctor by ID: {ex.Message}");
+                Console.WriteLine($"Error fetching technician by ID: {ex.Message}");
                 return null;
             }
         }
 
-        //  update method
+        // Update method
         public async Task<bool> UpdateAsync(Technician technician)
         {
             try
             {
-                var existingTechnician = await _DBcontext.Customers
-                    .Where(p => p.Code == technician.Code)
+                var existingTechnician = await _DBcontext.Technicians
+                    .Where(t => t.Code == technician.Code)
                     .FirstOrDefaultAsync();
 
                 if (existingTechnician == null)
@@ -98,14 +95,20 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
 
                 // Update the properties
                 existingTechnician.Name = technician.Name;
-                existingTechnician.ContactDetails = technician.ContactDetails;
+                existingTechnician.NickName = technician.NickName;
+                existingTechnician.NationalID = technician.NationalID;
+                existingTechnician.PhoneNumber1 = technician.PhoneNumber1;
+                existingTechnician.PhoneNumber2 = technician.PhoneNumber2;
+                existingTechnician.PhoneNumber3 = technician.PhoneNumber3;
+                existingTechnician.Governate = technician.Governate;
+                existingTechnician.City = technician.City;
 
                 await _DBcontext.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating doctor: {ex.Message}");
+                Console.WriteLine($"Error updating technician: {ex.Message}");
                 return false;
             }
         }

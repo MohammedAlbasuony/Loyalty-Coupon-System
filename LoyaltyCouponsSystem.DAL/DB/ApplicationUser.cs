@@ -20,5 +20,6 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public string? Imagepath { get; set; }
         public virtual Admin Admin { get; set; }
         public virtual Representative Representative { get; set; }
+       
     }
 }

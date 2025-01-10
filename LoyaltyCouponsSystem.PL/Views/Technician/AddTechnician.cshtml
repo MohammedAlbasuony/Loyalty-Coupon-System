@@ -19,9 +19,81 @@
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="ContactDetails"></label>
-        <input asp-for="ContactDetails" class="form-control" />
-        <span asp-validation-for="ContactDetails" class="text-danger"></span>
+        <label asp-for="NickName"></label>
+        <input asp-for="NickName" class="form-control" />
+        <span asp-validation-for="NickName" class="text-danger"></span>
     </div>
+    <div class="form-group">
+        <label asp-for="NationalID"></label>
+        <input asp-for="NationalID" class="form-control" type="text" />
+        <span asp-validation-for="NationalID" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PhoneNumber1"></label>
+        <input asp-for="PhoneNumber1" class="form-control" type="text" />
+        <span asp-validation-for="PhoneNumber1" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PhoneNumber2"></label>
+        <input asp-for="PhoneNumber2" class="form-control" type="text" />
+        <span asp-validation-for="PhoneNumber2" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PhoneNumber3"></label>
+        <input asp-for="PhoneNumber3" class="form-control" type="text" />
+        <span asp-validation-for="PhoneNumber3" class="text-danger"></span>
+    </div>
+
+    <!-- Governate Dropdown -->
+    <div class="form-group">
+        <label for="Governate">Select Governate</label>
+        <select asp-for="SelectedGovernate" class="form-control" id="Governate" required>
+            <option value="">Select Governate</option>
+            @foreach (var governate in Model.Governates)
+            {
+                <option value="@governate.Value">@governate.Text</option>
+            }
+        </select>
+    </div>
+
+    <!-- City Dropdown -->
+    <div class="form-group">
+        <label for="City">Select City</label>
+        <select asp-for="SelectedCity" class="form-control" id="City" required>
+            <option value="">Select City</option>
+        </select>
+    </div>
+
     <button type="submit" class="btn btn-primary">Add Technician</button>
 </form>
+
+@section Scripts {
+    <script>
+        // Make the city dropdown dynamic based on selected governate
+        document.getElementById("Governate").addEventListener("change", function () {
+            var governate = this.value;
+            var citySelect = document.getElementById("City");
+
+            // Clear existing options
+            citySelect.innerHTML = "<option value=''>Select City</option>";
+
+            // Define static cities for demonstration
+            var cities = {
+                "Cairo": ["City1", "City2"],
+                "Gharbeia": ["Tanta", "Qotor"],
+                "Sharqeia": ["City5", "City6"],
+                "Alexandria": ["City7", "City8"]
+            };
+
+            // Populate city dropdown based on selected governate
+            if (cities[governate]) {
+                cities[governate].forEach(function (city) {
+                    var option = document.createElement("option");
+                    option.value = city;
+                    option.text = city;
+                    citySelect.appendChild(option);
+                });
+            }
+        });
+    </script>
+}

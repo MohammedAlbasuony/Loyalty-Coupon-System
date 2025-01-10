@@ -1,13 +1,8 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
-using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 {
@@ -24,12 +19,17 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         {
             if (technicianViewModel != null)
             {
-
                 var technician = new Technician
                 {
                     Code = technicianViewModel.Code,
                     Name = technicianViewModel.Name,
-                    ContactDetails = technicianViewModel.ContactDetails
+                    NickName = technicianViewModel.NickName,
+                    NationalID = technicianViewModel.NationalID,
+                    PhoneNumber1 = technicianViewModel.PhoneNumber1,
+                    PhoneNumber2 = technicianViewModel.PhoneNumber2,
+                    PhoneNumber3 = technicianViewModel.PhoneNumber3,
+                    Governate = technicianViewModel.SelectedGovernate,
+                    City = technicianViewModel.SelectedCity
                 };
 
                 return await _technicianRepo.AddAsync(technician);
@@ -50,15 +50,25 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         {
             var technicians = await _technicianRepo.GetAllAsync();
 
-            // Manual Mapping
-            var technicianViewModel = technicians.Select(technician => new TechnicianViewModel
+            var technicianViewModels = technicians.Select(technician => new TechnicianViewModel
             {
                 Code = technician.Code,
                 Name = technician.Name,
-                ContactDetails = technician.ContactDetails
+                NickName = technician.NickName,
+                NationalID = technician.NationalID,
+                PhoneNumber1 = technician.PhoneNumber1,
+                PhoneNumber2 = technician.PhoneNumber2,
+                PhoneNumber3 = technician.PhoneNumber3,
+                SelectedGovernate = technician.Governate,
+                SelectedCity = technician.City
             }).ToList();
 
-            return technicianViewModel;
+            foreach (var technicianViewModel in technicianViewModels)
+            {
+                PopulateDropdowns(technicianViewModel);
+            }
+
+            return technicianViewModels;
         }
 
         public async Task<TechnicianViewModel> GetByIdAsync(string id)
@@ -73,31 +83,63 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     {
                         Code = technician.Code,
                         Name = technician.Name,
-                        ContactDetails = technician.ContactDetails
+                        NickName = technician.NickName,
+                        NationalID = technician.NationalID,
+                        PhoneNumber1 = technician.PhoneNumber1,
+                        PhoneNumber2 = technician.PhoneNumber2,
+                        PhoneNumber3 = technician.PhoneNumber3,
+                        SelectedGovernate = technician.Governate,
+                        SelectedCity = technician.City
                     };
 
+                    PopulateDropdowns(technicianViewModel);
                     return technicianViewModel;
                 }
             }
             return null;
         }
 
-
         public async Task<bool> UpdateAsync(TechnicianViewModel technicianViewModel)
         {
             if (technicianViewModel != null)
             {
-                // Manual Mapping
                 var technician = new Technician
                 {
                     Code = technicianViewModel.Code,
                     Name = technicianViewModel.Name,
-                    ContactDetails = technicianViewModel.ContactDetails
+                    NickName = technicianViewModel.NickName,
+                    NationalID = technicianViewModel.NationalID,
+                    PhoneNumber1 = technicianViewModel.PhoneNumber1,
+                    PhoneNumber2 = technicianViewModel.PhoneNumber2,
+                    PhoneNumber3 = technicianViewModel.PhoneNumber3,
+                    Governate = technicianViewModel.SelectedGovernate,
+                    City = technicianViewModel.SelectedCity
                 };
 
                 return await _technicianRepo.UpdateAsync(technician);
             }
             return false;
+        }
+
+        private void PopulateDropdowns(TechnicianViewModel viewModel)
+        {
+            // Hardcoded data for governates and cities
+            var governates = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Cairo", Value = "Cairo" },
+                new SelectListItem { Text = "Giza", Value = "Giza" },
+                new SelectListItem { Text = "Alexandria", Value = "Alexandria" }
+            };
+
+            var cities = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Nasr City", Value = "Nasr City" },
+                new SelectListItem { Text = "Dokki", Value = "Dokki" },
+                new SelectListItem { Text = "Smouha", Value = "Smouha" }
+            };
+
+            viewModel.Governates = governates;
+            viewModel.Cities = cities;
         }
     }
 }
