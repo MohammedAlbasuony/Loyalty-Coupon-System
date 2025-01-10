@@ -235,6 +235,18 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<DateTime?>("ClosureDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CouponID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CouponSort")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CouponType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("CreationDateTime")
                         .HasColumnType("datetime2");
 
@@ -253,18 +265,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<long>("SerialNumber")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("CouponSort")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CouponTemplateTemplateID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CouponType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -277,6 +277,10 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TypeOfCoupone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UniqueIdentifier")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -481,6 +485,9 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionID"));
 
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CouponSort")
                         .HasColumnType("nvarchar(max)");
 
@@ -492,6 +499,9 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     b.Property<string>("ExchangePermission")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Governate")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PurchaseAmount")
@@ -507,7 +517,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionType")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 

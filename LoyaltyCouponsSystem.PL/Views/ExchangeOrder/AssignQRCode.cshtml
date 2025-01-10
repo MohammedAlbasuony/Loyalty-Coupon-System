@@ -1,5 +1,4 @@
-﻿@using LoyaltyCouponsSystem.BLL.ViewModel.Customer_and_Technician
-@model AssignmentViewModel
+﻿@model AssignmentViewModel
 
 @{
     ViewData["Title"] = "Assign QR Codes";
@@ -9,7 +8,7 @@
     <!-- Customer Dropdown -->
     <div class="form-group">
         <label for="CustomerCodeOrName">Select Customer</label>
-        <select name="SelectedCustomerCode" class="form-control" required>
+        <select asp-for="SelectedCustomerCode" class="form-control" required>
             <option value="">Select Customer</option>
             @foreach (var customer in Model.Customers)
             {
@@ -21,7 +20,7 @@
     <!-- Technician Dropdown -->
     <div class="form-group">
         <label for="TechnicianCodeOrName">Select Technician</label>
-        <select name="SelectedTechnicianCode" class="form-control" required>
+        <select asp-for="SelectedTechnicianCode" class="form-control" required>
             <option value="">Select Technician</option>
             @foreach (var technician in Model.Technicians)
             {
@@ -33,7 +32,7 @@
     <!-- Governate Dropdown -->
     <div class="form-group">
         <label for="Governate">Select Governate</label>
-        <select name="SelectedGovernate" class="form-control" id="Governate" required>
+        <select asp-for="SelectedGovernate" class="form-control" id="Governate" required>
             <option value="">Select Governate</option>
             @foreach (var governate in Model.Governates)
             {
@@ -45,17 +44,17 @@
     <!-- City Dropdown (populated dynamically based on Governate) -->
     <div class="form-group">
         <label for="City">Select City</label>
-        <select name="SelectedCity" class="form-control" id="City" required>
+        <select asp-for="SelectedCity" class="form-control" id="City" required>
             <option value="">Select City</option>
         </select>
     </div>
 
-    <!-- Initial Coupon Sort and Type Dropdowns -->
+    <!-- Dynamic Coupon Fields -->
     <div id="couponFieldsContainer">
         <div class="couponFields">
             <div class="form-group">
                 <label for="CouponSort">Coupon Sort</label>
-                <select name="CouponSort" class="form-control">
+                <select name="Transactions[0].SelectedCouponSort" class="form-control" required>
                     <option value="">Select Coupon Sort</option>
                     @foreach (var sort in Model.CouponSorts)
                     {
@@ -66,7 +65,7 @@
 
             <div class="form-group">
                 <label for="CouponType">Coupon Type</label>
-                <select name="CouponType" class="form-control">
+                <select name="Transactions[0].SelectedCouponType" class="form-control" required>
                     <option value="">Select Coupon Type</option>
                     @foreach (var type in Model.CouponTypes)
                     {
@@ -77,12 +76,12 @@
 
             <div class="form-group">
                 <label for="StartSequenceNumber">Start Sequence Number</label>
-                <input type="number" name="StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
+                <input type="number" name="Transactions[0].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
             </div>
 
             <div class="form-group">
                 <label for="EndSequenceNumber">End Sequence Number</label>
-                <input type="number" name="EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
+                <input type="number" name="Transactions[0].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
             </div>
         </div>
     </div>
@@ -93,7 +92,7 @@
     <!-- Exchange Permission Input -->
     <div class="form-group">
         <label for="ExchangePermission">Exchange Permission</label>
-        <input type="text" name="ExchangePermission" class="form-control" placeholder="Enter exchange permission" required />
+        <input asp-for="ExchangePermission" class="form-control" placeholder="Enter exchange permission" required />
     </div>
 
     <button type="submit" class="btn btn-primary">Assign</button>
@@ -109,47 +108,44 @@
             newFields.classList.add("couponFields");
 
             // Coupon Sort Dropdown
-            newFields.innerHTML += `
-                <div class="form-group">
+            newFields.innerHTML +=
+                `<div class="form-group">
                     <label for="CouponSort">Coupon Sort</label>
-                    <select name="CouponSort" class="form-control">
+                    <select name="Transactions[${index}].SelectedCouponSort" class="form-control" required>
                         <option value="">Select Coupon Sort</option>
         @foreach (var sort in Model.CouponSorts)
         {
                                 <option value="@sort.Value">@sort.Text</option>
         }
                     </select>
-                </div>
-            `;
+                </div>`;
 
             // Coupon Type Dropdown
-            newFields.innerHTML += `
-                <div class="form-group">
+            newFields.innerHTML +=
+                `<div class="form-group">
                     <label for="CouponType">Coupon Type</label>
-                    <select name="CouponType" class="form-control">
+                    <select name="Transactions[${index}].SelectedCouponType" class="form-control" required>
                         <option value="">Select Coupon Type</option>
         @foreach (var type in Model.CouponTypes)
         {
                                 <option value="@type.Value">@type.Text</option>
         }
                     </select>
-                </div>
-            `;
+                </div>`;
 
             // Sequence Number Fields
-            newFields.innerHTML += `
-                <div class="form-group">
+            newFields.innerHTML +=
+                `<div class="form-group">
                     <label for="StartSequenceNumber">Start Sequence Number</label>
-                    <input type="number" name="StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
+                    <input type="number" name="Transactions[${index}].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
                 </div>
-
                 <div class="form-group">
                     <label for="EndSequenceNumber">End Sequence Number</label>
-                    <input type="number" name="EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
-                </div>
-            `;
+                    <input type="number" name="Transactions[${index}].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
+                </div>`;
 
             container.appendChild(newFields);
+            index++; // Increment index for the next set of fields
         });
 
         // Make the city dropdown dynamic based on selected governate
@@ -160,14 +156,15 @@
             // Clear existing options
             citySelect.innerHTML = "<option value=''>Select City</option>";
 
-            // Fetch cities for the selected governate (simulated with static data for now)
+            // Define static cities for demonstration
             var cities = {
                 "Cairo": ["City1", "City2"],
-                "Gharbeia": ["City3", "City4"],
+                "Gharbeia": ["Tanta", "Qotor"],
                 "Sharqeia": ["City5", "City6"],
                 "Alexandria": ["City7", "City8"]
             };
 
+            // Populate city dropdown based on selected governate
             if (cities[governate]) {
                 cities[governate].forEach(function(city) {
                     var option = document.createElement("option");
