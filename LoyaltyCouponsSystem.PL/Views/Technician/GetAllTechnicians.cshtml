@@ -12,7 +12,11 @@
         <tr>
             <th>Code</th>
             <th>Name</th>
-            <th>Contact Details</th>
+            <th>NickName</th>
+            <th>National ID</th>
+            <th>Governate</th>
+            <th>City</th>
+            <th>Phone Number</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -22,7 +26,11 @@
             <tr>
                 <td>@technician.Code</td>
                 <td>@technician.Name</td>
-                <td>@technician.ContactDetails</td>
+                <td>@technician.NickName</td>
+                <td>@technician.NationalID</td>
+                <td>@technician.SelectedGovernate</td>
+                <td>@technician.SelectedCity</td>
+                <td>@technician.PhoneNumber1</td>
                 <td>
                     <a href="@Url.Action("GetTechnicianById", "Technician", new { id = technician.Code })" class="btn btn-info">View</a>
                     <a href="@Url.Action("UpdateTechnician", "Technician", new { id = technician.Code })" class="btn btn-warning">Edit</a>

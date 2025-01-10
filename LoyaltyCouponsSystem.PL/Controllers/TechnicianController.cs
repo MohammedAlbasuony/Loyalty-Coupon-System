@@ -1,6 +1,7 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
 {
@@ -12,7 +13,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         {
             _technicianService = technicianService;
         }
-
+        
         public IActionResult Index()
         {
             return View();
@@ -33,7 +34,17 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [HttpGet]
         public IActionResult AddTechnician()
         {
-            return View();
+            var technicianViewModel = new TechnicianViewModel
+            {
+                Governates = new List<SelectListItem>
+        {
+            new SelectListItem { Text = "Cairo", Value = "Cairo" },
+            new SelectListItem { Text = "Gharbeia", Value = "Gharbeia" },
+            new SelectListItem { Text = "Sharqeia", Value = "Sharqeia" },
+            new SelectListItem { Text = "Alexandria", Value = "Alexandria" }
+        }
+            };
+            return View(technicianViewModel);
         }
 
         [HttpPost]
@@ -46,7 +57,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 {
                     return RedirectToAction("GetAllTechnicians");
                 }
-                ModelState.AddModelError("", "Unable to add doctor. Please try again.");
+                ModelState.AddModelError("", "Unable to add technician. Please try again.");
             }
 
             return View(technicianViewModel);

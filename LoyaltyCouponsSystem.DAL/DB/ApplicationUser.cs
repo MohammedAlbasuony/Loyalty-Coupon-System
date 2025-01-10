@@ -22,5 +22,4 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public virtual Admin Admin { get; set; }
         public virtual Representative Representative { get; set; }
 
-    }
 }
