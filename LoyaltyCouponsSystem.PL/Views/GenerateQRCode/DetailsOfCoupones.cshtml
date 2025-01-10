@@ -2,7 +2,7 @@
 @model QRCodeDetailsViewModel
 @{
     ViewData["Title"] = "QR Code Generator";
-
+    Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
 
 }
 
@@ -12,89 +12,86 @@
     </div>
 
     <form asp-controller="GenerateQRCode" asp-action="DetailsOfCoupones" method="post">
-
         <div class="container">
+            <div class="row g-3" style="direction: rtl; text-align: right;">
+                <!-- نوع الكوبون -->
+                <div class="col-md-6">
+                    <label for="typeOfCoupon" class="form-label">اختر نوع الكوبون:</label>
+                    <select asp-for="TypeOfCoupon" class="form-select" aria-label="Default select example">
+                        <option selected>اختر نوع الكوبون</option>
+                        <option value="راك ثيرم">راك ثيرم</option>
+                        <option value="صرف جي تكس">صرف جي تكس</option>
+                        <option value="اقطار كبيرة وهودذا">اقطار كبيرة وهودذا</option>
+                        <option value="كعب راك ثيرم">كعب راك ثيرم</option>
+                        <option value="كعب صرف جي تكس">كعب صرف جي تكس</option>
+                        <option value="كعب اقطار كبيرة وهودذا">كعب اقطار كبيرة وهودذا</option>
+                    </select>
+                </div>
 
+                <!-- القيمة -->
+                <div class="col-md-6">
+                    <label for="value" class="form-label">القيمة:</label>
+                    <input type="number" class="form-control" id="value" name="Value" value="50" min="1" />
+                </div>
 
-            <div class="mb-3" style="direction: rtl; text-align: right;">
-                <label for="value">اختر نوع الكوبون:</label>
-                <select asp-for="TypeOfCoupon" class="form-select" aria-label="Default select example">
-                    <option selected>اختر نوع الكوبون</option>
-                    <option value="راك ثيرم">راك ثيرم</option>
-                    <option value="صرف جي تكس">صرف جي تكس</option>
-                    <option value="اقطار كبيرة وهودذا">اقطار كبيرة وهودذا</option>
-                    <option selected>اختر نوع كعب الاختبار</option>
-                    <option value="كعب راك ثيرم">كعب راك ثيرم</option>
-                    <option value="كعب صرف جي تكس">كعب صرف جي تكس</option>
-                    <option value="كعب اقطار كبيرة وهودذا">كعب اقطار كبيرة وهودذا</option>
-                </select>
+                <!-- المحافظة -->
+                <div class="col-md-6">
+                    <label asp-for="GovernorateId" class="form-label">اختر المحافظة (اختياري):</label>
+                    <select class="form-select" asp-for="GovernorateId" asp-items="@(new SelectList(Model.governorates,"Id","Name"))">
+                        <option selected>اختر المحافظة</option>
+                    </select>
+                </div>
+
+                <!-- المنطقة -->
+                <div class="col-md-6">
+                    <label asp-for="AreaId" class="form-label">اختر المنطقة (اختياري):</label>
+                    <select class="form-select" asp-for="AreaId" asp-items="@(new SelectList(Model.Areas,"Id","Name"))">
+                        <option selected>اختر المنطقة</option>
+                    </select>
+                </div>
+
+                <!-- العدد -->
+                <div class="col-md-6">
+                    <label for="Count" class="form-label">اختر العدد:</label>
+                    <input type="number" class="form-control" id="Count" name="Count" required>
+                </div>
+
+                <!-- مسلسل الكوبون -->
+                <div class="col-md-6">
+                    <label for="SerialNumber" class="form-label">مسلسل الكوبون:</label>
+                    <input type="number" class="form-control" id="SerialNumber" name="Serialnumber" required>
+                </div>
+
+                <!-- عدد الكوبونات في الصف -->
+                <div class="col-md-6">
+                    <label for="couponsPerRow" class="form-label">Coupons Per Row:</label>
+                    <input type="number" class="form-control" id="couponsPerRow" name="CouponsPerRow" value="5" min="1" />
+                </div>
+
+                <!-- المسافة الأفقية -->
+                <div class="col-md-6">
+                    <label for="horizontalSpacing" class="form-label">المسافة الأفقية بين الكوبونات (cm):</label>
+                    <input type="number" step="0.1" class="form-control" id="horizontalSpacing" name="HorizontalSpacing" value="0.5" />
+                </div>
+
+                <!-- المسافة الرأسية -->
+                <div class="col-md-6">
+                    <label for="verticalSpacing" class="form-label">المسافة الرأسية بين الكوبونات (cm):</label>
+                    <input type="number" step="0.1" class="form-control" id="verticalSpacing" name="VerticalSpacing" value="1" />
+                </div>
+
+                <!-- حجم الكوبون -->
+                <div class="col-md-6">
+                    <label for="couponWidth" class="form-label">حجم الكوبون (cm):</label>
+                    <input type="number" step="0.1" class="form-control" id="couponWidth" name="CouponSize" value="2.5" />
+                </div>
+
+                <!-- زر الإرسال -->
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary w-100">إنشاء الكوبونات</button>
+                </div>
             </div>
-
-          
-
-            <div class="mb-3" style="direction: rtl; text-align: right;">
-                <label for="value">القيمه:</label>
-                <input type="number" class="form-control" id="value" name="Value" value="50" min="1" />
-            </div>
-
-
-            <div class="mb-3" style="direction: rtl; text-align: right;">
-                <label asp-for="GovernorateId" class="form-label">اختر المحافظه (اختياري):</label>
-                <select class="form-select" aria-label="Default select example" asp-for="GovernorateId" asp-items="@(new SelectList(Model.governorates,"Id","Name"))">
-                    <option selected>اختر المحافظه </option>
-
-                </select>
-
-
-            </div>
-
-
-            <div class="mb-3" style="direction: rtl; text-align: right;">
-                <label asp-for="AreaId" class="form-label">اختر المنطقه (اختياري):</label>
-                <select class="form-select" aria-label="Default select example" asp-for="AreaId" asp-items="@(new SelectList(Model.Areas,"Id","Name"))">
-                    <option selected>اختر المنطقه </option>
-
-                </select>
-
-
-            </div>
-
-
-            <div class="mb-3" style="direction: rtl; text-align: right;">
-                <label for="Count" class="form-label">اختر العدد:</label>
-                <input type="number" class="form-control" id="Count" name="Count" required>
-            </div>
-
-            <div class="mb-3" style="direction: rtl; text-align: right;">
-                <label for="SerialNumber" class="form-label">مسلسل الكوبون:</label>
-                <input type="number" class="form-control" id="SerialNumber" name="Serialnumber" required>
-            </div>
-
-            <div class="mb-3" style="direction: rtl; text-align: right;">
-                <label for="couponsPerRow">Coupons Per Row:</label>
-                <input type="number"  class="form-control" id="couponsPerRow" name="CouponsPerRow" value="5" min="1" />
-            </div>
-            <div class="mb-3" style="direction: rtl; text-align: right;">
-                <label for="horizontalSpacing">المسافه الافقيه بين الكوبونات (cm):</label>
-                <input type="number" step="0.1" class="form-control" id="horizontalSpacing" name="HorizontalSpacing" value="0.5" />
-            </div>
-            <div class="mb-3" style="direction: rtl; text-align: right;">
-                <label for="verticalSpacing">المسافه الرأسيه بين الكوبونات (cm):</label>
-                <input type="number" step="0.1" class="form-control" id="verticalSpacing" name="VerticalSpacing" value="1" />
-            </div>
-            <div class="mb-3" style="direction: rtl; text-align: right;">
-                <label for="couponWidth">حجم الكوبون (cm):</label>
-                <input type="number" step="0.1" class="form-control" id="couponWidth" name="CouponSize" value="2.5" />
-            </div>
-            
-
-            <div class="mb-4" style="direction: rtl; text-align: right;">
-                <button type="submit" class="btn btn-primary">انشاء الكوبونات </button>
-
-            </div>
-
         </div>
-
     </form>
 
     @section Scripts {
