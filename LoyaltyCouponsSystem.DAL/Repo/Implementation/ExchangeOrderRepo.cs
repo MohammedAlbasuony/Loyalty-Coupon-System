@@ -1,0 +1,54 @@
+﻿using global::LoyaltyCouponsSystem.DAL.DB;
+using global::LoyaltyCouponsSystem.DAL.Entity;
+using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
+using Microsoft.EntityFrameworkCore;
+
+
+namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
+{
+    namespace LoyaltyCouponsSystem.DAL.Repository
+    {
+        public class ExchangeOrderRepo : IExchangeOrderRepo
+        {
+            private readonly ApplicationDbContext _context;
+
+            public ExchangeOrderRepo(ApplicationDbContext context)
+            {
+                _context = context;
+            }
+
+            public async Task<Customer> GetCustomerByCodeOrNameAsync(string customerCodeOrName)
+            {
+                return await _context.Customers
+                    .FirstOrDefaultAsync(c => c.Code == customerCodeOrName || c.Name == customerCodeOrName);
+            }
+
+            public async Task<Technician> GetTechnicianByCodeOrNameAsync(string technicianCodeOrName)
+            {
+                return await _context.Technicians
+                    .FirstOrDefaultAsync(t => t.Code == technicianCodeOrName || t.Name == technicianCodeOrName);
+            }
+
+            public async Task<List<Customer>> GetAllCustomersAsync()
+            {
+                return await _context.Customers.ToListAsync();
+            }
+
+            public async Task<List<Technician>> GetAllTechniciansAsync()
+            {
+                return await _context.Technicians.ToListAsync();
+            }
+
+            public async Task AddTransactionAsync(Transaction transaction)
+            {
+                await _context.Transactions.AddAsync(transaction);
+            }
+
+            public async Task SaveChangesAsync()
+            {
+                await _context.SaveChangesAsync();
+            }
+        }
+    }
+
+}

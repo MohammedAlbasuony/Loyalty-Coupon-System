@@ -73,7 +73,7 @@ namespace LoyaltyCouponsSystem.DAL.DB
             modelBuilder.Entity<Transaction>(entity =>
             {
                 entity.HasKey(e => e.TransactionID);
-                entity.Property(e => e.TransactionType).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.TransactionType).HasMaxLength(50);
                 entity.Property(e => e.PurchaseAmount).HasColumnType("decimal(18,2)");
                 entity.HasOne(e => e.Customer)
                     .WithMany(c => c.Transactions)

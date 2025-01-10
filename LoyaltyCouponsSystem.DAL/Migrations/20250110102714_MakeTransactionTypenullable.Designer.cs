@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250107090707_GovernateArea")]
-    partial class GovernateArea
+    [Migration("20250110102714_MakeTransactionTypenullable")]
+    partial class MakeTransactionTypenullable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -238,6 +238,18 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<DateTime?>("ClosureDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CouponID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CouponSort")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CouponType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("CreationDateTime")
                         .HasColumnType("datetime2");
 
@@ -271,6 +283,10 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UniqueIdentifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Value")
                         .HasColumnType("int");
 
@@ -286,6 +302,10 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerID"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactDetails")
                         .IsRequired()
@@ -337,6 +357,9 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     b.Property<long>("MaxSerialNumber")
                         .HasColumnType("bigint");
+
+                    b.Property<int>("YearNotId")
+                        .HasColumnType("int");
 
                     b.HasKey("Year");
 
@@ -439,6 +462,10 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TechnicianID"));
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ContactDetails")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -461,23 +488,46 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionID"));
 
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CouponSort")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CouponType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CustomerID")
                         .HasColumnType("int");
 
+                    b.Property<string>("ExchangePermission")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Governate")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("PurchaseAmount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SequenceNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TechnicianID")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionType")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("TransactionID");
 
                     b.HasIndex("CustomerID");
+
+                    b.HasIndex("TechnicianID");
 
                     b.ToTable("Transactions");
                 });
@@ -716,7 +766,15 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Technician", "Technician")
+                        .WithMany()
+                        .HasForeignKey("TechnicianID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Technician");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
