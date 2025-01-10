@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:LoyaltyCouponsSystem.DAL/Migrations/20250110144248_AfterFixed.Designer.cs
-    [Migration("20250110144248_AfterFixed")]
-    partial class AfterFixed
-========
-    [Migration("20250110092848_AllData")]
-    partial class AllData
->>>>>>>> c55c552b1b7e215c5718e0c2853b9641622dd84e:LoyaltyCouponsSystem.DAL/Migrations/20250110092848_AllData.Designer.cs
+    [Migration("20250110102714_MakeTransactionTypenullable")]
+    partial class MakeTransactionTypenullable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -525,7 +520,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionType")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
