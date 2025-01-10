@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class WithNewAttriputeForCouponeAndTemplete : Migration
+    public partial class AfterFixed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -88,7 +88,8 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     CustomerID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ContactDetails = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    ContactDetails = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,11 +117,42 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     Year = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MaxSerialNumber = table.Column<long>(type: "bigint", nullable: false),
-                    MaXNumberInYear = table.Column<long>(type: "bigint", nullable: false)
+                    MaXNumberInYear = table.Column<long>(type: "bigint", nullable: false),
+                    YearNotId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_GlobalCounters", x => x.Year);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Governorates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Governorates", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QRScanLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    QR_ID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ScanTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserIP = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserAgent = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NumberOfScans = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QRScanLogs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -144,7 +176,8 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     TechnicianID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ContactDetails = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ContactDetails = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -294,24 +327,22 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Transactions",
+                name: "Areas",
                 columns: table => new
                 {
-                    TransactionID = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PurchaseAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TransactionType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CustomerID = table.Column<int>(type: "int", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GovernateId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Transactions", x => x.TransactionID);
+                    table.PrimaryKey("PK_Areas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Transactions_Customers_CustomerID",
-                        column: x => x.CustomerID,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerID",
+                        name: "FK_Areas_Governorates_GovernateId",
+                        column: x => x.GovernateId,
+                        principalTable: "Governorates",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -358,6 +389,41 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     table.ForeignKey(
                         name: "FK_CouponTechnician_Technicians_TechniciansTechnicianID",
                         column: x => x.TechniciansTechnicianID,
+                        principalTable: "Technicians",
+                        principalColumn: "TechnicianID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Transactions",
+                columns: table => new
+                {
+                    TransactionID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PurchaseAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TransactionType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Governate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CustomerID = table.Column<int>(type: "int", nullable: false),
+                    TechnicianID = table.Column<int>(type: "int", nullable: false),
+                    CouponSort = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CouponType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SequenceNumber = table.Column<int>(type: "int", nullable: false),
+                    ExchangePermission = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transactions", x => x.TransactionID);
+                    table.ForeignKey(
+                        name: "FK_Transactions_Customers_CustomerID",
+                        column: x => x.CustomerID,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Transactions_Technicians_TechnicianID",
+                        column: x => x.TechnicianID,
                         principalTable: "Technicians",
                         principalColumn: "TechnicianID",
                         onDelete: ReferentialAction.Cascade);
@@ -413,6 +479,11 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         principalColumn: "ApplicationUserId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Areas_GovernateId",
+                table: "Areas",
+                column: "GovernateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -489,11 +560,19 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 name: "IX_Transactions_CustomerID",
                 table: "Transactions",
                 column: "CustomerID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_TechnicianID",
+                table: "Transactions",
+                column: "TechnicianID");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Areas");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -525,7 +604,13 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 name: "GlobalCounters");
 
             migrationBuilder.DropTable(
+                name: "QRScanLogs");
+
+            migrationBuilder.DropTable(
                 name: "Transactions");
+
+            migrationBuilder.DropTable(
+                name: "Governorates");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -546,10 +631,10 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 name: "Coupons");
 
             migrationBuilder.DropTable(
-                name: "Technicians");
+                name: "Customers");
 
             migrationBuilder.DropTable(
-                name: "Customers");
+                name: "Technicians");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
