@@ -122,6 +122,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             var result = await _userManager.AddToRoleAsync(user, roleName);
             return result.Succeeded; 
+            //if result succed true 
+            // create mmethod in user repo get two parameter
+            //first one user id second role namme 
         }
 
     }
