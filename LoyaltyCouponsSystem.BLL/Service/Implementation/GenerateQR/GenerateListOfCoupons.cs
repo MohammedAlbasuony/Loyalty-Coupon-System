@@ -9,17 +9,17 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateQR
 {
     public class GenerateListOfCoupons
     {
-        public async Task<List<(byte[], string)>> GenerateQRCodesAsync(List<(Coupon, string)> coupons, string BaseURL)
+        public async Task<List<byte[]>> GenerateQRCodesAsync(List<Coupon> coupons, string BaseURL)
         {
-            List<(byte[], string)> qrCodes = new List<(byte[], string)>();
+            List<byte[]> qrCodes = new List<byte[]>();
 
             foreach (var coupon in coupons)
             {
                 QRCodeGeneratorHelper qRCodeGeneratorHelper = new QRCodeGeneratorHelper();
 
                 // استبدال الكود المتزامن بكود غير متزامن
-                byte[] qrCode = await qRCodeGeneratorHelper.GenerateQRCodeAsync(coupon.Item1, BaseURL);
-                qrCodes.Add((qrCode, coupon.Item2));
+                byte[] qrCode = await qRCodeGeneratorHelper.GenerateQRCodeAsync(coupon, BaseURL);
+                qrCodes.Add((qrCode));
             }
 
             return qrCodes;

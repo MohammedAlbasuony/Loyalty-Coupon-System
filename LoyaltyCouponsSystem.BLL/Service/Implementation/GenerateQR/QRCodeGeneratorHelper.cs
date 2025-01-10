@@ -1,36 +1,69 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.DAL.Entity;
 using QRCoder;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateQR
 {
     public class QRCodeGeneratorHelper : IQRCodeGeneratorHelper
     {
-        public async Task<byte[]> GenerateQRCodeAsync(Coupon Details, string baseUrl)
+        public async Task<byte[]> GenerateQRCodeAsync(Coupon details, string baseUrl)
         {
             // Build TrackUrl ==> This Url which open when scan QRCode
-            string trackUrl = $"{baseUrl}/HistoryScan/track?ID={Details.CouponeId}";
+            string trackUrl = $"{baseUrl}/HistoryScan/track?ID={details.CouponeId}";
 
-            //start to build QR code
-            byte[] QRCode = new byte[0];
-
+            // Generate QR Code
+            byte[] combinedImageBytes = new byte[0];
             if (!string.IsNullOrEmpty(trackUrl))
             {
-                // Generate QRCode contain only on Link For WepPage
-                QRCodeGenerator qRCodeGenerator = new QRCodeGenerator();
-                QRCodeData data = qRCodeGenerator.CreateQrCode(trackUrl, QRCodeGenerator.ECCLevel.Q);
+                QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
+                QRCodeData data = qrCodeGenerator.CreateQrCode(trackUrl, QRCodeGenerator.ECCLevel.Q);
                 BitmapByteQRCode bitmap = new BitmapByteQRCode(data);
 
-                // استخدام await لتحويل العملية إلى غير متزامنة (إذا كانت العملية تستغرق وقتًا)
-                QRCode = await Task.Run(() => bitmap.GetGraphic(20));
+                // Generate QR code image
+                byte[] qrCodeBytes = bitmap.GetGraphic(20);
+                using (var qrCodeImage = new Bitmap(new MemoryStream(qrCodeBytes)))
+                {
+                    // Define the dimensions for the combined image (QR + text)
+                    int combinedWidth = qrCodeImage.Width+100;
+                    int combinedHeight = qrCodeImage.Height + 150; // Extra height for the serial number text
+
+                    using (var combinedImage = new Bitmap(combinedWidth, combinedHeight))
+                    using (var graphics = Graphics.FromImage(combinedImage))
+                    {
+                        graphics.Clear(Color.White);
+
+                        // Draw the QR code
+                        graphics.DrawImage(qrCodeImage, 0, 0);
+
+                        // Draw the serial number below the QR code
+                        string serialNumber = details.SerialNumber.ToString();
+                        float targetWidthInCm = 4; // عرض النص المطلوب بالسنتيمتر
+                        int fontSize = QRCodeWithTextHelper.GetFontSizeForWidth(graphics, serialNumber, "Arial", targetWidthInCm);
+
+                        using (var font = new Font("Arial", 65, FontStyle.Bold))
+                        using (var brush = new SolidBrush(Color.Black))
+                        {
+                            SizeF textSize = graphics.MeasureString(serialNumber, font);
+                            float textX = (combinedWidth - textSize.Width) / 2; // Center the text
+                            float textY = qrCodeImage.Height + 3; // Position below the QR code
+                            graphics.DrawString(serialNumber, font, brush, textX, textY);
+                        }
+
+                        // Save the combined image to a memory stream
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            combinedImage.Save(memoryStream, ImageFormat.Png);
+                            combinedImageBytes = memoryStream.ToArray();
+                        }
+                    }
+                }
             }
 
-            return QRCode;
+            return combinedImageBytes;
         }
     }
 }

@@ -2,6 +2,7 @@
 using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.BLL.Service.Implementation.GeneratePDF;
 using LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateQR;
+using LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateWord;
 using LoyaltyCouponsSystem.BLL.ViewModel.QRCode;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
@@ -18,6 +19,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         private readonly IQRCodeGeneratorHelper _QRCodeGeneratorHelper;
         private readonly ApplicationDbContext _context;
 
+    
         public GenerateQRCodeController(
             ILogger<GenerateQRCodeController> logger,
             IQRCodeGeneratorHelper QRCodeGeneratorHelper,
@@ -38,15 +40,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return Ok(areas);
         }
 
-        public async Task<IActionResult> GetAllCupones()
-        {
-            var result = await _context.Coupons.ToListAsync();
-            return View(result);
-        }
+       
 
         [HttpGet]
         public async Task<IActionResult> GenerateCouponsPDF(
-            List<(byte[], string)> couponImages,
+            List<byte[]> couponImages,
             int couponsPerRow,
             float horizontalSpacing,
             float verticalSpacing,
@@ -71,6 +69,32 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GenerateCouponsWord(
+    List<byte[]> couponImages,
+    int couponsPerRow,
+    float horizontalSpacing,
+    float verticalSpacing,
+    float couponSize)
+        {
+            if (couponImages == null || !couponImages.Any())
+            {
+                return BadRequest("No coupon images provided.");
+            }
+
+            try
+            {
+                var generateWordWithCoupons = new clsGenerateWordWithCoupons();
+                byte[] wordData = await generateWordWithCoupons.GenerateWordWithCouponsAsync(
+                    couponImages, couponsPerRow, horizontalSpacing, verticalSpacing, couponSize);
+
+                return File(wordData, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "Coupons.docx");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
         [HttpGet]
         public async Task<IActionResult> GetMaxSerialNumber()
         {
@@ -99,26 +123,28 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
 
             // قائمة الـ QR Codes
-            var qrCodesList = new List<(Coupon, string)>();
+            var qrCodesList = new List<Coupon>();
             var serviceToMangeCounters = new ServiceToMangeCounters(_context);
             int currentYear = DateTime.Now.Year;
 
             // إنشاء الكوبونات
             for (int i = 0; i < detailsVM.Count; i++)
             {
+                ServiceToSetSerialNumber serialNumber = new ServiceToSetSerialNumber();
                 var couponDetails = new Coupon
                 {
+                    
                     TypeOfCoupone = detailsVM.TypeOfCoupon,
                     Value = detailsVM.Value,
                     GovernorateId = detailsVM.GovernorateId,
                     AreaId = detailsVM.AreaId,
                     NumInYear = await serviceToMangeCounters.GetNextNumInYearAsync(),
-                    SerialNumber = detailsVM.SerialNumber + i
-                };
+                    SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber + i)
+                }; 
 
                 await _context.Coupons.AddAsync(couponDetails);
                 await _context.SaveChangesAsync();
-                qrCodesList.Add((couponDetails, $"{currentYear}{detailsVM.SerialNumber + i}"));
+                qrCodesList.Add(couponDetails);
             }
 
             await serviceToMangeCounters.UpdateMaxSerialNumAsync(detailsVM.Count);
@@ -129,7 +155,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var qrCodesAsBytes = generateListOfCoupons.GenerateQRCodesAsync(qrCodesList, baseUrl);
 
             // إنشاء ملف PDF من QR Codes
-            return await GenerateCouponsPDF(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
+           // return await GenerateCouponsPDF(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
+
+            // إنشاء ملف Word من QR Codes
+            return await GenerateCouponsWord(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
+
         }
 
         public IActionResult Index()
