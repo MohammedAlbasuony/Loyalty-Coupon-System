@@ -97,8 +97,10 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             if (customer != null && technician != null && transactions != null)
             {
+                string ExchangePermissionNum = transactions[0].ExchangePermission;
                 foreach (var transaction in transactions)
                 {
+                    
                     for (int seqNum = transaction.StartSequenceNumber; seqNum <= transaction.EndSequenceNumber; seqNum++)
                     {
                         var newTransaction = new Transaction
@@ -111,7 +113,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                             CouponSort = transaction.SelectedCouponSort,
                             CouponType = transaction.SelectedCouponType,
                             SequenceNumber = seqNum,
-                            ExchangePermission = transaction.ExchangePermission
+                            ExchangePermission = ExchangePermissionNum,
+                            //CreatedBy = User.Identity.Name
+
                         };
 
                         await _repository.AddTransactionAsync(newTransaction);

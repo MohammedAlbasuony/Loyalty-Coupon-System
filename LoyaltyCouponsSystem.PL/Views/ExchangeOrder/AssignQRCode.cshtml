@@ -5,10 +5,9 @@
 }
 
 <form asp-action="AssignQRCode" method="post" id="assignForm">
-    <!-- Customer Dropdown -->
     <div class="form-group">
         <label for="CustomerCodeOrName">Select Customer</label>
-        <select asp-for="SelectedCustomerCode" class="form-control" required>
+        <select asp-for="SelectedCustomerCode" class="form-control select2" required>
             <option value="">Select Customer</option>
             @foreach (var customer in Model.Customers)
             {
@@ -20,7 +19,7 @@
     <!-- Technician Dropdown -->
     <div class="form-group">
         <label for="TechnicianCodeOrName">Select Technician</label>
-        <select asp-for="SelectedTechnicianCode" class="form-control" required>
+        <select asp-for="SelectedTechnicianCode" class="form-control select2" required>
             <option value="">Select Technician</option>
             @foreach (var technician in Model.Technicians)
             {
@@ -47,6 +46,12 @@
         <select asp-for="SelectedCity" class="form-control" id="City" required>
             <option value="">Select City</option>
         </select>
+    </div>
+
+    <!-- Exchange Permission Input -->
+    <div class="form-group">
+        <label for="ExchangePermission">Exchange Permission</label>
+        <input asp-for="ExchangePermission" name="Transactions[0].ExchangePermission" class="form-control" placeholder="Enter exchange permission number" required />
     </div>
 
     <!-- Dynamic Coupon Fields -->
@@ -89,17 +94,15 @@
     <!-- Button to Add Another Set of Fields -->
     <button type="button" class="btn btn-secondary" id="addFieldsButton">Add Another</button>
 
-    <!-- Exchange Permission Input -->
-    <div class="form-group">
-        <label for="ExchangePermission">Exchange Permission</label>
-        <input asp-for="ExchangePermission" class="form-control" placeholder="Enter exchange permission" required />
-    </div>
+    
 
     <button type="submit" class="btn btn-primary">Assign</button>
 </form>
 
 @section Scripts {
     <script>
+        let index = 1; // Initialize index to 1 (since the first set of fields is already rendered with index 0)
+
         // Handle dynamic addition of fields for coupon sort, coupon type, and sequence numbers
         document.getElementById("addFieldsButton").addEventListener("click", function() {
             var container = document.getElementById("couponFieldsContainer");
@@ -144,8 +147,11 @@
                     <input type="number" name="Transactions[${index}].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
                 </div>`;
 
+            // Append new fields to the container
             container.appendChild(newFields);
-            index++; // Increment index for the next set of fields
+
+            // Increment index for the next set of fields
+            index++;
         });
 
         // Make the city dropdown dynamic based on selected governate
@@ -174,5 +180,23 @@
                 });
             }
         });
+
     </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+    <script>
+        // Initialize Select2 on the Customer dropdown
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: 'Select Customer',
+                allowClear: true
+            });
+        });
+    </script>
+
+    <!-- Include Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+
 }
