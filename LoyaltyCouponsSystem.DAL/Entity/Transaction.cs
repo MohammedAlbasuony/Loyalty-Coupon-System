@@ -10,7 +10,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity
     {
         public int TransactionID { get; set; }
         public decimal PurchaseAmount { get; set; }
-        public string TransactionType { get; set; }
+        public string? TransactionType { get; set; }
         public DateTime Timestamp { get; set; }
 
         public string? Governate { get; set; }
