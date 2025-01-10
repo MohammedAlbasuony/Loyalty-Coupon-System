@@ -13,6 +13,7 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public string FullName { get; set; }         // This will also be used as the UserName.
         public string? Role { get; set; }
         public string? PhoneNumber { get; set; }
+        public string? OptionalPhoneNumber { get; set; } 
         public string? Governorate { get; set; }
         public string? City { get; set; }
         public string? NationalID { get; set; }
@@ -20,5 +21,6 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public string? Imagepath { get; set; }
         public virtual Admin Admin { get; set; }
         public virtual Representative Representative { get; set; }
+
     }
 }
