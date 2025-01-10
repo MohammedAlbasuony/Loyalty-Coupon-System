@@ -43,12 +43,15 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 .WithOne(a => a.Governorate)
                 .HasForeignKey(a => a.GovernateId)
                 .OnDelete(DeleteBehavior.Cascade); // عند حذف المحافظة يتم حذف المناطق
-       
 
+            // Ensure NationalID is unique
+            modelBuilder.Entity<ApplicationUser>()
+                    .HasIndex(u => u.NationalID)
+                    .IsUnique();
 
-        // Ensure NationalID is unique
-        modelBuilder.Entity<ApplicationUser>()
-                .HasIndex(u => u.NationalID)
+            // Ensure PhoneNumber is unique
+            modelBuilder.Entity<ApplicationUser>()
+                .HasIndex(u => u.PhoneNumber)
                 .IsUnique();
 
             modelBuilder.Entity<Admin>()

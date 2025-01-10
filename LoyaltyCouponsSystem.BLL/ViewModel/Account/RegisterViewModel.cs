@@ -9,9 +9,17 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Account
         [MaxLength(50, ErrorMessage = "Name cannot exceed 50 characters.")]
         public string Name { get; set; }
 
+        [Required(ErrorMessage = "National ID is required.")]
+        [RegularExpression(@"^\d{14}$", ErrorMessage = "National ID must be exactly 14 digits long.")]
+        [Display(Name = "National ID")]
+        public string NationalID { get; set; }
+
         [Required(ErrorMessage = "Phone Number is required.")]
         [RegularExpression(@"^01[0-9]{9}$", ErrorMessage = "Phone number must follow the format 01xxxxxxxxx.")]
         public string PhoneNumber { get; set; }
+
+        [RegularExpression(@"^01[0-9]{9}$", ErrorMessage = "Phone number must follow the format 01xxxxxxxxx.")]
+        public string? OptionalPhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Governorate is required.")]
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Governorate must contain only letters and spaces.")]
@@ -21,15 +29,8 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Account
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "City must contain only letters and spaces.")]
         public string City { get; set; }
 
-        [Required(ErrorMessage = "National ID is required.")]
-        [RegularExpression(@"^\d{14}$", ErrorMessage = "National ID must be exactly 14 digits long.")]
-        [Display(Name = "National ID")]
-        public string NationalID { get; set; }
-
-        [Required(ErrorMessage = "Role is required.")]
-        [RegularExpression(@"^(Admin|HR|Representative|Storekeeper|Accountant)$", ErrorMessage = "Please select a valid role.")]
+        [Required]
         public string Role { get; set; }
-
 
         [Required(ErrorMessage = "Password is required.")]
         [StringLength(40, MinimumLength = 8, ErrorMessage = "The password must be at least 8 characters long.")]
@@ -41,5 +42,6 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Account
         [DataType(DataType.Password)]
         [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; }
+
     }
 }
