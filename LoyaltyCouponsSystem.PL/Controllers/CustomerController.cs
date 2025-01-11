@@ -52,6 +52,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View(customerViewModel);
         }
 
+
         public async Task<IActionResult> DeleteCustomer(string id)
         {
             await _customerService.DeleteAsync(id);

@@ -69,9 +69,25 @@ namespace LoyaltyCouponsSystem.DAL.DB
             modelBuilder.Entity<Customer>(entity =>
             {
                 entity.HasKey(e => e.CustomerID);
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.ContactDetails).HasMaxLength(200);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(20); 
+
+                entity.Property(e => e.Governate)
+                    .HasMaxLength(50); 
+
+                entity.Property(e => e.City)
+                    .HasMaxLength(50); 
+
+                entity.Property(e => e.PhoneNumber)
+                    .HasMaxLength(11); 
             });
+
 
             modelBuilder.Entity<Transaction>(entity =>
             {

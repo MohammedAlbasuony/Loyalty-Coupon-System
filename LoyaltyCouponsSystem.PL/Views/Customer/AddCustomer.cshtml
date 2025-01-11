@@ -5,23 +5,199 @@
     ViewData["Title"] = "Add Customer";
 }
 
-<h1>Add Customer</h1>
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <h1 class="display-5 text-primary"><b>Add Customer</b></h1>
+        <p class="lead text-secondary">Register new customers with ease and flexibility.</p>
+    </div>
 
-<form asp-action="AddCustomer" method="post">
-    <div class="form-group">
-        <label asp-for="Code"></label>
-        <input asp-for="Code" class="form-control" />
-        <span asp-validation-for="Code" class="text-danger"></span>
+    <!-- Form Section -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form asp-action="AddCustomer" method="post" id="customerForm">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <!-- Name -->
+                <div class="form-group mb-3">
+                    <label asp-for="Name" class="form-label text-primary"><b>Name <span class="text-danger">*</span></b></label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter customer name" required />
+                </div>
+
+                <!-- Account Number -->
+                <div class="form-group mb-3">
+                    <label asp-for="Code" class="form-label text-primary"><b>Account Number <span class="text-danger">*</span></b></label>
+                    <input asp-for="Code" class="form-control" placeholder="Enter account number" required />
+                    <span asp-validation-for="Code" class="text-danger"></span>
+                </div>
+
+                <!-- Governate -->
+                <div class="form-group mb-3">
+                    <label for="governate" class="form-label text-primary"><b>Governate</b></label>
+                    <select id="governate" class="form-select" asp-for="Governate">
+                        <option value="" disabled selected>Choose a Governate</option>
+                        <option value="Cairo">Cairo</option>
+                        <option value="Alexandria">Alexandria</option>
+                        <option value="Giza">Giza</option>
+                        <option value="Dakahlia">Dakahlia</option>
+                        <option value="Red Sea">Red Sea</option>
+                        <option value="Beheira">Beheira</option>
+                        <option value="Fayoum">Fayoum</option>
+                        <option value="Sharqia">Sharqia</option>
+                        <option value="Aswan">Aswan</option>
+                        <option value="Assiut">Assiut</option>
+                        <option value="Beni Suef">Beni Suef</option>
+                        <option value="Port Said">Port Said</option>
+                        <option value="Suez">Suez</option>
+                        <option value="Matruh">Matruh</option>
+                        <option value="Qalyubia">Qalyubia</option>
+                        <option value="Gharbia">Gharbia</option>
+                        <option value="Monufia">Monufia</option>
+                        <option value="Qena">Qena</option>
+                        <option value="North Sinai">North Sinai</option>
+                        <option value="Sohag">Sohag</option>
+                        <option value="South Sinai">South Sinai</option>
+                        <option value="Kafr El Sheikh">Kafr El Sheikh</option>
+                        <option value="Damietta">Damietta</option>
+                        <option value="Ismailia">Ismailia</option>
+                        <option value="Luxor">Luxor</option>
+                        <option value="New Valley">New Valley</option>
+                    </select>
+                </div>
+
+                <!-- City -->
+                <div class="form-group mb-3">
+                    <label for="city" class="form-label text-primary"><b>City</b></label>
+                    <select id="city" class="form-select" asp-for="City" disabled>
+                        <option value="" disabled selected>Choose a City</option>
+                        <!-- Cities will be populated dynamically -->
+                    </select>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group mb-3">
+                    <label asp-for="PhoneNumber" class="form-label text-primary"><b>Phone Number</b></label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-custom">
+                        <i class="fas fa-save"></i> Register Customer
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="ContactDetails"></label>
-        <input asp-for="ContactDetails" class="form-control" />
-        <span asp-validation-for="ContactDetails" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Add Customer</button>
-</form>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        font-size: 16px;
+        padding: 10px 15px;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        }
+
+    label {
+        font-weight: bold;
+    }
+
+    .btn-custom {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+        font-size: 16px;
+        border: none;
+        border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-custom:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+</style>
+
+<script>
+        const citiesByGovernate = {
+        Cairo: ["Nasr City", "Heliopolis", "Maadi", "New Cairo"],
+        Alexandria: ["Montaza", "Sidi Gaber", "Smouha"],
+        Giza: ["Dokki", "Haram", "6th of October"],
+        Dakahlia: ["Mansoura", "Mit Ghamr", "Talkha"],
+        "Red Sea": ["Hurghada", "Safaga", "El Qoseir"],
+        Beheira: ["Damanhour", "Rashid", "Kafr El-Dawwar"],
+        Fayoum: ["Fayoum City", "Tamiya", "Ibsheway"],
+        Sharqia: ["Zagazig", "Belbeis", "10th of Ramadan City"],
+        Aswan: ["Aswan City", "Kom Ombo", "Edfu"],
+        Assiut: ["Assiut City", "Manfalut", "Dayrout"],
+        "Beni Suef": ["Beni Suef City", "Nasser", "Ihnasya"],
+        "Port Said": ["Port Said City"],
+        Suez: ["Suez City"],
+        Matruh: ["Marsa Matruh", "Siwa", "Alamein"],
+        Qalyubia: ["Banha", "Shubra El-Kheima", "Qalyub"],
+        Gharbia: ["Tanta", "El-Mahalla", "Kafr El-Zayat"],
+        Monufia: ["Shebin El-Kom", "Sadat City", "Menouf"],
+        Qena: ["Qena City", "Nag Hammadi", "Qus"],
+        "North Sinai": ["Arish", "Sheikh Zuweid", "Rafah"],
+        Sohag: ["Sohag City", "Tahta", "Akhmim"],
+        "South Sinai": ["Sharm El-Sheikh", "Dahab", "Taba"],
+        "Kafr El Sheikh": ["Kafr El Sheikh City", "Desouk", "Balteem"],
+        Damietta: ["Damietta City", "Ras El Bar", "New Damietta"],
+        Ismailia: ["Ismailia City", "Fayed", "Qantara"],
+        Luxor: ["Luxor City", "Armant", "Esna"],
+        "New Valley": ["Kharga", "Dakhla", "Farafra"]
+    };
+
+
+    document.getElementById("governate").addEventListener("change", function () {
+        const governate = this.value;
+        const citySelect = document.getElementById("city");
+
+        citySelect.innerHTML = '<option value="" disabled selected>Choose a City</option>';
+
+        if (governate && citiesByGovernate[governate]) {
+            citySelect.disabled = false;
+            citiesByGovernate[governate].forEach(city => {
+                const option = document.createElement("option");
+                option.value = city;
+                option.textContent = city;
+                citySelect.appendChild(option);
+            });
+        } else {
+            citySelect.disabled = true;
+        }
+    });
+
+    document.getElementById("customerForm").addEventListener("submit", function (e) {
+        const name = document.getElementById("Name").value.trim();
+        const code = document.getElementById("Code").value.trim();
+
+        if (!name || !code) {
+            alert("Name and Account Number are required!");
+            e.preventDefault();
+        }
+    });
+</script>
