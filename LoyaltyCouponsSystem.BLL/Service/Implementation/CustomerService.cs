@@ -22,9 +22,11 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 
                 var customer = new Customer
                 {
-                    Code = customerViewModel.Code,
                     Name = customerViewModel.Name,
-                    ContactDetails = customerViewModel.ContactDetails
+                    Code = customerViewModel.Code,
+                    Governate = customerViewModel.Governate,
+                    City = customerViewModel.City,
+                    PhoneNumber = customerViewModel.PhoneNumber
                 };
 
                 return await _customerRepo.AddAsync(customer);
@@ -48,9 +50,11 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             // Manual Mapping
             var customerViewModels = customers.Select(customer => new CustomerViewModel
             {
-                Code = customer.Code,
                 Name = customer.Name,
-                ContactDetails = customer.ContactDetails
+                Code = customer.Code,
+                Governate = customer.Governate,
+                City = customer.City,
+                PhoneNumber = customer.PhoneNumber
             }).ToList();
 
             return customerViewModels;
@@ -66,9 +70,11 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 {
                     var customerViewModel = new CustomerViewModel
                     {
-                        Code = customer.Code,
                         Name = customer.Name,
-                        ContactDetails = customer.ContactDetails
+                        Code = customer.Code,
+                        Governate = customer.Governate,
+                        City = customer.City,
+                        PhoneNumber = customer.PhoneNumber
                     };
 
                     return customerViewModel;
@@ -85,9 +91,12 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 // Manual Mapping
                 var customer = new Customer
                 {
-                    Code = customerViewModel.Code,
                     Name = customerViewModel.Name,
-                    ContactDetails = customerViewModel.ContactDetails
+                    Code = customerViewModel.Code,
+                    Governate = customerViewModel.Governate,
+                    City = customerViewModel.City,
+                    PhoneNumber = customerViewModel.PhoneNumber,
+
                 };
 
                 return await _customerRepo.UpdateAsync(customer);

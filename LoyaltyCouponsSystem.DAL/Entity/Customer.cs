@@ -5,11 +5,22 @@ namespace LoyaltyCouponsSystem.DAL.Entity
 {
     public class Customer
     {
+        [Key]
         public int CustomerID { get; set; }
-
+        [Required]
+        [MaxLength(100)]
         public string Name { get; set; }
-        public string ContactDetails { get; set; }
+        [Required]
+        [MaxLength(20)]
         public string Code { get; set; }
         public ICollection<Transaction> Transactions { get; set; }
+        [MaxLength(50)]
+        public string? Governate { get; set; }
+
+        [MaxLength(50)]
+        public string? City { get; set; }
+        [MaxLength(11)]
+        [Phone]
+        public string? PhoneNumber { get; set; }
     }
 }
