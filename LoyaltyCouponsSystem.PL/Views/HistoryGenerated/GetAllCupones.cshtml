@@ -67,34 +67,34 @@
                         {
                 <tr>
                     <td>
-                                    @Html.DisplayFor(modelItem => item.SerialNumber)
+                                    @ViewBag.SerialNumber
                     </td>
                     <td>
-                                    @Html.DisplayFor(modelItem => item.TypeOfCoupone)
+                                    @ViewBag.TypeOfCoupone
                     </td>
                     <td>
-                                    @Html.DisplayFor(modelItem => item.GovernorateId)
+                                    @ViewBag.GovernorateName
                     </td>
                     <td>
-                                    @Html.DisplayFor(modelItem => item.AreaId)
+                                    @ViewBag.AreaName
                     </td>
                     <td>
-                                    @Html.DisplayFor(modelItem => item.Value)
+                                    @ViewBag.Value
                     </td>
                     <td>
-                                    @Html.DisplayFor(modelItem => item.NumInYear)
+                                    @ViewBag.NumInYear
                     </td>
                     <td>
-                                    @Html.DisplayFor(modelItem => item.Status)
+                                    @ViewBag.Status
                     </td>
                     <td>
-                                    @Html.DisplayFor(modelItem => item.CreationDateTime)
+                                    @ViewBag.CreationDateTime
                     </td>
                     <td>
                         <a asp-action="Edit " asp-route-id="@item.CouponeId">Number Of Scans</a> |
                     </td>
                     <td>
-                                    @Html.DisplayFor(modelItem => item.EmployeWhoGenerateID)
+                         <a asp-action="GeneratedBy " asp-route-id="@item.CouponeId">GeneratedBy</a> |
                     </td>
                    <td>
                         <a asp-action="" asp-route-id="@item.CouponeId">Scaned By</a> |
