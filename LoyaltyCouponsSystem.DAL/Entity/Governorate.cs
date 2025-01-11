@@ -14,5 +14,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public string Name { get; set; }
 
         public ICollection<Area> Areas { get; set; } // العلاقة One-to-Many
+
+        public List<Coupon> CouponList { get; set; }
     }
 }

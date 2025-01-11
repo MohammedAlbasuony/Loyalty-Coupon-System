@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/LoyaltyCouponsSystem.PL/Views/HistoryGenerated/GetAllCupones.cshtml
+/LoyaltyCouponsSystem.PL/Views/HistoryGenerated/Index.cshtml
+/LoyaltyCouponsSystem.PL/Views/Shared/_LayoutCoupon.cshtml
