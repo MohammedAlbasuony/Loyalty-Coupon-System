@@ -92,21 +92,27 @@
                                 <p>Admin Dashboard</p>
                                 <span class="caret"></span>
                             </a>
+
                             <div class="collapse" id="dashboard">
                                 <ul class="nav nav-collapse">
                                     <li>
                                         <a href="@Url.Action("ManageUsers", "Admin")">
-                                            <span class="sub-item">Mange Users</span>
+                                            <span class="sub-item">Manage Representative</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="@Url.Action("ManageUsers", "Admin")">
-                                            <span class="sub-item">Mange Users</span>
+                                        <a href="@Url.Action("GetAllCustomers", "Customer")">
+                                            <span class="sub-item">Manage Customer</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="@Url.Action("ManageUsers", "Admin")">
-                                            <span class="sub-item">Mange Users</span>
+                                        <a href="@Url.Action("GetAllDistributors", "Distributor")">
+                                            <span class="sub-item">Manage Distributor</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("GetAllTechnicians", "Technician")">
+                                            <span class="sub-item">Manage Technician</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -133,11 +139,41 @@
                             </a>
                             
                         </li>
-                        
-                        
-                        
-                        
-                        
+                        <li class="nav-item active">
+                        <a data-bs-toggle="collapse"
+                           href="#exchangepermission"
+                           aria-expanded="false"
+                           class="collapsed">
+                            <i class="fas fa-home"></i>
+                            <p>Exchange Permission</p>
+                            <span class="caret"></span>
+                        </a>
+                        </li>
+                        @* <li class="nav-item active"> *@
+                        @*     <a href="@Url.Action("AssignQRCode", "ExchangeOrder")" *@
+                        @*        class="collapsed" *@
+                        @*        aria-expanded="false"> *@
+                        @*         <i class="fas fa-home"></i> *@
+                        @*         <p>Exchange Permission</p> *@
+                        @*         <span class="caret"></span> *@
+                        @*     </a> *@
+
+                        @* </li> *@
+
+                        <div class="collapse" id="exchangepermission">
+                            <ul class="nav nav-collapse">
+                                <li>
+                                    <a href="@Url.Action("AssignQRCode", "ExchangeOrder")">
+                                        <span class="sub-item">Assign Exchange Order</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="@Url.Action("AllTransactions", "Transaction")">
+                                        <span class="sub-item">Exchange all Transactions</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </ul>
                 </div>
             </div>
@@ -426,7 +462,7 @@
                                 <div class="card-body">
                                     <h5 class="card-title">Add Distributor</h5>
                                     <br />
-                                    <a href="/distributor/add" class="btn btn-primary">Add</a>
+                                    <a href="/distributor/adddistributor" class="btn btn-primary">Add</a>
                                 </div>
                             </div>
                         </div>

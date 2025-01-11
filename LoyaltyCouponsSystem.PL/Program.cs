@@ -15,11 +15,11 @@ namespace LoyaltyCouponsSystem.PL
         private static void ConfigurePasswordOptions(IdentityOptions options)
         {
             options.Password.RequireDigit = true;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = false;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequireUppercase = true;
             options.Password.RequiredLength = 8;
-            options.Password.RequiredUniqueChars = 0;
+            options.Password.RequiredUniqueChars = 1;
 
             // Allow spaces in UserName
             options.User.AllowedUserNameCharacters =

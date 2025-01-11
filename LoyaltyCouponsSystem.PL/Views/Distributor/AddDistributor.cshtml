@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Add Distributor";
+    Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
 
     // Simplify customer data to just 'Code' and 'Name'
     var simplifiedCustomers = Model.Customers.Select(c => new
