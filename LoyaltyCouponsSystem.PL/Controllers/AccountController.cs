@@ -1,11 +1,13 @@
 ﻿namespace LoyaltyCouponsSystem.PL.Controllers
 {
+    using LoyaltyCouponsSystem.BLL.Service.Abstraction;
     using LoyaltyCouponsSystem.BLL.ViewModel.Account;
     using LoyaltyCouponsSystem.DAL.DB;
     
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
+    using Newtonsoft.Json;
 
     namespace UsersApp.Controllers
     {
@@ -14,13 +16,14 @@
             private readonly SignInManager<ApplicationUser> signInManager;
             private readonly UserManager<ApplicationUser> userManager;
             private readonly ApplicationDbContext _context;
+            private readonly IAccountService _accountService;
 
-
-            public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+            public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ApplicationDbContext context, IAccountService accountService)
             {
                 this.signInManager = signInManager;
                 this.userManager = userManager;
                 _context = context;
+                _accountService = accountService;
             }
 
             public IActionResult Login()
@@ -37,6 +40,8 @@
 
                     if (result.Succeeded)
                     {
+                        var userDetails = _accountService.GetUserByUsernameAsync(model.Name); 
+                        TempData["UserDetails"] = JsonConvert.SerializeObject(userDetails);
                         return RedirectToAction("Index", "Home");
                     }
                     else

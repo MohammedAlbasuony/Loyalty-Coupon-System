@@ -1,0 +1,144 @@
+﻿@model LoyaltyCouponsSystem.BLL.ViewModel.Distributor.DistributorViewModel
+
+@{
+    ViewData["Title"] = "Add Distributor";
+}
+
+<h1>Add Distributor</h1>
+
+<form asp-action="AddDistributor" method="post" id="addDistributorForm">
+    <!-- Distributor Details -->
+    <div class="form-group">
+        <label asp-for="Code">Code</label>
+        <input asp-for="Code" class="form-control" aria-label="Distributor Code" />
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Name">Name</label>
+        <input asp-for="Name" class="form-control" aria-label="Distributor Name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PhoneNumber1">Phone Number</label>
+        <input asp-for="PhoneNumber1" class="form-control" aria-label="Phone Number" />
+        <span asp-validation-for="PhoneNumber1" class="text-danger"></span>
+    </div>
+
+    <!-- Governate Dropdown -->
+    <div class="form-group">
+        <label asp-for="SelectedGovernate">Select Governate</label>
+        <select asp-for="SelectedGovernate" asp-items="Model.Governates" class="form-control" id="Governate" aria-label="Select Governate">
+            <option value="">Select Governate</option>
+        </select>
+    </div>
+
+    <!-- City Dropdown -->
+    <div class="form-group">
+        <label asp-for="SelectedCity">Select City</label>
+        <select asp-for="SelectedCity" asp-items="Model.Cities" class="form-control" id="City" aria-label="Select City">
+            <option value="">Select City</option>
+        </select>
+    </div>
+
+    <!-- Dynamically added customer dropdowns will appear here -->
+    <h3>Customers</h3>
+    <div id="customerContainer" class="form-group">
+        <label asp-for="SelectedCustomerCode">Select Customer</label>
+        <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-control select2" aria-label="Select Customer">
+            <option value="">Select Customer</option>
+        </select>
+    </div>
+
+    <!-- Button to Add New Customer -->
+    <button type="button" class="btn btn-secondary" id="addCustomerButton">Add New Customer</button>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-primary mt-3" id="submitDistributorButton">Add Distributor</button>
+</form>
+
+@section Scripts {
+    <!-- Pass Customers data from Razor View to JavaScript -->
+    <script>
+        const customers = @Html.Raw(Json.Serialize(Model.Customers));
+    </script>
+
+    <script>
+        let customerIndex = 1; // Initialize customer index
+
+        // Add new customer dropdown dynamically
+        document.getElementById("addCustomerButton").addEventListener("click", function () {
+            const container = document.getElementById("customerContainer");
+
+            // Create a new div to contain the new customer dropdown
+            const newFields = document.createElement("div");
+            newFields.classList.add("customerFields", "mt-3");
+
+            // Create the dropdown dynamically with options
+            let options = `<option value="">Select Customer</option>`;
+            customers.forEach(customer => {
+                options += `<option value="${customer.Code}">${customer.Name} (${customer.Code})</option>`;
+            });
+
+            // Set the innerHTML with the options
+            newFields.innerHTML = `
+                <div class="form-group">
+                    <label for="SelectedCustomerCode_${customerIndex}">Select Customer</label>
+                    <select name="Customers[${customerIndex}].Code" class="form-control select2" id="SelectedCustomerCode_${customerIndex}" aria-label="Select Customer">
+                        ${options}
+                    </select>
+                </div>`;
+
+            // Append the new customer dropdown field to the container
+            container.appendChild(newFields);
+
+            // Increment the customer index for the next customer
+            customerIndex++;
+
+            // Re-initialize Select2 for the newly added dropdown
+            $('.select2').select2({
+                placeholder: 'Select Customer',
+                allowClear: true
+            });
+        });
+
+        // Make the city dropdown dynamic based on selected governate
+        document.getElementById("Governate").addEventListener("change", function () {
+            const governate = this.value;
+            const citySelect = document.getElementById("City");
+
+            // Clear existing options
+            citySelect.innerHTML = "<option value=''>Select City</option>";
+
+            // Use an AJAX call to fetch cities dynamically
+            if (governate) {
+                fetch(`/Distributor/GetCitiesByGovernate?governate=${governate}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(city => {
+                            const option = document.createElement("option");
+                            option.value = city;
+                            option.text = city;
+                            citySelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching cities:', error);
+                        alert('Could not fetch cities. Please try again later.');
+                    });
+            }
+        });
+
+        // Initialize Select2 for customer dropdown
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Select Customer',
+                allowClear: true
+            });
+        });
+    </script>
+
+    <!-- Include Select2 CSS and JS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+}
