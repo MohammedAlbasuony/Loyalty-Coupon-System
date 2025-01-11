@@ -17,12 +17,13 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddDistributor()
+        public async Task<IActionResult> AddDistributorAsync()
         {
             var distributorViewModel = new DistributorViewModel
             {
+
                 Governates = new List<SelectListItem>
-        {
+                {
                 new SelectListItem { Text = "Cairo", Value = "Cairo" },
                 new SelectListItem { Text = "Giza", Value = "Giza" },
                 new SelectListItem { Text = "Alexandria", Value = "Alexandria" },
@@ -49,7 +50,9 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 new SelectListItem { Text = "New Valley", Value = "New Valley" },
                 new SelectListItem { Text = "Gharbia", Value = "Gharbia" },
                 new SelectListItem { Text = "Suez", Value = "Suez" }
-        }
+                },
+                Customers = await _distributorService.GetCustomersForDropdownAsync()
+
             };
             return View(distributorViewModel);
         }

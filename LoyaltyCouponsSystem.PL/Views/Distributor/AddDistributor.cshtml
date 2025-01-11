@@ -2,6 +2,13 @@
 
 @{
     ViewData["Title"] = "Add Distributor";
+
+    // Simplify customer data to just 'Code' and 'Name'
+    var simplifiedCustomers = Model.Customers.Select(c => new
+    {
+        Code = c.Value,
+        Name = c.Text
+    }).ToList();
 }
 
 <div class="container mt-5">
@@ -56,31 +63,17 @@
                     </select>
                 </div>
 
-                <!-- Customers -->
-                <h3 class="mt-4 text-primary">Customers</h3>
-                <div id="customerContainer" class="form-group mb-3">
-                    <label asp-for="SelectedCustomerCode" class="form-label text-primary"><b>Select Customer</b></label>
-                    <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-select select2">
-                        <option value="" disabled selected>Select Customer</option>
+                <!-- Dynamically added customer dropdowns will appear here -->
+                <h3>Customers</h3>
+                <div id="customerContainer" class="form-group">
+                    <label asp-for="SelectedCustomerCode">Select Customer</label>`
+                    <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-control select2" aria-label="Select Customer">
+                        <option value="">Select Customer</option>
                     </select>
                 </div>
 
-                @* <!-- Customer Name --> *@
-                @* <div class="form-group mb-3"> *@
-                @*     <label asp-for="CustomerName" class="form-label text-primary"><b>Customer Name</b></label> *@
-                @*     <input asp-for="CustomerName" class="form-control" placeholder="Enter customer name" /> *@
-                @* </div> *@
-
-                @* <!-- Representative Name --> *@
-                @* <div class="form-group mb-3"> *@
-                @*     <label asp-for="RepresentativeName" class="form-label text-primary"><b>Representative Name</b></label> *@
-                @*     <input asp-for="RepresentativeName" class="form-control" placeholder="Enter representative name" /> *@
-                @* </div> *@
-
-                <!-- Add Customer Button -->
-                <button type="button" class="btn btn-outline-secondary mb-3" id="addCustomerButton">
-                    <i class="fas fa-plus"></i> Add New Customer
-                </button>
+                <!-- Button to Add New Customer -->
+                <button type="button" class="btn btn-secondary" id="addCustomerButton">Add New Customer</button>
 
                 <!-- Submit Button -->
                 <div class="text-center">
@@ -95,6 +88,78 @@
 
 <!-- Scripts Section -->
 @section Scripts {
+    <script>
+        debugger;
+         // Serialize the Model.Customers data into JavaScript for use in the script
+         const customers = @Html.Raw(Json.Serialize(Model.Customers));
+
+         // Log customers to the console for debugging
+         console.log("Customers data:", customers);
+
+         let customerIndex = 1; // Initialize customer index for dynamic dropdowns
+
+         // Add a new customer dropdown dynamically
+         document.getElementById("addCustomerButton").addEventListener("click", function () {
+             const container = document.getElementById("customerContainer");
+
+             // Create a new div to contain the new customer dropdown
+             const newFields = document.createElement("div");
+             newFields.classList.add("customerFields", "mt-3");
+
+             // Check if customers is an array and contains the expected data
+             if (Array.isArray(customers) && customers.length > 0) {
+                 let options = `<option value="">Select Customer</option>`;
+
+                 // Iterate over the customers array and add each customer as an option
+                 customers.forEach(customer => {
+                     if (customer.text && customer.value) {
+                         options += `<option value="${customer.value}">${customer.text}</option>`;
+                     } else {
+                         console.error("Invalid customer data:", customer);
+                     }
+                 });
+
+                 // Set the innerHTML with the options
+                 newFields.innerHTML = `
+                     <div class="form-group">
+                         <label for="SelectedCustomerCode_${customerIndex}">Select Customer</label>
+                         <select name="Customers[${customerIndex}].Code" class="form-control select2" id="SelectedCustomerCode_${customerIndex}" aria-label="Select Customer">
+                             ${options}
+                         </select>
+                     </div>`;
+
+                 // Append the new customer dropdown field to the container
+                 container.appendChild(newFields);
+
+                 // Increment the customer index for the next customer
+                 customerIndex++;
+
+                 // Re-initialize Select2 for the newly added dropdown
+                 $('.select2').select2({
+                     placeholder: 'Select Customer',
+                     allowClear: true
+                 });
+             } else {
+                 console.error("No customers data available or invalid format.");
+             }
+         });
+
+         // Initialize Select2 for the existing customer dropdown
+         $(document).ready(function () {
+             $('.select2').select2({
+                 placeholder: 'Select Customer',
+                 allowClear: true
+             });
+         });
+
+        // Initialize Select2 for customer dropdown
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Select Customer',
+                allowClear: true
+            });
+        });
+    </script>
     <script>
             const citiesByGovernate = {
             Cairo: ["Nasr City", "Heliopolis", "Maadi", "New Cairo"],
@@ -144,55 +209,8 @@
                 citySelect.disabled = true;
             }
         });
-
-        let customerIndex = 1; // Initialize customer index
-
-        // Add new customer dropdown dynamically
-        document.getElementById("addCustomerButton").addEventListener("click", function () {
-            const container = document.getElementById("customerContainer");
-
-            // Create a new div to contain the new customer dropdown
-            const newFields = document.createElement("div");
-            newFields.classList.add("customerFields", "mt-3");
-
-            // Create the dropdown dynamically with options
-            let options = `<option value="" disabled selected>Select Customer</option>`;
-            customers.forEach(customer => {
-                options += `<option value="${customer.Code}">${customer.Name} (${customer.Code})</option>`;
-            });
-
-            // Set the innerHTML with the options
-            newFields.innerHTML = `
-                <div class="form-group">
-                    <label for="SelectedCustomerCode_${customerIndex}" class="form-label text-primary"><b>Customer</b></label>
-                    <select name="Customers[${customerIndex}].Code" class="form-select select2" id="SelectedCustomerCode_${customerIndex}">
-                        ${options}
-                    </select>
-                </div>`;
-
-            // Append the new customer dropdown field to the container
-            container.appendChild(newFields);
-
-            // Increment the customer index for the next customer
-            customerIndex++;
-
-            // Re-initialize Select2 for the newly added dropdown
-            $('.select2').select2({
-                placeholder: 'Select Customer',
-                allowClear: true
-            });
-        });
-
+        </script>
         
-
-        // Initialize Select2 for customer dropdown
-        $(document).ready(function () {
-            $('.select2').select2({
-                placeholder: 'Select Customer',
-                allowClear: true
-            });
-        });
-    </script>
 
     <!-- Include Select2 CSS and JS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
