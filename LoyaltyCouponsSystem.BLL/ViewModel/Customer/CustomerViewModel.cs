@@ -1,14 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace LoyaltyCouponsSystem.BLL.ViewModel.Customer;
-{
     public class CustomerViewModel
     {
-        public string Code { get; set; }
-        public string Name { get; set; }
-        public string ContactDetails { get; set; }
-        public string AccountNumber { get; set; }
-
 
         [Required(ErrorMessage = "Name is required.")]
         [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "Name must contain only letters, numbers, and spaces.")]
@@ -29,5 +23,3 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Customer;
         [RegularExpression(@"^01[0-9]{9}$", ErrorMessage = "Phone number must follow the format 01xxxxxxxxx.")]
         public string? PhoneNumber { get; set; }
     }
-
-}
