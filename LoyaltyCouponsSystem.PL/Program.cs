@@ -49,12 +49,15 @@ namespace LoyaltyCouponsSystem.PL
 
             // Register repositories and services
             builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
             builder.Services.AddScoped<ICustomerService, CustomerService>();
             builder.Services.AddScoped<ITechnicianRepo, TechnicianRepo>();
             builder.Services.AddScoped<ITechnicianService, TechnicianService>();
             builder.Services.AddScoped<IExchangeOrderRepo, ExchangeOrderRepo>();
             builder.Services.AddScoped<IExchangeOrderService, ExchangeOrderService>();
+            builder.Services.AddScoped<IDistributorService, DistributorService>();
+            builder.Services.AddScoped<IDistributorRepo, DistributorRepo>();
 
 
             //Add service make QRCode to the container

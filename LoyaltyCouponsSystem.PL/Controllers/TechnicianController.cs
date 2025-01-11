@@ -1,6 +1,7 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
 {
@@ -33,23 +34,42 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [HttpGet]
         public IActionResult AddTechnician()
         {
-            return View();
+            var technicianViewModel = new TechnicianViewModel
+            {
+                Governates = new List<SelectListItem>
+        {
+            new SelectListItem { Text = "Cairo", Value = "Cairo" },
+            new SelectListItem { Text = "Gharbeia", Value = "Gharbeia" },
+            new SelectListItem { Text = "Sharqeia", Value = "Sharqeia" },
+            new SelectListItem { Text = "Alexandria", Value = "Alexandria" }
+        }
+            };
+            return View(technicianViewModel);
         }
 
         [HttpPost]
         public async Task<IActionResult> AddTechnician(TechnicianViewModel technicianViewModel)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var result = await _technicianService.AddAsync(technicianViewModel);
-                if (result)
+                if (ModelState.IsValid)
                 {
-                    return RedirectToAction("GetAllTechnicians");
+                    var result = await _technicianService.AddAsync(technicianViewModel);
+                    if (result)
+                    {
+                        return RedirectToAction("GetAllTechnicians");
+                    }
+                    ModelState.AddModelError("", "Unable to add technician. Please try again.");
                 }
-                ModelState.AddModelError("", "Unable to add doctor. Please try again.");
-            }
 
-            return View(technicianViewModel);
+                return View(technicianViewModel);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
         }
 
         public async Task<IActionResult> DeleteTechnician(string id)

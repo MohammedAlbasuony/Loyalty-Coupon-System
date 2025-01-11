@@ -14,5 +14,6 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
         Task<bool> UpdateUserAsync(AdminUserViewModel model);
         Task<bool> DeleteUserAsync(string userId);
         Task<bool> AssignRoleToUserAsync(string userId, string roleName);
+        Task<bool> UpdateUserRoleName(string userId, string roleName);
     }
 }

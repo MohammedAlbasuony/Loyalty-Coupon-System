@@ -14,8 +14,9 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<StoreKeeper> StoreKeepers { get; set; }
-       
+
         public DbSet<Technician> Technicians { get; set; }
+        public DbSet<Distributor> Distributors { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
@@ -43,12 +44,15 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 .WithOne(a => a.Governorate)
                 .HasForeignKey(a => a.GovernateId)
                 .OnDelete(DeleteBehavior.Cascade); // عند حذف المحافظة يتم حذف المناطق
-       
 
+            // Ensure NationalID is unique
+            modelBuilder.Entity<ApplicationUser>()
+                    .HasIndex(u => u.NationalID)
+                    .IsUnique();
 
-        // Ensure NationalID is unique
-        modelBuilder.Entity<ApplicationUser>()
-                .HasIndex(u => u.NationalID)
+            // Ensure PhoneNumber is unique
+            modelBuilder.Entity<ApplicationUser>()
+                .HasIndex(u => u.PhoneNumber)
                 .IsUnique();
 
             modelBuilder.Entity<Admin>()
@@ -66,9 +70,25 @@ namespace LoyaltyCouponsSystem.DAL.DB
             modelBuilder.Entity<Customer>(entity =>
             {
                 entity.HasKey(e => e.CustomerID);
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.ContactDetails).HasMaxLength(200);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(20); 
+
+                entity.Property(e => e.Governate)
+                    .HasMaxLength(50); 
+
+                entity.Property(e => e.City)
+                    .HasMaxLength(50); 
+
+                entity.Property(e => e.PhoneNumber)
+                    .HasMaxLength(11); 
             });
+
 
             modelBuilder.Entity<Transaction>(entity =>
             {
@@ -80,16 +100,29 @@ namespace LoyaltyCouponsSystem.DAL.DB
                     .HasForeignKey(e => e.CustomerID);
             });
 
-
-            modelBuilder.Entity<GlobalCounter>(entity => {
+            modelBuilder.Entity<Distributor>()
+           .HasMany(d => d.Customers)
+           .WithMany(c => c.Distributors)
+           .UsingEntity<Dictionary<string, object>>(
+               "DistributorCustomer", 
+           j => j.HasOne<Customer>().WithMany().HasForeignKey("CustomerId"),
+           j => j.HasOne<Distributor>().WithMany().HasForeignKey("DistributorId"),
+           j =>
+           {
+               j.HasKey("DistributorId", "CustomerId");
+               j.ToTable("DistributorCustomers"); 
+           }
+       );
+            modelBuilder.Entity<GlobalCounter>(entity =>
+            {
                 entity.HasKey(GC => GC.Year);
-                });
+            });
 
 
             modelBuilder.Entity<Coupon>(entity =>
             {
                 entity.HasKey(e => e.CouponeId);
-                
+
                 entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
             });
 
@@ -99,10 +132,10 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.Property(e => e.NameAttribute).IsRequired().HasMaxLength(100);
             });
 
-           
-           
 
-           
+
+
+
 
             modelBuilder.Entity<Technician>(entity =>
             {

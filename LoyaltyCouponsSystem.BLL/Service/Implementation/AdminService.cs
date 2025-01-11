@@ -3,11 +3,6 @@ using LoyaltyCouponsSystem.BLL.ViewModel.Admin;
 using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 {
@@ -33,8 +28,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             UserName = user.UserName,
             Email = user.Email,
             EmailConfirmed = user.EmailConfirmed,
-            Role = user.Role,        
-            IsDeleted = user.IsDeleted 
+            Role = user.Role,
+            IsDeleted = user.IsDeleted
         }).ToListAsync();
 
             return users;
@@ -52,7 +47,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 Id = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,
-                Role = roles.FirstOrDefault(),              
+                Role = roles.FirstOrDefault(),
             };
         }
         public async Task<bool> UpdateUserAsync(AdminUserViewModel model)
@@ -62,14 +57,14 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             user.Email = model.Email;
             user.UserName = model.UserName;
-             var currentRoles = await _userManager.GetRolesAsync(user);
+            var currentRoles = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, currentRoles);
             var addRoleResult = await _userManager.AddToRoleAsync(user, model.Role);
 
             if (!addRoleResult.Succeeded)
-            {               
+            {
                 var errors = addRoleResult.Errors.Select(e => e.Description);
-               
+
             }
 
             var result = await _userManager.UpdateAsync(user);
@@ -99,20 +94,20 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             }
         }
 
-       
+
         public async Task<bool> AssignRoleToUserAsync(string userId, string roleName)
         {
-           
+
             var roleExists = await _roleManager.RoleExistsAsync(roleName);
             if (!roleExists)
             {
-                return false; 
+                return false;
             }
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return false; 
+                return false;
             }
 
             if (await _userManager.IsInRoleAsync(user, roleName))
@@ -121,8 +116,24 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             }
 
             var result = await _userManager.AddToRoleAsync(user, roleName);
-            return result.Succeeded; 
+            return result.Succeeded;
+            //if result succed true 
+            // create mmethod in user repo get two parameter
+            //first one user id second role namme 
         }
 
+
+        public async Task<bool> UpdateUserRoleName(string userId, string roleName)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return false;
+
+            user.Role = roleName;
+            dbContext.Users.Update(user);
+            await dbContext.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

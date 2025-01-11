@@ -15,6 +15,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
         public IActionResult Index()
         {
+
             return View();
         }
 
