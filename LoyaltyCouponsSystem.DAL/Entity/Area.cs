@@ -16,5 +16,11 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public int GovernateId { get; set; }
 
         public Governorate Governorate { get; set; } // العلاقة مع Governorate
+
+        public List<Coupon> CouponList { get; set; }
+       
+
+
+
     }
 }
