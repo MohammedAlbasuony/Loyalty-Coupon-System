@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250111081712_updatecustomer")]
+    partial class updatecustomer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,21 +68,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.HasIndex("TechniciansTechnicianID");
 
                     b.ToTable("CouponTechnician");
-                });
-
-            modelBuilder.Entity("DistributorCustomer", b =>
-                {
-                    b.Property<int>("DistributorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DistributorId", "CustomerId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("DistributorCustomers", (string)null);
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.DB.ApplicationUser", b =>
@@ -331,39 +319,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.HasKey("CustomerID");
 
                     b.ToTable("Customers");
-                });
-
-            modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Distributor", b =>
-                {
-                    b.Property<int>("DistributorID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DistributorID"));
-
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Governate")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PhoneNumber1")
-                        .HasColumnType("int");
-
-                    b.HasKey("DistributorID");
-
-                    b.ToTable("Distributors");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Employee", b =>
@@ -773,21 +728,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Technician", null)
                         .WithMany()
                         .HasForeignKey("TechniciansTechnicianID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DistributorCustomer", b =>
-                {
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Customer", null)
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Distributor", null)
-                        .WithMany()
-                        .HasForeignKey("DistributorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -25,8 +25,13 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             return new CustomerViewModel
             {
+                Name = customer.Name,
                 Code = customer.Code,
-                Name = customer.Name
+                Governate = customer.Governate,
+                City = customer.City,
+                PhoneNumber = customer.PhoneNumber
+
+
             };
         }
 
