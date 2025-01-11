@@ -13,6 +13,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         [Required]
         [MaxLength(20)]
         public string Code { get; set; }
+        public ICollection<Distributor> Distributors { get; set; }
         public ICollection<Transaction> Transactions { get; set; }
         [MaxLength(50)]
         public string? Governate { get; set; }

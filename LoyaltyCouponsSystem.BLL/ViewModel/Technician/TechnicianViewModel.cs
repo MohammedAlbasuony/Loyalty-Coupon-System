@@ -5,7 +5,6 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
 {
     public class TechnicianViewModel
     {
-        //public int TechnicianID { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
         public string NickName { get; set; }

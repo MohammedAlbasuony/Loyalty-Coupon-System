@@ -14,8 +14,9 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<StoreKeeper> StoreKeepers { get; set; }
-       
+
         public DbSet<Technician> Technicians { get; set; }
+        public DbSet<Distributor> Distributors { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
@@ -99,16 +100,29 @@ namespace LoyaltyCouponsSystem.DAL.DB
                     .HasForeignKey(e => e.CustomerID);
             });
 
-
-            modelBuilder.Entity<GlobalCounter>(entity => {
+            modelBuilder.Entity<Distributor>()
+           .HasMany(d => d.Customers)
+           .WithMany(c => c.Distributors)
+           .UsingEntity<Dictionary<string, object>>(
+               "DistributorCustomer", 
+           j => j.HasOne<Customer>().WithMany().HasForeignKey("CustomerId"),
+           j => j.HasOne<Distributor>().WithMany().HasForeignKey("DistributorId"),
+           j =>
+           {
+               j.HasKey("DistributorId", "CustomerId");
+               j.ToTable("DistributorCustomers"); 
+           }
+       );
+            modelBuilder.Entity<GlobalCounter>(entity =>
+            {
                 entity.HasKey(GC => GC.Year);
-                });
+            });
 
 
             modelBuilder.Entity<Coupon>(entity =>
             {
                 entity.HasKey(e => e.CouponeId);
-                
+
                 entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
             });
 
@@ -118,10 +132,10 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.Property(e => e.NameAttribute).IsRequired().HasMaxLength(100);
             });
 
-           
-           
 
-           
+
+
+
 
             modelBuilder.Entity<Technician>(entity =>
             {
