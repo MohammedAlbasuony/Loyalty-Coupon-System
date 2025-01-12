@@ -5,20 +5,35 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
 {
     public class TechnicianViewModel
     {
+        [Required(ErrorMessage = "Account Number is required.")]
+        [StringLength(20, ErrorMessage = "Account Number must be less than 20 digits.")]
         public string Code { get; set; }
         public string Name { get; set; }
         public string NickName { get; set; }
+
         [Required(ErrorMessage = "National ID is required.")]
         [RegularExpression(@"^\d{14}$", ErrorMessage = "National ID must be exactly 14 digits long.")]
         [Display(Name = "National ID")]
         public string NationalID { get; set; }
+
+        [Required(ErrorMessage = "Phone number is required.")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits.")]
+        [Display(Name = "Primary Phone Number")]
         public int PhoneNumber1 { get; set; }
+
+        [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits.")]
+        [Display(Name = "Secondary Phone Number")]
         public int? PhoneNumber2 { get; set; }
+
+        [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits.")]
+        [Display(Name = "Tertiary Phone Number")]
         public int? PhoneNumber3 { get; set; }
+
         public List<SelectListItem> Governates { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> Cities { get; set; } = new List<SelectListItem>();
         public string SelectedGovernate { get; set; }
         public string SelectedCity { get; set; }
     }
+
 
 }
