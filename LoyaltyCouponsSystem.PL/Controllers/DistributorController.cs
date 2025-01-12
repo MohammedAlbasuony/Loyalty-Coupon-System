@@ -16,6 +16,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _distributorService = distributorService;
         }
 
+        public IActionResult Index()
+        {
+            return View();
+        }
+
         [HttpGet]
         public async Task<IActionResult> AddDistributorAsync()
         {
@@ -99,6 +104,25 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
             distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
             return View(distributorViewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllDistributors()
+        {
+            var distributors = await _distributorService.GetAllAsync();
+            return View(distributors);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteDistributor(int id)
+        {
+            var result = await _distributorService.DeleteAsync(id);
+            if (result)
+            {
+                return RedirectToAction("GetAllDistributors");
+            }
+            ModelState.AddModelError("", "Unable to delete distributor. Please try again.");
+            return RedirectToAction("GetAllDistributors");
         }
     }
 }

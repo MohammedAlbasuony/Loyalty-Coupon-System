@@ -23,6 +23,6 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public string? CouponType { get; set; } 
         public int SequenceNumber { get; set; }
         public string ExchangePermission { get; set; }
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
     }
 }

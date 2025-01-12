@@ -1,15 +1,13 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
-using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.BLL.ViewModel.Admin;
 using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
 {
-    //[Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly IAdminService _adminService;
@@ -23,9 +21,9 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _adminService = adminService;
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> ManageUsers()
         {
-
             var allUsers = await _userManager.Users.ToListAsync();
             var confirmedUsers = allUsers.Where(u => u.EmailConfirmed == true).ToList();
             var unconfirmedUsers = allUsers.Where(u => u.EmailConfirmed == false).ToList();
@@ -56,7 +54,6 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             };
 
             return View(model);
-
         }
 
         // Edit user
@@ -99,7 +96,6 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
         }
 
-
         [HttpGet]
         public async Task<IActionResult> AssignRoleForm()
         {
@@ -135,10 +131,8 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var result = await _userManager.AddToRoleAsync(user, roleName);
             if (result.Succeeded)
                 TempData["SuccessMessage"] = $"Role '{roleName}' has been assigned to user.";
-
             else
                 TempData["ErrorMessage"] = "Failed to assign the role.";
-
 
             var userRoleName = await _adminService.UpdateUserRoleName(userId, roleName);
 
@@ -171,4 +165,3 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
     }
 }
-

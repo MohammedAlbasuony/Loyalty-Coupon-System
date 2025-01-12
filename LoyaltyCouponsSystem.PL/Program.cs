@@ -15,16 +15,15 @@ namespace LoyaltyCouponsSystem.PL
         private static void ConfigurePasswordOptions(IdentityOptions options)
         {
             options.Password.RequireDigit = true;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = false;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequireUppercase = true;
             options.Password.RequiredLength = 8;
-            options.Password.RequiredUniqueChars = 0;
+            options.Password.RequiredUniqueChars = 1;
 
             // Allow spaces in UserName
             options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
-
         }
 
         public static async Task Main(string[] args)
@@ -59,9 +58,14 @@ namespace LoyaltyCouponsSystem.PL
             builder.Services.AddScoped<IDistributorService, DistributorService>();
             builder.Services.AddScoped<IDistributorRepo, DistributorRepo>();
 
-
-            //Add service make QRCode to the container
+            // Add service make QRCode to the container
             builder.Services.AddScoped<IQRCodeGeneratorHelper, QRCodeGeneratorHelper>();
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/Login"; // Redirect to login page
+                options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect to access denied page
+            });
 
             var app = builder.Build();
 
@@ -74,6 +78,7 @@ namespace LoyaltyCouponsSystem.PL
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
@@ -82,19 +87,24 @@ namespace LoyaltyCouponsSystem.PL
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
-            // Ensure roles exist at startup
+            // Ensure roles and the initial SuperAdmin user exist at startup
             using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                await CreateRolesAsync(roleManager);
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                await CreateRolesAndSuperAdminAsync(roleManager, userManager);
             }
 
             app.Run();
         }
 
-        private static async Task CreateRolesAsync(RoleManager<IdentityRole> roleManager)
+        private static async Task CreateRolesAndSuperAdminAsync(
+    RoleManager<IdentityRole> roleManager,
+    UserManager<ApplicationUser> userManager)
         {
+            // Roles to ensure exist
             string[] roleNames = { "Admin", "HR", "Representative", "Storekeeper", "Accountant", "SuperAdmin" };
+
             foreach (var roleName in roleNames)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))
@@ -102,6 +112,43 @@ namespace LoyaltyCouponsSystem.PL
                     await roleManager.CreateAsync(new IdentityRole(roleName));
                 }
             }
+
+            // Create the initial SuperAdmin user if not already present
+            var superAdminEmail = "superadmin@example.com";
+            var superAdminUserName = "superadmin";
+            var superAdminPassword = "SuperAdmin@Password_2025!";
+
+            var superAdmin = await userManager.FindByEmailAsync(superAdminEmail);
+            if (superAdmin == null)
+            {
+                var newSuperAdmin = new ApplicationUser
+                {
+                    UserName = superAdminUserName,
+                    Email = superAdminEmail,
+                    EmailConfirmed = true, // Skip email confirmation for the initial user
+                    FullName = "Super Admin" // Provide a default FullName value
+                };
+
+                var createResult = await userManager.CreateAsync(newSuperAdmin, superAdminPassword);
+                if (createResult.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(newSuperAdmin, "SuperAdmin");
+                    Console.WriteLine("SuperAdmin user created successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Error creating SuperAdmin user:");
+                    foreach (var error in createResult.Errors)
+                    {
+                        Console.WriteLine($"- {error.Description}");
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("SuperAdmin user already exists.");
+            }
         }
+
     }
 }

@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "All Distributors";
+    Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
 }
 
 <h1>All Distributors</h1>
@@ -14,7 +15,8 @@
             <th>Phone Number</th>
             <th>Governate</th>
             <th>City</th>
-            <th>Actions</th>
+            <th>Customers</th>
+            <th>Actions</th>     
         </tr>
     </thead>
     <tbody>
@@ -25,11 +27,11 @@
                 <td>@distributor.Name</td>
                 <td>@distributor.PhoneNumber1</td>
                 <td>@distributor.SelectedGovernate</td>
-                <td>@distributor.SelectedCity</td>
+                <td>@distributor.SelectedCustomerCode</td>
+                <td>@distributor.SelectedCity</td>              
                 <td>
-                    <a href="@Url.Action("GetDistributorById", "Distributor", new { id = distributor.Code })">View</a> |
                     <a href="@Url.Action("UpdateDistributor", "Distributor", new { id = distributor.Code })">Edit</a> |
-                    <a href="@Url.Action("DeleteDistributor", "Distributor", new { id = distributor.Code })" onclick="return confirm('Are you sure?')">Delete</a>
+                    <a href="@Url.Action("GetAllDistributors", "Distributor", new { id = distributor.Code })" onclick="return confirm('Are you sure?')">Delete</a>
                 </td>
             </tr>
         }
