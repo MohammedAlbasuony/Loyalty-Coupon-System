@@ -39,7 +39,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 .OrderBy(c => c.SerialNumber) // ترتيب حسب Serial Number
 
                 // إضافة شرط البحث إذا تم توفير Serial Number
-                .Where(c => string.IsNullOrEmpty(serialNumber) || c.SerialNumber.ToString().Contains(serialNumber));
+                .Where(c => string.IsNullOrEmpty(serialNumber) || c.SerialNumber.ToString().Contains(serialNumber)|| c.Status.ToString().Contains(serialNumber));
 
             // إجمالي عدد العناصر بعد التصفية (لصفحات الترقيم)
             int totalCount = query.Count();

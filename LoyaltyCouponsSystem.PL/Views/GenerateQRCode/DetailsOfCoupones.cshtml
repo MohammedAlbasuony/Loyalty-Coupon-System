@@ -18,7 +18,7 @@
                 <div class="col-md-6">
                     <label for="typeOfCoupon" class="form-label">اختر نوع الكوبون:</label>
                     <select asp-for="TypeOfCoupon" class="form-select" aria-label="Default select example">
-                        <option selected>اختر نوع الكوبون</option>
+                        <option disabled selected>اختر نوع الكوبون</option>
                         <option value="راك ثيرم">راك ثيرم</option>
                         <option value="صرف جي تكس">صرف جي تكس</option>
                         <option value="اقطار كبيرة وهودذا">اقطار كبيرة وهودذا</option>
@@ -38,7 +38,7 @@
                 <div class="col-md-6">
                     <label asp-for="GovernorateId" class="form-label">اختر المحافظة (اختياري):</label>
                     <select class="form-select" asp-for="GovernorateId" asp-items="@(new SelectList(Model.governorates,"Id","Name"))">
-                        <option selected>اختر المحافظة</option>
+                        <option disabled selected>اختر المحافظة</option>
                     </select>
                 </div>
 
@@ -46,7 +46,7 @@
                 <div class="col-md-6">
                     <label asp-for="AreaId" class="form-label">اختر المنطقة (اختياري):</label>
                     <select class="form-select" asp-for="AreaId" asp-items="@(new SelectList(Model.Areas,"Id","Name"))">
-                        <option selected>اختر المنطقة</option>
+                        <option disabled selected>اختر المنطقة</option>
                     </select>
                 </div>
 
@@ -59,7 +59,7 @@
                 <!-- مسلسل الكوبون -->
                 <div class="col-md-6">
                     <label for="SerialNumber" class="form-label">مسلسل الكوبون:</label>
-                    <input type="number" class="form-control" id="SerialNumber" name="Serialnumber" required>
+                    <input type="text" class="form-control" id="SerialNumber" name="Serialnumber" required>
                 </div>
 
                 <!-- عدد الكوبونات في الصف -->
@@ -97,26 +97,29 @@
     @section Scripts {
         <script>
             $(document).ready(function () {
-                let maxSerialNumber = 0;
+            let maxSerialNumber = 0;
 
-                // Fetch the maximum serial number from the server
-                $.get("/GenerateQRCode/GetMaxSerialNumber", function (data) {
-                    maxSerialNumber = data;
-                });
+            // Fetch the maximum serial number from the server
+            $.get("/GenerateQRCode/GetMaxSerialNumber", function (data) {
+                maxSerialNumber = parseInt(data);
+            });
 
-                // Validate the serial number on blur
-                $("#SerialNumber").on("blur", function () {
-                    const enteredSerial = parseInt($(this).val());
-                    if (!isNaN(enteredSerial) && enteredSerial <= maxSerialNumber) {
-                        // Show an error message below the input field
-                        if (!$("#serialNumberError").length) {
-                            $("#SerialNumber").after('<span id="serialNumberError" style="color: red;">الرقم المدخل أقل من أعلى رقم مسلسل (' + maxSerialNumber + '). يرجى إدخال رقم أكبر.</span>');
-                        }
-                    } else {
-                        // Remove the error message if the input is valid
-                        $("#serialNumberError").remove();
+            // Validate the serial number on blur
+            $("#SerialNumber").on("blur", function () {
+                const enteredSerial = parseInt($(this).val());
+                const formattedMaxSerial = maxSerialNumber.toString().padStart(7, '0'); // Format the max serial number
+
+                if (!isNaN(enteredSerial) && enteredSerial <= maxSerialNumber) {
+                    // Show an error message below the input field
+                    if (!$("#serialNumberError").length) {
+                        $("#SerialNumber").after('<span id="serialNumberError" style="color: red;">الرقم المدخل أقل من أعلى رقم مسلسل (' + formattedMaxSerial + '). يرجى إدخال رقم أكبر.</span>');
                     }
-                });
+                } else {
+                    // Remove the error message if the input is valid
+                    $("#serialNumberError").remove();
+                }
+            });
+
 
                 // Handle governorate and area changes
                 $('#GovernorateId').change(function () {

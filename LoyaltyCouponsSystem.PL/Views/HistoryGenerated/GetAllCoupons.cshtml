@@ -48,17 +48,51 @@
                 </table>
             </div>
             <div>
-                <!-- Pagination -->
                 <nav>
                     <ul class="pagination">
-                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@(ViewBag.CurrentPage - 1)">Previous</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage > 3)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=1">1</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link">...</a>
+                            </li>
+                        }
+
+                        @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
                         {
                             <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
                                 <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@i">@i</a>
                             </li>
                         }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages - 2)
+                        {
+                            <li class="page-item disabled">
+                                <a class="page-link">...</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@ViewBag.TotalPages">@ViewBag.TotalPages</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@(ViewBag.CurrentPage + 1)">Next</a>
+                            </li>
+                        }
                     </ul>
                 </nav>
+
             </div>
         </div>
     </div>

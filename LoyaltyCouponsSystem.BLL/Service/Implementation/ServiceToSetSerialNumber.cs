@@ -11,11 +11,14 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
         private string SserialNumber;
 
-        public long GetSerialNumber(long serialNumber)
+        private long LongSerialNumber;
+
+        public string GetSerialNumber(string serialNumber,int i)
         {
             int year = DateTime.Now.Year;
-            SserialNumber = Convert.ToString(year) + Convert.ToString(serialNumber);
-            return long.Parse(SserialNumber);
+            SserialNumber = Convert.ToString(year) + serialNumber;
+            LongSerialNumber = long.Parse(SserialNumber) + i;
+            return Convert.ToString( LongSerialNumber);
 
 
         }
