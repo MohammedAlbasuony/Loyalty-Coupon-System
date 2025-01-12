@@ -7,53 +7,62 @@
 
 }
 
-<h1 class="text-primary text-center mt-4">All Customers</h1>
 
-<div class="container mt-5 border-light-modern p-4">
-    <!-- Search Filters -->
-    <div class="row mb-4 justify-content-center">
-        <div class="col-md-8">
-            <div class="input-group shadow-sm">
-                <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, Code, Governorate, City, or Phone Number...">
+<div class="container mt-4">
+    <!-- Backward Button -->
+    <div class="mb-3">
+        <a href="@Url.Action("Index", "Customer")" class="btn btn-custom-backward">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <b><h1 class="text-primary text-center">All Customers</h1></b>
+
+
+        <!-- Search Filters -->
+        <div class="row mb-4 justify-content-center">
+            <div class="col-md-8">
+                <div class="input-group shadow-sm">
+                    <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, Code, Governorate, City, or Phone Number...">
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Table -->
-    <div class="table-responsive">
-        <table id="customerTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
-            <thead class="thead-dark bg-primary text-white">
-                <tr>
-                    <th>Name</th>
-                    <th>Customer Code</th>
-                    <th>Governorate</th>
-                    <th>City</th>
-                    <th>Phone Number</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var customer in Model)
-                {
-                    <tr id="row-@customer.Code">
-                        <td>@customer.Name</td>
-                        <td>@customer.Code</td>
-                        <td>@customer.Governate</td>
-                        <td>@customer.City</td>
-                        <td>@customer.PhoneNumber</td>
-                        <td>
-                            <a href="@Url.Action("UpdateCustomer", "Customer", new { id = customer.Code })" class="btn btn-outline-primary btn-sm me-2">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@customer.Code')">
-                                <i class="fas fa-trash-alt"></i> Delete
-                            </button>
-                        </td>
+        <!-- Table -->
+        <div class="table-responsive">
+            <table id="customerTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
+                <thead class="thead-dark bg-primary text-white">
+                    <tr>
+                        <th>Name</th>
+                        <th>Customer Code</th>
+                        <th>Governorate</th>
+                        <th>City</th>
+                        <th>Phone Number</th>
+                        <th>Action</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @foreach (var customer in Model)
+                    {
+                        <tr id="row-@customer.Code">
+                            <td>@customer.Name</td>
+                            <td>@customer.Code</td>
+                            <td>@customer.Governate</td>
+                            <td>@customer.City</td>
+                            <td>@customer.PhoneNumber</td>
+                            <td>
+                                <a href="@Url.Action("UpdateCustomer", "Customer", new { id = customer.Code })" class="btn btn-outline-primary btn-sm me-2">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@customer.Code')">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -76,12 +85,6 @@
 </div>
 
 <style>
-    .border-light-modern {
-        border: 3px solid #007bff !important;
-        border-radius: 12px;
-        padding: 15px;
-        background-color: #f9f9f9;
-    }
 
     .table {
         border-radius: 12px;
@@ -142,6 +145,29 @@
         font-weight: bold;
         letter-spacing: 1px;
     }
+
+    .btn-custom-backward {
+        font-size: 14px;
+        padding: 8px 20px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        border: 2px solid #007bff;
+        color: #007bff;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom-backward i {
+            margin-right: 5px;
+        }
+
+        .btn-custom-backward:hover {
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+
 </style>
 
 
