@@ -1,18 +1,4 @@
-﻿@* <!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>@ViewBag.Title</title>
-</head>
-<body>
-
-</body>
-</html>
- *@
-
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -84,10 +70,7 @@
                 <div class="sidebar-content">
                     <ul class="nav nav-secondary">
                         <li class="nav-item active">
-                            <a data-bs-toggle="collapse"
-                               href="#dashboard"
-                               aria-expanded="false"
-                               class="collapsed">
+                            <a data-bs-toggle="collapse" href="#dashboard" aria-expanded="false" class="collapsed">
                                 <i class="fas fa-home"></i>
                                 <p>Admin Dashboard</p>
                                 <span class="caret"></span>
@@ -120,35 +103,25 @@
                         </li>
 
                         <li class="nav-item active">
-                            <a href="@Url.Action("DetailsOfCoupones", "GenerateQRCode")"
-                               class="collapsed"
-                               aria-expanded="false">
+                            <a href="@Url.Action("DetailsOfCoupones", "GenerateQRCode")" class="collapsed" aria-expanded="false">
                                 <i class="fas fa-home"></i>
                                 <p>Generate QRs</p>
                                 <span class="caret"></span>
                             </a>
-                            
                         </li>
                         <li class="nav-item active">
-                            <a href="@Url.Action("GetAllCoupons", "HistoryGenerated")"
-                               class="collapsed"
-                               aria-expanded="false">
+                            <a href="@Url.Action("GetAllCoupons", "HistoryGenerated")" class="collapsed" aria-expanded="false">
                                 <i class="fas fa-home"></i>
                                 <p>History Generated QRs</p>
                                 <span class="caret"></span>
                             </a>
-                            
                         </li>
                         <li class="nav-item active">
-                            <a data-bs-toggle="collapse"
-                               href="#exchangepermission"
-                               aria-expanded="false"
-                               class="collapsed">
+                            <a data-bs-toggle="collapse" href="#exchangepermission" aria-expanded="false" class="collapsed">
                                 <i class="fas fa-home"></i>
                                 <p>Exchange Permission</p>
                                 <span class="caret"></span>
                             </a>
-                       
 
                             <div class="collapse" id="exchangepermission">
                                 <ul class="nav nav-collapse">
@@ -164,6 +137,16 @@
                                     </li>
                                 </ul>
                             </div>
+                        </li>
+
+                        <!-- Logout Button -->
+                        <li class="nav-item mt-auto">
+                            <form action="/Account/Logout" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger w-100"
+                                        style="background-color: #dc3545; font-size: 14px; height: 40px; padding: 0 15px; border-radius: 20px; line-height: 38px; font-weight: 500; color: white;">
+                                    <i class="fas fa-sign-out-alt"></i> Log Out
+                                </button>
+                            </form>
                         </li>
                     </ul>
                 </div>
@@ -184,8 +167,146 @@
             </div>
         </div>
 
+    </div>
 
-        @*  <div class="container">
+
+    <!--   Core JS Files   -->
+    <script src="~/assets/js/core/jquery-3.7.1.min.js"></script>
+    <script src="~/assets/js/core/popper.min.js"></script>
+    <script src="~/assets/js/core/bootstrap.min.js"></script>
+
+    <!-- jQuery Scrollbar -->
+    <script src="~/assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+
+    <!-- Chart JS -->
+    <script src="~/assets/js/plugin/chart.js/chart.min.js"></script>
+
+    <!-- jQuery Sparkline -->
+    <script src="~/assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+
+    <!-- Chart Circle -->
+    <script src="~/assets/js/plugin/chart-circle/circles.min.js"></script>
+
+    <!-- Datatables -->
+    <script src="~/assets/js/plugin/datatables/datatables.min.js"></script>
+
+    <!-- Bootstrap Notify -->
+    <script src="~/assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
+
+    <!-- jQuery Vector Maps -->
+    <script src="~/assets/js/plugin/jsvectormap/jsvectormap.min.js"></script>
+    <script src="~/assets/js/plugin/jsvectormap/world.js"></script>
+
+    <!-- Sweet Alert -->
+    <script src="~/assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+
+    <!-- Kaiadmin JS -->
+    <script src="~/assets/js/kaiadmin.min.js"></script>
+
+
+    <script>
+        $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
+          type: "line",
+          height: "70",
+          width: "100%",
+          lineWidth: "2",
+          lineColor: "#177dff",
+          fillColor: "rgba(23, 125, 255, 0.14)",
+        });
+
+        $("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
+          type: "line",
+          height: "70",
+          width: "100%",
+          lineWidth: "2",
+          lineColor: "#f3545d",
+          fillColor: "rgba(243, 84, 93, .14)",
+        });
+
+        $("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
+          type: "line",
+          height: "70",
+          width: "100%",
+          lineWidth: "2",
+          lineColor: "#ffa534",
+          fillColor: "rgba(255, 165, 52, .14)",
+        });
+    </script>
+    @RenderSection("Scripts", required: false)
+
+    <!-- Modal -->
+    <div class="modal fade" id="addOptionsModal" tabindex="-1" aria-labelledby="addOptionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addOptionsModalLabel">Select an Option</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row text-center">
+                        <!-- Card 1 -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Add Customer</h5>
+                                    <br />
+                                    <a href="/customer" class="btn btn-primary">Add</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Add Distributor</h5>
+                                    <br />
+                                    <a href="/distributor/adddistributor" class="btn btn-primary">Add</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Add Technician</h5>
+                                    <br />
+                                    <a href="/Technician" class="btn btn-primary">Add</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>
+
+
+
+<!--Non Usable part of the layout-->
+
+
+
+@* <!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+
+</body>
+</html>
+ *@
+
+
+
+@*  <div class="container">
             <div class="page-inner">
                 <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
                     <div>
@@ -357,123 +478,3 @@
 
             </div>
         </div> *@
-
-
-    </div>
-
-
-
-    <!--   Core JS Files   -->
-    <script src="~/assets/js/core/jquery-3.7.1.min.js"></script>
-    <script src="~/assets/js/core/popper.min.js"></script>
-    <script src="~/assets/js/core/bootstrap.min.js"></script>
-
-    <!-- jQuery Scrollbar -->
-    <script src="~/assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
-
-    <!-- Chart JS -->
-    <script src="~/assets/js/plugin/chart.js/chart.min.js"></script>
-
-    <!-- jQuery Sparkline -->
-    <script src="~/assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
-
-    <!-- Chart Circle -->
-    <script src="~/assets/js/plugin/chart-circle/circles.min.js"></script>
-
-    <!-- Datatables -->
-    <script src="~/assets/js/plugin/datatables/datatables.min.js"></script>
-
-    <!-- Bootstrap Notify -->
-    <script src="~/assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
-
-    <!-- jQuery Vector Maps -->
-    <script src="~/assets/js/plugin/jsvectormap/jsvectormap.min.js"></script>
-    <script src="~/assets/js/plugin/jsvectormap/world.js"></script>
-
-    <!-- Sweet Alert -->
-    <script src="~/assets/js/plugin/sweetalert/sweetalert.min.js"></script>
-
-    <!-- Kaiadmin JS -->
-    <script src="~/assets/js/kaiadmin.min.js"></script>
-
-
-    <script>
-        $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
-          type: "line",
-          height: "70",
-          width: "100%",
-          lineWidth: "2",
-          lineColor: "#177dff",
-          fillColor: "rgba(23, 125, 255, 0.14)",
-        });
-
-        $("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
-          type: "line",
-          height: "70",
-          width: "100%",
-          lineWidth: "2",
-          lineColor: "#f3545d",
-          fillColor: "rgba(243, 84, 93, .14)",
-        });
-
-        $("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
-          type: "line",
-          height: "70",
-          width: "100%",
-          lineWidth: "2",
-          lineColor: "#ffa534",
-          fillColor: "rgba(255, 165, 52, .14)",
-        });
-    </script>
-    @RenderSection("Scripts", required: false)
-
-    <!-- Modal -->
-    <div class="modal fade" id="addOptionsModal" tabindex="-1" aria-labelledby="addOptionsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addOptionsModalLabel">Select an Option</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row text-center">
-                        <!-- Card 1 -->
-                        <div class="col-md-4 mb-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Add Customer</h5>
-                                    <br />
-                                    <a href="/customer" class="btn btn-primary">Add</a>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Card 2 -->
-                        <div class="col-md-4 mb-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Add Distributor</h5>
-                                    <br />
-                                    <a href="/distributor/adddistributor" class="btn btn-primary">Add</a>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Card 3 -->
-                        <div class="col-md-4 mb-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Add Technician</h5>
-                                    <br />
-                                    <a href="/Technician" class="btn btn-primary">Add</a>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-</body>
-</html>
