@@ -40,8 +40,25 @@
 
                     if (result.Succeeded)
                     {
-                        var userDetails = _accountService.GetUserByUsernameAsync(model.Name); 
-                        TempData["UserDetails"] = JsonConvert.SerializeObject(userDetails);
+                        var userDetails = await _accountService.GetUserByUsernameAsync(model.Name);
+
+                        // Serialize user details to TempData if necessary
+                        TempData["UserDetails"] = JsonConvert.SerializeObject(userDetails, new JsonSerializerSettings
+                        {
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        });
+
+                        // Check if the user is a SuperAdmin
+                        var user = await userManager.FindByNameAsync(model.Name);
+                        var roles = await userManager.GetRolesAsync(user);
+
+                        if (roles.Contains("SuperAdmin"))
+                        {
+                            // Redirect to ManageUsers for SuperAdmin
+                            return RedirectToAction("ManageUsers", "Admin");
+                        }
+
+                        // Redirect to home if not SuperAdmin
                         return RedirectToAction("Index", "Home");
                     }
                     else
@@ -52,6 +69,8 @@
                 }
                 return View(model);
             }
+
+
 
             public IActionResult Register()
             {
@@ -264,12 +283,18 @@
                     return View(model);
                 }
             }
+            public IActionResult AccessDenied()
+            {
+                return View();
+            }
 
             public async Task<IActionResult> Logout()
             {
                 await signInManager.SignOutAsync();
                 return RedirectToAction("Index", "Home");
             }
+
+
         }
     }
 }
