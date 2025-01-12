@@ -16,6 +16,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _distributorService = distributorService;
         }
 
+        public IActionResult Index()
+        {
+            return View();
+        }
+
         [HttpGet]
         public async Task<IActionResult> AddDistributorAsync()
         {
