@@ -140,40 +140,31 @@
                             
                         </li>
                         <li class="nav-item active">
-                        <a data-bs-toggle="collapse"
-                           href="#exchangepermission"
-                           aria-expanded="false"
-                           class="collapsed">
-                            <i class="fas fa-home"></i>
-                            <p>Exchange Permission</p>
-                            <span class="caret"></span>
-                        </a>
+                            <a data-bs-toggle="collapse"
+                               href="#exchangepermission"
+                               aria-expanded="false"
+                               class="collapsed">
+                                <i class="fas fa-home"></i>
+                                <p>Exchange Permission</p>
+                                <span class="caret"></span>
+                            </a>
+                       
+
+                            <div class="collapse" id="exchangepermission">
+                                <ul class="nav nav-collapse">
+                                    <li>
+                                        <a href="@Url.Action("AssignQRCode", "ExchangeOrder")">
+                                            <span class="sub-item">Assign Exchange Order</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("AllTransactions", "Transaction")">
+                                            <span class="sub-item">Exchange all Transactions</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
-                        @* <li class="nav-item active"> *@
-                        @*     <a href="@Url.Action("AssignQRCode", "ExchangeOrder")" *@
-                        @*        class="collapsed" *@
-                        @*        aria-expanded="false"> *@
-                        @*         <i class="fas fa-home"></i> *@
-                        @*         <p>Exchange Permission</p> *@
-                        @*         <span class="caret"></span> *@
-                        @*     </a> *@
-
-                        @* </li> *@
-
-                        <div class="collapse" id="exchangepermission">
-                            <ul class="nav nav-collapse">
-                                <li>
-                                    <a href="@Url.Action("AssignQRCode", "ExchangeOrder")">
-                                        <span class="sub-item">Assign Exchange Order</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="@Url.Action("AllTransactions", "Transaction")">
-                                        <span class="sub-item">Exchange all Transactions</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
                     </ul>
                 </div>
             </div>
