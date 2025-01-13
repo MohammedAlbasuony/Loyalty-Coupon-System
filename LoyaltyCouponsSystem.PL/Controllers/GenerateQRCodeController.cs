@@ -126,6 +126,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var qrCodesList = new List<Coupon>();
             var serviceToMangeCounters = new ServiceToMangeCounters(_context);
             int currentYear = DateTime.Now.Year;
+          
 
             // إنشاء الكوبونات
             for (int i = 0; i < detailsVM.Count; i++)
@@ -139,7 +140,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     GovernorateId = detailsVM.GovernorateId,
                     AreaId = detailsVM.AreaId,
                     NumInYear = await serviceToMangeCounters.GetNextNumInYearAsync(),
-                    SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber + i)
+                    SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber, i)
                 }; 
 
                 await _context.Coupons.AddAsync(couponDetails);
@@ -147,7 +148,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 qrCodesList.Add(couponDetails);
             }
 
-            await serviceToMangeCounters.UpdateMaxSerialNumAsync(detailsVM.Count);
+            await serviceToMangeCounters.UpdateMaxSerialNumAsync(detailsVM.SerialNumber, detailsVM.Count);
 
             // إنشاء QR Codes
             var generateListOfCoupons = new GenerateListOfCoupons();

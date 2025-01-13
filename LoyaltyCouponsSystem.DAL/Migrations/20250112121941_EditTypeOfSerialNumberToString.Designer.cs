@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250112121941_EditTypeOfSerialNumberToString")]
+    partial class EditTypeOfSerialNumberToString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,6 +68,21 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.HasIndex("TechniciansTechnicianID");
 
                     b.ToTable("CouponTechnician");
+                });
+
+            modelBuilder.Entity("DistributorCustomer", b =>
+                {
+                    b.Property<int>("DistributorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DistributorId", "CustomerId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("DistributorCustomers", (string)null);
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.DB.ApplicationUser", b =>
@@ -305,12 +323,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Governate")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -344,15 +356,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CustomerID")
-                        .HasColumnType("int");
-
                     b.Property<string>("Governate")
                         .HasColumnType("nvarchar(max)");
 
@@ -368,24 +371,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     b.HasKey("DistributorID");
 
-                    b.HasIndex("CustomerID");
-
                     b.ToTable("Distributors");
-                });
-
-            modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.DistributorCustomer", b =>
-                {
-                    b.Property<int>("DistributorID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CustomerID")
-                        .HasColumnType("int");
-
-                    b.HasKey("DistributorID", "CustomerID");
-
-                    b.HasIndex("CustomerID");
-
-                    b.ToTable("DistributorCustomer");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Employee", b =>
@@ -533,12 +519,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Governate")
@@ -804,6 +784,21 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("DistributorCustomer", b =>
+                {
+                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Customer", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Distributor", null)
+                        .WithMany()
+                        .HasForeignKey("DistributorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Admin", b =>
                 {
                     b.HasOne("LoyaltyCouponsSystem.DAL.DB.ApplicationUser", "ApplicationUser")
@@ -854,30 +849,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Navigation("Areas");
 
                     b.Navigation("Governorates");
-                });
-
-            modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Distributor", b =>
-                {
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Customer", null)
-                        .WithMany("Distributors")
-                        .HasForeignKey("CustomerID");
-                });
-
-            modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.DistributorCustomer", b =>
-                {
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Customer", "Customer")
-                        .WithMany("DistributorCustomers")
-                        .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Distributor", "Distributor")
-                        .WithMany("DistributorCustomers")
-                        .HasForeignKey("DistributorID");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Distributor");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Representative", b =>
@@ -982,16 +953,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Customer", b =>
                 {
-                    b.Navigation("DistributorCustomers");
-
-                    b.Navigation("Distributors");
-
                     b.Navigation("Transactions");
-                });
-
-            modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Distributor", b =>
-                {
-                    b.Navigation("DistributorCustomers");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Employee", b =>

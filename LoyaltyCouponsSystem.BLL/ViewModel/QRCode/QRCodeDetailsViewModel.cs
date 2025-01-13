@@ -16,7 +16,7 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.QRCode
 
         public int Count { get; set; }
 
-        public long SerialNumber { get; set; }
+        public string SerialNumber { get; set; }
 
         public float CouponSize{ get; set; }
 
