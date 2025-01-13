@@ -19,6 +19,8 @@
             <th>Governate</th>
             <th>City</th>
             <th>Phone Number</th>
+            <th>Created By</th>
+            <th>Created At</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -33,6 +35,8 @@
                 <td>@technician.SelectedGovernate</td>
                 <td>@technician.SelectedCity</td>
                 <td>@technician.PhoneNumber1</td>
+                <td>@technician.CreatedBy</td>
+                <td>@technician.CreatedAt</td>
                 <td>
                     <a href="@Url.Action("UpdateTechnician", "Technician", new { id = technician.Code })" class="btn btn-warning">Edit</a>
                     <a href="@Url.Action("DeleteTechnician", "Technician", new { id = technician.Code })" class="btn btn-danger">Delete</a>

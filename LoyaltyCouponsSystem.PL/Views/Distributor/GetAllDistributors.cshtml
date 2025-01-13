@@ -16,6 +16,8 @@
             <th>Governate</th>
             <th>City</th>
             <th>Customers</th>
+            <th>Created By</th>
+            <th>Created At</th>
             <th>Actions</th>     
         </tr>
     </thead>
@@ -27,8 +29,10 @@
                 <td>@distributor.Name</td>
                 <td>@distributor.PhoneNumber1</td>
                 <td>@distributor.SelectedGovernate</td>
-                <td>@distributor.SelectedCustomerCode</td>
-                <td>@distributor.SelectedCity</td>              
+                <td>@distributor.SelectedCity</td>
+                <td>@distributor.AvailableCustomers</td>
+                <td>@distributor.CreatedBy</td>
+                 <td>@distributor.CreatedAt</td>
                 <td>
                     <a href="@Url.Action("UpdateDistributor", "Distributor", new { id = distributor.Code })">Edit</a> |
                     <a href="@Url.Action("GetAllDistributors", "Distributor", new { id = distributor.Code })" onclick="return confirm('Are you sure?')">Delete</a>

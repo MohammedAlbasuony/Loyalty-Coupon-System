@@ -64,17 +64,18 @@
                     </select>
                 </div>
 
+
                 <!-- Dynamically added customer dropdowns will appear here -->
                 <h3>Customers</h3>
                 <div id="customerContainer" class="form-group">
-                    <label asp-for="SelectedCustomerCode">Select Customer</label>
-                    <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-control select2" aria-label="Select Customer">
+                    <label asp-for="SelectedCustomerCodes">Select Customer</label>
+                    <select asp-for="SelectedCustomerCodes" asp-items="Model.Customers" class="form-control select2"multiple aria-label="Select Customer">
                         <option value="">Select Customer</option>
                     </select>
                 </div>
 
                 <!-- Button to Add New Customer -->
-                <button type="button" class="btn btn-secondary" id="addCustomerButton">Add New Customer</button>
+                 <button type="button" class="btn btn-secondary" id="addCustomerButton">Add New Customer</button> 
 
                 <!-- Submit Button -->
                 <div class="text-center">
