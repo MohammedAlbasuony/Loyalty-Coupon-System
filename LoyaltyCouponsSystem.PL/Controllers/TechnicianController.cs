@@ -7,6 +7,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 {
     public class TechnicianController : Controller
     {
+
         private readonly ITechnicianService _technicianService;
 
         public TechnicianController(ITechnicianService technicianService)

@@ -6,6 +6,42 @@
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
 }
 
+<h1>All Technicians</h1>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>NickName</th>
+            <th>National ID</th>
+            <th>Governate</th>
+            <th>City</th>
+            <th>Phone Number</th>
+            <th>Created By</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var technician in Model)
+        {
+            <tr>
+                <td>@technician.Code</td>
+                <td>@technician.Name</td>
+                <td>@technician.NickName</td>
+                <td>@technician.NationalID</td>
+                <td>@technician.SelectedGovernate</td>
+                <td>@technician.SelectedCity</td>
+                <td>@technician.PhoneNumber1</td>
+                <td>@technician.CreatedBy</td>
+                <td>@technician.CreatedAt</td>
+                <td>
+                    <a href="@Url.Action("UpdateTechnician", "Technician", new { id = technician.Code })" class="btn btn-warning">Edit</a>
+                    <a href="@Url.Action("DeleteTechnician", "Technician", new { id = technician.Code })" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+
 <div class="container mt-4">
     <!-- Backward Button -->
     <div class="mb-3">
@@ -154,6 +190,7 @@
 
         .btn-custom-backward i {
             margin-right: 5px;
+
         }
 
         .btn-custom-backward:hover {

@@ -46,6 +46,9 @@ namespace LoyaltyCouponsSystem.PL
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+
+            // Register IHttpContextAccessor
+            builder.Services.AddHttpContextAccessor();
             // Register repositories and services
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
@@ -94,7 +97,7 @@ namespace LoyaltyCouponsSystem.PL
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
                 await CreateRolesAndSuperAdminAsync(roleManager, userManager);
             }
-
+            app.MapDefaultControllerRoute();
             app.Run();
         }
 
