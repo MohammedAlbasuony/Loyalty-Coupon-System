@@ -23,5 +23,8 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         [MaxLength(11)]
         [Phone]
         public string? PhoneNumber { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public ICollection<DistributorCustomer> DistributorCustomers { get; set; }
     }
 }
