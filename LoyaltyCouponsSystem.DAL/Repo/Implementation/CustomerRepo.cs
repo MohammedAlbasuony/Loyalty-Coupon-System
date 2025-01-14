@@ -1,31 +1,17 @@
 ﻿using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SkiaSharp;
 
 namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
 {
     public class CustomerRepo : ICustomerRepo
     {
         private readonly ApplicationDbContext _DBcontext;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CustomerRepo(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public CustomerRepo(ApplicationDbContext context)
         {
             _DBcontext = context;
-            _userManager = userManager;
-            _httpContextAccessor = httpContextAccessor;
-        }
-        public async Task<List<int>> GetCustomerIdsByCodesAsync(List<string> customerCodes)
-        {
-            return await _DBcontext.Customers
-                .Where(c => customerCodes.Contains(c.Code))
-                .Select(c => c.CustomerID)
-                .ToListAsync();
         }
 
         // Add a customer
@@ -35,9 +21,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             {
                 if (customer == null)
                     throw new ArgumentNullException(nameof(customer));
-                var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
-                customer.CreatedBy = currentUser?.UserName;
-                customer.CreatedAt = DateTime.UtcNow;
+
                 await _DBcontext.Customers.AddAsync(customer);
                 await _DBcontext.SaveChangesAsync();
                 return true;

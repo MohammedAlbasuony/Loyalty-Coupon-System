@@ -38,24 +38,6 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.HasKey(l => new { l.LoginProvider, l.ProviderKey });
             });
 
-         
-
-            modelBuilder.Entity<DistributorCustomer>()
-                .HasKey(dc => new { dc.DistributorID, dc.CustomerID });
-
-            modelBuilder.Entity<DistributorCustomer>()
-                .HasOne(dc => dc.Distributor)
-                .WithMany(d => d.DistributorCustomers)
-                .HasForeignKey(dc => dc.DistributorID)
-                .IsRequired(false); // Make the relationship optional
-
-
-            modelBuilder.Entity<DistributorCustomer>()
-                .HasOne(dc => dc.Customer)
-                .WithMany(c => c.DistributorCustomers)
-                .HasForeignKey(dc => dc.CustomerID);
-
-
             //Governate and Area
             modelBuilder.Entity<Governorate>()
                 .HasMany(g => g.Areas)
@@ -95,16 +77,16 @@ namespace LoyaltyCouponsSystem.DAL.DB
 
                 entity.Property(e => e.Code)
                     .IsRequired()
-                    .HasMaxLength(20);
+                    .HasMaxLength(20); 
 
                 entity.Property(e => e.Governate)
-                    .HasMaxLength(50);
+                    .HasMaxLength(50); 
 
                 entity.Property(e => e.City)
-                    .HasMaxLength(50);
+                    .HasMaxLength(50); 
 
                 entity.Property(e => e.PhoneNumber)
-                    .HasMaxLength(11);
+                    .HasMaxLength(11); 
             });
 
 
@@ -118,7 +100,19 @@ namespace LoyaltyCouponsSystem.DAL.DB
                     .HasForeignKey(e => e.CustomerID);
             });
 
-
+            modelBuilder.Entity<Distributor>()
+           .HasMany(d => d.Customers)
+           .WithMany(c => c.Distributors)
+           .UsingEntity<Dictionary<string, object>>(
+               "DistributorCustomer", 
+           j => j.HasOne<Customer>().WithMany().HasForeignKey("CustomerId"),
+           j => j.HasOne<Distributor>().WithMany().HasForeignKey("DistributorId"),
+           j =>
+           {
+               j.HasKey("DistributorId", "CustomerId");
+               j.ToTable("DistributorCustomers"); 
+           }
+       );
             modelBuilder.Entity<GlobalCounter>(entity =>
             {
                 entity.HasKey(GC => GC.Year);

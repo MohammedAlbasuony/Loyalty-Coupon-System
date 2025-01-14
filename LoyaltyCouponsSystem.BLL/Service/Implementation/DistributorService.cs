@@ -2,57 +2,41 @@
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
-using LoyaltyCouponsSystem.DAL.Repo.Implementation;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Distributor = LoyaltyCouponsSystem.DAL.Entity.Distributor;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 {
     public class DistributorService : IDistributorService
     {
         private readonly IDistributorRepo _distributorRepo;
-        private readonly ICustomerRepo _customerRepo;
 
-        public DistributorService(IDistributorRepo distributorRepo, ICustomerRepo customerRepo)
+        public DistributorService(IDistributorRepo distributorRepo)
         {
             _distributorRepo = distributorRepo;
-            _customerRepo = customerRepo;
         }
 
         public async Task<bool> AddAsync(DistributorViewModel distributorViewModel)
         {
 
-            if (distributorViewModel == null)
-                return false;
-
-            // Map Distributor entity
-            var distributor = new Distributor
+            if (distributorViewModel != null)
             {
-                Name = distributorViewModel.Name,
-                PhoneNumber1 = distributorViewModel.PhoneNumber1,
-                Governate = distributorViewModel.SelectedGovernate,
-                City = distributorViewModel.SelectedCity,
-                Code = distributorViewModel.Code,
-                IsDeleted = distributorViewModel.IsDeleted,
-                CreatedBy = distributorViewModel.CreatedBy,
-                CreatedAt = distributorViewModel.CreatedAt,
-                DistributorCustomers = new List<DistributorCustomer>()
-            };
-
-            // Fetch Customer IDs from the repository based on selected customer codes
-            var customerIds = await _customerRepo.GetCustomerIdsByCodesAsync(distributorViewModel.SelectedCustomerCodes);
-
-            // Create DistributorCustomer mappings
-            distributor.DistributorCustomers = customerIds
-                .Select(customerId => new DistributorCustomer
+                var distributor = new Distributor
                 {
-                    CustomerID = customerId
-                })
-                .ToList();
-            return await _distributorRepo.AddAsync(distributor);
+                    Name = distributorViewModel.Name,
+                    PhoneNumber1 = distributorViewModel.PhoneNumber1,
+                    Governate = distributorViewModel.SelectedGovernate,
+                    City = distributorViewModel.SelectedCity,
+                    Code = distributorViewModel.Code,
+                    IsDeleted = distributorViewModel.IsDeleted
+                };
+
+                return await _distributorRepo.AddAsync(distributor);
+            }
+            return false;
         }
-
-
 
         public async Task<bool> DeleteAsync(int id)
         {
@@ -127,7 +111,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             return customers.Select(c => new SelectListItem
             {
-                Value = c.Code,
+                Value = c.Code,        
                 Text = $"{c.Code} - {c.Name}"
             }).ToList();
         }

@@ -41,6 +41,4 @@ public class AssignmentViewModel
     public string ExchangePermission { get; set; }
     public string CustomerDetails { get; set; }
     public string TechnicianDetails { get; set; }
-    public string? CreatedBy { get; set; }
-
 }

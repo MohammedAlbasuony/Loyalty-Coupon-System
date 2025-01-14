@@ -13,7 +13,5 @@
         public string? City { get; set; }
         public string Code { get; set; }
         public ICollection<Coupon> Coupons { get; set; }
-        public string? CreatedBy { get; set; }
-        public DateTime? CreatedAt { get; set; } 
     }
 }

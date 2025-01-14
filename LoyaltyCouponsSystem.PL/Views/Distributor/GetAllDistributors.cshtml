@@ -5,41 +5,6 @@
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
 }
 
-
-<h1>All Distributors</h1>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Phone Number</th>
-            <th>Governate</th>
-            <th>City</th>
-            <th>Customers</th>
-            <th>Created By</th>
-            <th>Created At</th>
-            <th>Actions</th>     
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var distributor in Model)
-        {
-            <tr>
-                <td>@distributor.Code</td>
-                <td>@distributor.Name</td>
-                <td>@distributor.PhoneNumber1</td>
-                <td>@distributor.SelectedGovernate</td>
-                <td>@distributor.SelectedCity</td>
-                <td>@distributor.AvailableCustomers</td>
-                <td>@distributor.CreatedBy</td>
-                 <td>@distributor.CreatedAt</td>
-                <td>
-                    <a href="@Url.Action("UpdateDistributor", "Distributor", new { id = distributor.Code })">Edit</a> |
-                    <a href="@Url.Action("GetAllDistributors", "Distributor", new { id = distributor.Code })" onclick="return confirm('Are you sure?')">Delete</a>
-                </td>
-            </tr>
-
 <div class="container mt-4">
     <!-- Backward Button -->
     <div class="mb-3">
@@ -133,7 +98,6 @@
             padding: 12px;
             border-bottom: 2px solid #ffffff;
             text-transform: uppercase;
-
         }
 
     .table-hover tbody tr:hover {

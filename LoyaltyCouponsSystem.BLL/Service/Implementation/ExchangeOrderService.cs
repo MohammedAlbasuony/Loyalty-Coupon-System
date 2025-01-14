@@ -29,10 +29,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 Code = customer.Code,
                 Governate = customer.Governate,
                 City = customer.City,
-                PhoneNumber = customer.PhoneNumber,
-                
+                PhoneNumber = customer.PhoneNumber
 
-                
 
             };
         }
@@ -121,7 +119,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                             CouponType = transaction.SelectedCouponType,
                             SequenceNumber = seqNum,
                             ExchangePermission = ExchangePermissionNum,
-                            CreatedBy = transaction.CreatedBy,
+                            //CreatedBy = User.Identity.Name
 
                         };
 

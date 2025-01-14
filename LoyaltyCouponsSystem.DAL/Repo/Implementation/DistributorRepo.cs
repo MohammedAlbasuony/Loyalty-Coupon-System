@@ -1,31 +1,20 @@
-﻿using LoyaltyCouponsSystem.DAL.DB;
-using LoyaltyCouponsSystem.DAL.Entity;
+﻿using LoyaltyCouponsSystem.DAL.Entity;
+using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
 {
     public class DistributorRepo : IDistributorRepo
     {
         private readonly ApplicationDbContext _DBcontext;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DistributorRepo(ApplicationDbContext context , UserManager<ApplicationUser> userManager , IHttpContextAccessor httpContextAccessor)
+        public DistributorRepo(ApplicationDbContext context)
         {
             _DBcontext = context;
-            _userManager = userManager;
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-        public async Task<List<int>> GetValidCustomerIdsAsync(List<string> customerCodes)
-        {
-            return await _DBcontext.Customers
-             .Where(c => customerCodes.Contains(c.Code)) // Match codes to IDs
-             .Select(c => c.CustomerID)
-             .ToListAsync();
         }
 
         // Add method
@@ -33,16 +22,13 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             try
             {
-                var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
-                distributor.CreatedBy = currentUser?.UserName;
-                distributor.CreatedAt = DateTime.UtcNow;
-                _DBcontext.Distributors.Add(distributor);
-                return await _DBcontext.SaveChangesAsync() > 0; // Returns true only if changes were saved
+                await _DBcontext.Distributors.AddAsync(distributor);
+                await _DBcontext.SaveChangesAsync();
+                return true;
             }
             catch (Exception ex)
             {
-                // Log exception here
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Error adding distributor: {ex.Message}");
                 return false;
             }
         }
@@ -52,11 +38,10 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             try
             {
-
-                var user = await _DBcontext.Users.FindAsync(id);
-                if (user != null)
+                var distributor = await _DBcontext.Distributors.Where(d => d.DistributorID == id).FirstOrDefaultAsync();
+                if (distributor != null)
                 {
-                    user.IsDeleted = true;
+                    _DBcontext.Distributors.Remove(distributor);
                     await _DBcontext.SaveChangesAsync();
                     return true;
                 }
@@ -64,7 +49,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting user: {ex.Message}");
+                Console.WriteLine($"Error deleting distributor: {ex.Message}");
                 return false;
             }
         }
@@ -142,7 +127,5 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 return new List<Customer>();
             }
         }
-
-
     }
 }
