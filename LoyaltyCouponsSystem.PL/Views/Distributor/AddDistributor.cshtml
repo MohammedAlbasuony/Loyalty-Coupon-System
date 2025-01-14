@@ -13,6 +13,14 @@
 }
 
 <div class="container mt-5">
+
+    <!-- Backward Button -->
+    <div class="mb-4">
+        <a href="@Url.Action("Index", "Distributor")" class="btn btn-outline-primary" style="border-radius: 30px;">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
     <!-- Header Section -->
     <div class="text-center mb-4">
         <h1 class="display-5 text-primary"><b>Add Distributor</b></h1>
@@ -221,6 +229,29 @@
 }
 
 <style>
+
+    .btn-outline-primary {
+        font-size: 14px;
+        padding: 8px 20px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        border: 2px solid #007bff;
+        color: #007bff;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+        .btn-outline-primary i {
+            margin-right: 5px;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+        }
+
     .form-control, .form-select {
         border-radius: 20px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

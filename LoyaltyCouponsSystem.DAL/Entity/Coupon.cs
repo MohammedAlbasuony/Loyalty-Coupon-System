@@ -12,7 +12,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity
 
         
         public string CouponeId { get; private set; } = Guid.NewGuid().ToString();
-        public long SerialNumber { get; set; }
+        public string SerialNumber { get; set; }
 
         public string TypeOfCoupone { get; set; }
         public string Status { get; set; } = "Created";

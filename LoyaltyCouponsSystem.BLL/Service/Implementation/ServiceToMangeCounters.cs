@@ -79,10 +79,10 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         }
 
         // تحويل هذه الدالة لتعمل بشكل غير متزامن
-        public async Task<long> UpdateMaxSerialNumAsync(int count)
+        public async Task<long> UpdateMaxSerialNumAsync(string BeginSerialNum,int count)
         {
             int currentYear = DateTime.Now.Year;
-
+            long LongSerialNum=long.Parse(BeginSerialNum);
             // Check if the year exists
             var globalCounter = await _context.GlobalCounters
                 .SingleOrDefaultAsync(gc => gc.YearNotId == currentYear);
@@ -90,7 +90,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             if (globalCounter != null)
             {
                 // Increment the counter
-                globalCounter.MaxSerialNumber += count;
+                globalCounter.MaxSerialNumber = LongSerialNum+count;
                 await _context.SaveChangesAsync(); // Save changes to the database asynchronously
             }
 
