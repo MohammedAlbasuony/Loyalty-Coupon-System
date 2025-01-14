@@ -1,6 +1,8 @@
 ﻿using global::LoyaltyCouponsSystem.DAL.DB;
 using global::LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -11,9 +13,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         public class ExchangeOrderRepo : IExchangeOrderRepo
         {
             private readonly ApplicationDbContext _context;
-
-            public ExchangeOrderRepo(ApplicationDbContext context)
+            private readonly UserManager<ApplicationUser> _userManager;
+            private readonly IHttpContextAccessor _httpContextAccessor;
+            public ExchangeOrderRepo(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
             {
+                _userManager = userManager;
+                _httpContextAccessor = httpContextAccessor;
                 _context = context;
             }
 
@@ -41,6 +46,8 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
 
             public async Task AddTransactionAsync(Transaction transaction)
             {
+                var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
+                transaction.CreatedBy = currentUser?.UserName;
                 await _context.Transactions.AddAsync(transaction);
             }
 

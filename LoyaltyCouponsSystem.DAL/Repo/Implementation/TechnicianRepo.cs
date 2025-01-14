@@ -1,6 +1,8 @@
 ﻿using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
@@ -8,10 +10,14 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
     public class TechnicianRepo : ITechnicianRepo
     {
         private readonly ApplicationDbContext _DBcontext;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TechnicianRepo(ApplicationDbContext context)
+        public TechnicianRepo(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
             _DBcontext = context;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // Add method
@@ -19,6 +25,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             try
             {
+                var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
+                technician.CreatedBy = currentUser?.UserName;
+                technician.CreatedAt = DateTime.UtcNow;
                 await _DBcontext.Technicians.AddAsync(technician);
                 await _DBcontext.SaveChangesAsync();
                 return true;

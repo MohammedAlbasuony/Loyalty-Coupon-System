@@ -119,7 +119,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                             CouponType = transaction.SelectedCouponType,
                             SequenceNumber = seqNum,
                             ExchangePermission = ExchangePermissionNum,
-                            //CreatedBy = User.Identity.Name
+                            CreatedBy = transaction.CreatedBy,
 
                         };
 

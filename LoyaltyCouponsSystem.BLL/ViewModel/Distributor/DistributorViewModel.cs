@@ -1,6 +1,5 @@
 ﻿using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace LoyaltyCouponsSystem.BLL.ViewModel.Distributor
@@ -17,11 +16,14 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Distributor
         [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits.")]
         [Display(Name = "Primary Phone Number")]
         public int PhoneNumber1 { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? CreatedAt { get; set; }
         public string? SelectedGovernate { get; set; }
         public string? SelectedCity { get; set; }
         public List<SelectListItem> Governates { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> Cities { get; set; } = new List<SelectListItem>();
-        public string SelectedCustomerCode { get; set; }
+        public List<string> SelectedCustomerCodes { get; set; }
+        public List<CustomerViewModel>? AvailableCustomers { get; set; }
         public List<SelectListItem> Customers { get; set; } = new List<SelectListItem>();
 
     }

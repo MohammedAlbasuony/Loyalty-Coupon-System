@@ -16,7 +16,7 @@
 
     <!-- Backward Button -->
     <div class="mb-4">
-        <a href="@Url.Action("Index", "Distributor")" class="btn btn-outline-primary" style="border-radius: 30px;">
+        <a href="@Url.Action("Index", "Distributor")" class="btn btn-custom-backward">
             <i class="fas fa-arrow-left"></i> Back
         </a>
     </div>
@@ -30,9 +30,8 @@
     <!-- Form Section -->
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <form asp-action="AddDistributor" method="post" id="addDistributorForm" class="shadow-lg p-4 bg-white rounded">
-                <!-- Validation Summary -->
-                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+            <form asp-action="AddDistributor" method="post" id="addDistributorForm">
+                <div asp-validation-summary="All" class="text-danger"></div>
 
                 <!-- Code -->
                 <div class="form-group mb-3">
@@ -57,10 +56,6 @@
                     <label asp-for="SelectedGovernate" class="form-label text-primary"><b>Governate</b></label>
                     <select asp-for="SelectedGovernate" asp-items="Model.Governates" class="form-select" id="governate">
                         <option value="" disabled selected>Choose a Governate</option>
-                        @foreach (var governate in Model.Governates)
-                        {
-                            <option value="@governate.Value">@governate.Text</option>
-                        }
                     </select>
                 </div>
 
@@ -72,21 +67,17 @@
                     </select>
                 </div>
 
-                <!-- Dynamically added customer dropdowns will appear here -->
-                <h3>Customers</h3>
-                <div id="customerContainer" class="form-group">
-                    <label asp-for="SelectedCustomerCode">Select Customer</label>
-                    <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-control select2" aria-label="Select Customer">
-                        <option value="">Select Customer</option>
+                <!-- Select Customer -->
+                <div class="form-group mb-3">
+                    <label asp-for="SelectedCustomerCodes" class="form-label text-primary"><b>Select Customer</b></label>
+                    <select asp-for="SelectedCustomerCodes" asp-items="Model.Customers" class="form-control select2" multiple>
+                        <option></option> <!-- Placeholder for dropdown -->
                     </select>
                 </div>
 
-                <!-- Button to Add New Customer -->
-                <button type="button" class="btn btn-secondary" id="addCustomerButton">Add New Customer</button>
-
                 <!-- Submit Button -->
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary px-5">
+                    <button type="submit" class="btn btn-custom">
                         <i class="fas fa-save"></i> Add Distributor
                     </button>
                 </div>
@@ -97,80 +88,20 @@
 
 <!-- Scripts Section -->
 @section Scripts {
+    <!-- Initialize Select2 for customer dropdown -->
     <script>
-        debugger;
-         // Serialize the Model.Customers data into JavaScript for use in the script
-         const customers = @Html.Raw(Json.Serialize(Model.Customers));
-
-         // Log customers to the console for debugging
-         console.log("Customers data:", customers);
-
-         let customerIndex = 1; // Initialize customer index for dynamic dropdowns
-
-         // Add a new customer dropdown dynamically
-         document.getElementById("addCustomerButton").addEventListener("click", function () {
-             const container = document.getElementById("customerContainer");
-
-             // Create a new div to contain the new customer dropdown
-             const newFields = document.createElement("div");
-             newFields.classList.add("customerFields", "mt-3");
-
-             // Check if customers is an array and contains the expected data
-             if (Array.isArray(customers) && customers.length > 0) {
-                 let options = `<option value="">Select Customer</option>`;
-
-                 // Iterate over the customers array and add each customer as an option
-                 customers.forEach(customer => {
-                     if (customer.text && customer.value) {
-                         options += `<option value="${customer.value}">${customer.text}</option>`;
-                     } else {
-                         console.error("Invalid customer data:", customer);
-                     }
-                 });
-
-                 // Set the innerHTML with the options
-                 newFields.innerHTML = `
-                     <div class="form-group">
-                         <label for="SelectedCustomerCode_${customerIndex}">Select Customer</label>
-                         <select name="Customers[${customerIndex}].Code" class="form-control select2" id="SelectedCustomerCode_${customerIndex}" aria-label="Select Customer">
-                             ${options}
-                         </select>
-                     </div>`;
-
-                 // Append the new customer dropdown field to the container
-                 container.appendChild(newFields);
-
-                 // Increment the customer index for the next customer
-                 customerIndex++;
-
-                 // Re-initialize Select2 for the newly added dropdown
-                 $('.select2').select2({
-                     placeholder: 'Select Customer',
-                     allowClear: true
-                 });
-             } else {
-                 console.error("No customers data available or invalid format.");
-             }
-         });
-
-         // Initialize Select2 for the existing customer dropdown
-         $(document).ready(function () {
-             $('.select2').select2({
-                 placeholder: 'Select Customer',
-                 allowClear: true
-             });
-         });
-
-        // Initialize Select2 for customer dropdown
         $(document).ready(function () {
             $('.select2').select2({
-                placeholder: 'Select Customer',
-                allowClear: true
+                placeholder: "Search and Select Customers", // Placeholder for search
+                allowClear: true, // Allow clearing selections
+                width: '100%' // Adjust the dropdown to fit container width
             });
         });
     </script>
+
+    <!-- Handle governate and city cascading functionality -->
     <script>
-            const citiesByGovernate = {
+        const citiesByGovernate = {
             Cairo: ["Nasr City", "Heliopolis", "Maadi", "New Cairo"],
             Alexandria: ["Montaza", "Sidi Gaber", "Smouha"],
             Giza: ["Dokki", "Haram", "6th of October"],
@@ -199,7 +130,6 @@
             "New Valley": ["Kharga", "Dakhla", "Farafra"]
         };
 
-
         document.getElementById("governate").addEventListener("change", function () {
             const governate = this.value;
             const citySelect = document.getElementById("city");
@@ -218,8 +148,7 @@
                 citySelect.disabled = true;
             }
         });
-        </script>
-        
+    </script>
 
     <!-- Include Select2 CSS and JS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
@@ -227,9 +156,9 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 }
 
-<style>
 
-    .btn-outline-primary {
+<style>
+    .btn-custom-backward {
         font-size: 14px;
         padding: 8px 20px;
         font-weight: bold;
@@ -237,15 +166,12 @@
         align-items: center;
         border: 2px solid #007bff;
         color: #007bff;
-        transition: all 0.3s ease;
+        border-radius: 30px;
         text-decoration: none;
+        transition: all 0.3s ease;
     }
 
-        .btn-outline-primary i {
-            margin-right: 5px;
-        }
-
-        .btn-outline-primary:hover {
+        .btn-custom-backward:hover {
             background-color: #007bff;
             color: #fff;
             text-decoration: none;
@@ -258,23 +184,25 @@
         padding: 10px 15px;
     }
 
-        .form-control:focus, .form-select:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-        }
-
-    .btn-primary {
+    .btn-custom {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
         background-color: #007bff;
-        border-radius: 30px;
+        color: #fff;
         font-weight: bold;
         font-size: 16px;
-    }
-
-    .btn-outline-secondary {
+        border: none;
         border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
     }
 
-    label {
-        font-weight: bold;
-    }
+        .btn-custom:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
 </style>
+
