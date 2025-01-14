@@ -36,12 +36,12 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Account
         [StringLength(100, ErrorMessage = "Password must be at least {2} and at most {1} characters long.", MinimumLength = 8)]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")]
         [DataType(DataType.Password)]
+        [Compare("ConfirmPassword", ErrorMessage = "Passwords do not match.")]
         public string Password { get; set; }
 
         [Required(ErrorMessage = "Confirm Password is required.")]
         [DataType(DataType.Password)]
         [Display(Name = "Confirm Password")]
-        [Compare("ConfirmPassword", ErrorMessage = "Passwords do not match.")]
         public string ConfirmPassword { get; set; }
 
     }
