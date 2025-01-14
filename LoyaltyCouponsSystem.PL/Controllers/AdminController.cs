@@ -24,37 +24,45 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> ManageUsers()
         {
-            var allUsers = await _userManager.Users.ToListAsync();
-            var confirmedUsers = allUsers.Where(u => u.EmailConfirmed == true).ToList();
-            var unconfirmedUsers = allUsers.Where(u => u.EmailConfirmed == false).ToList();
+            var users = _userManager.Users.ToList();
+            var allRoles = _roleManager.Roles.Select(r => r.Name).ToList();
 
-            var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
+            var confirmedUsers = new List<AdminUserViewModel>();
+            var unconfirmedUsers = new List<AdminUserViewModel>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                var userModel = new AdminUserViewModel
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    NationalID = user.NationalID,
+                    PhoneNumber = user.PhoneNumber,
+                    OptionalPhoneNumber = user.OptionalPhoneNumber,
+                    Governorate = user.Governorate,
+                    City = user.City,
+                    Role = roles.FirstOrDefault(),
+                    EmailConfirmed = user.EmailConfirmed
+                };
+
+                if (user.EmailConfirmed == true)
+                    confirmedUsers.Add(userModel);
+                else
+                    unconfirmedUsers.Add(userModel);
+            }
 
             var model = new ManageUsersViewModel
             {
-                ConfirmedUsers = confirmedUsers.Select(u => new AdminUserViewModel
-                {
-                    Id = u.Id,
-                    UserName = u.UserName,
-                    Email = u.Email,
-                    EmailConfirmed = u.EmailConfirmed,
-                    Role = u.Role
-                }).ToList(),
-
-                UnconfirmedUsers = unconfirmedUsers.Select(u => new AdminUserViewModel
-                {
-                    Id = u.Id,
-                    UserName = u.UserName,
-                    Email = u.Email,
-                    EmailConfirmed = u.EmailConfirmed,
-                    Role = u.Role
-                }).ToList(),
-
-                AllRoles = roles
+                ConfirmedUsers = confirmedUsers,
+                UnconfirmedUsers = unconfirmedUsers,
+                AllRoles = allRoles
             };
 
             return View(model);
         }
+
 
         // Edit user
         public async Task<IActionResult> EditUser(string id)
