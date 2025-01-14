@@ -29,9 +29,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     PhoneNumber2 = technicianViewModel.PhoneNumber2,
                     PhoneNumber3 = technicianViewModel.PhoneNumber3,
                     Governate = technicianViewModel.SelectedGovernate,
-                    City = technicianViewModel.SelectedCity,
-                    CreatedAt = technicianViewModel?.CreatedAt,
-                    CreatedBy = technicianViewModel?.CreatedBy,
+                    City = technicianViewModel.SelectedCity
                 };
 
                 return await _technicianRepo.AddAsync(technician);

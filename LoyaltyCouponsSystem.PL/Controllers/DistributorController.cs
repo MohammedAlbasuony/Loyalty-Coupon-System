@@ -1,5 +1,4 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
-using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +10,10 @@ namespace LoyaltyCouponsSystem.PL.Controllers
     public class DistributorController : Controller
     {
         private readonly IDistributorService _distributorService;
-        private readonly ICustomerService _customerService;
-        public DistributorController(IDistributorService distributorService , ICustomerService customerService)
+
+        public DistributorController(IDistributorService distributorService)
         {
             _distributorService = distributorService;
-            _customerService = customerService;
         }
 
         public IActionResult Index()
@@ -69,7 +67,6 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         {
             if (ModelState.IsValid)
             {
-            
                 var result = await _distributorService.AddAsync(distributorViewModel);
                 if (result)
                 {
@@ -105,7 +102,6 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 }
                 ModelState.AddModelError("", "Unable to update distributor. Please try again.");
             }
-
             distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
             return View(distributorViewModel);
         }
@@ -113,12 +109,6 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllDistributors()
         {
-            var customers = await _customerService.GetAllAsync();
-            var model = new DistributorViewModel
-            {
-                SelectedCustomerCodes = new List<string>(),
-                AvailableCustomers = customers // Populate the dropdown
-            };
             var distributors = await _distributorService.GetAllAsync();
             return View(distributors);
         }

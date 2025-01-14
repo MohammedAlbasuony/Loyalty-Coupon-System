@@ -9,9 +9,6 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Abstraction
         Task<List<Customer>> GetAllAsync();
         Task<Customer> GetByIdAsync(string id);
         Task<bool> UpdateAsync(Customer customer);
-        Task<List<int>> GetCustomerIdsByCodesAsync(List<string> customerCodes);
-       
-
     }
 
 }
