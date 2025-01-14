@@ -10,12 +10,10 @@
 @if (User.IsInRole("SuperAdmin"))
 {
     <div class="container mt-4">
-
-    <b><h1 class="text-primary text-center">Manage Users</h1></b>
+        <b><h1 class="text-primary text-center">Manage Users</h1></b>
 
         <div class="table-responsive mt-4">
-            <h3 class="text-success">Confirmed Users</h3>
-            <table id="confirmedUsersTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
+            <table id="usersTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
                 <thead class="thead-dark bg-primary text-white">
                     <tr>
                         <th>Username</th>
@@ -25,6 +23,7 @@
                         <th>Governorate</th>
                         <th>City</th>
                         <th>Current Role</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -39,10 +38,11 @@
                             <td>@user.UserName</td>
                             <td>@user.NationalID</td>
                             <td>@user.PhoneNumber</td>
-                            <td>@(string.IsNullOrEmpty(user.OptionalPhoneNumber) ? "No Optional phone number entered" : user.OptionalPhoneNumber)</td>
+                            <td>@(string.IsNullOrEmpty(user.OptionalPhoneNumber) ? "N/A" : user.OptionalPhoneNumber)</td>
                             <td>@user.Governorate</td>
                             <td>@user.City</td>
                             <td>@user.Role</td>
+                            <td><span class="badge bg-success">Active</span></td>
                             <td>
                                 <div class="action-container d-flex align-items-center gap-3">
                                     <form asp-action="AssignRole" asp-controller="Admin" method="post" class="d-flex align-items-center">
@@ -62,40 +62,18 @@
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
-        </div>
 
-
-
-
-    <!-- Unconfirmed Users Section -->
-        <div class="table-responsive mt-4">
-            <h3 class="text-danger">Unconfirmed Users</h3>
-            <table id="unconfirmedUsersTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
-                <thead class="thead-dark bg-primary text-white">
-                    <tr>
-                        <th>Username</th>
-                        <th>National ID</th>
-                        <th>Phone Number</th>
-                        <th>Optional Phone</th>
-                        <th>Governorate</th>
-                        <th>City</th>
-                        <th>Current Role</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
                     @foreach (var user in Model.UnconfirmedUsers)
                     {
                         <tr>
                             <td>@user.UserName</td>
                             <td>@user.NationalID</td>
                             <td>@user.PhoneNumber</td>
-                            <td>@(string.IsNullOrEmpty(user.OptionalPhoneNumber) ? "No Optional phone number entered" : user.OptionalPhoneNumber)</td>
+                            <td>@(string.IsNullOrEmpty(user.OptionalPhoneNumber) ? "N/A" : user.OptionalPhoneNumber)</td>
                             <td>@user.Governorate</td>
                             <td>@user.City</td>
                             <td>@user.Role</td>
+                            <td><span class="badge bg-warning text-dark">Pending</span></td>
                             <td>
                                 <div class="action-container d-flex flex-column align-items-start gap-2">
                                     <form asp-action="AssignRole" asp-controller="Admin" method="post" class="d-flex align-items-center">
@@ -124,10 +102,9 @@
                 </tbody>
             </table>
         </div>
+    </div>
 
 
-
-</div>
 
 
     <!-- Confirmation Modals -->
