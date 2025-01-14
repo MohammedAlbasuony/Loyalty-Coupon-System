@@ -11,7 +11,14 @@
 {
     <div class="container mt-4">
         <b><h1 class="text-primary text-center">Manage Users</h1></b>
-
+        <br />
+        <div class="row mb-4 justify-content-center">
+            <div class="col-md-8">
+                <div class="input-group shadow-sm">
+                    <input type="text" id="searchBox" class="form-control" placeholder="Search ...">
+                </div>
+            </div>
+        </div>
         <div class="table-responsive mt-4">
             <table id="usersTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
                 <thead class="thead-dark bg-primary text-white">
@@ -59,6 +66,7 @@
                                         </button>
                                     </form>
                                 </div>
+
                             </td>
                         </tr>
                     }
@@ -73,7 +81,7 @@
                             <td>@user.Governorate</td>
                             <td>@user.City</td>
                             <td>@user.Role</td>
-                            <td><span class="badge bg-warning text-dark">Pending</span></td>
+                            <td><span class="badge bg-warning text-white">Pending</span></td>
                             <td>
                                 <div class="action-container d-flex flex-column align-items-start gap-2">
                                     <form asp-action="AssignRole" asp-controller="Admin" method="post" class="d-flex align-items-center">
@@ -211,32 +219,17 @@ else
         background-color: #cc0000;
     }
 
-    /* Action Container */
-    .action-container {
-        display: flex;
-        flex-direction: row; /* Adjusted for horizontal alignment */
-        align-items: center;
-        gap: 10px;
-    }
-
-    /* Action Container */
-    .action-container {
-        display: flex;
-        flex-direction: row; /* Ensure horizontal alignment */
-        align-items: center;
-        gap: 20px; /* Increase space between dropdown and button */
-    }
-
     /* Dropdown Styling */
     .action-dropdown {
         border-radius: 8px;
         padding: 5px 10px;
         font-size: 14px;
         width: auto;
-        max-width: 180px; /* Wider dropdown for better readability */
-        text-align: left; /* Align text to the beginning */
+        max-width: 180px;
+        text-align: left;
         border: 1px solid #ddd;
         transition: border-color 0.3s ease;
+        margin-right: 10px; /* Add margin to increase spacing */
     }
 
         .action-dropdown:focus {
@@ -249,7 +242,7 @@ else
         background-color: #007bff;
         color: white;
         border: none;
-        padding: 6px 12px; /* Adjust button size */
+        padding: 4px 8px; /* Smaller button size */
         font-size: 12px;
         font-weight: bold;
         border-radius: 6px;
@@ -260,13 +253,12 @@ else
             background-color: #0056b3;
         }
 
-
     /* Confirm Account Button */
     .confirm-btn {
         background-color: #ffc107;
         color: white;
         border: none;
-        padding: 6px 12px; /* Smaller button size */
+        padding: 4px 8px;
         font-size: 12px;
         font-weight: bold;
         border-radius: 6px;
@@ -275,10 +267,28 @@ else
 
         .confirm-btn:hover {
             background-color: #e0a800;
-            color:#FFFFFF
+            color: #FFFFFF
         }
 
-    
+    #searchBox {
+        border-radius: 20px;
+        padding: 10px;
+        font-size: 16px;
+        width: 100%;
+        border: 2px solid #007bff;
+        background-color: #f9f9f9;
+        padding-left: 15px;
+    }
+
+        #searchBox::placeholder {
+            font-style: italic;
+            color: #aaa;
+        }
+
+    .input-group {
+        margin-bottom: 15px;
+    }
+
 
 </style>
 
@@ -309,4 +319,16 @@ else
         const modal = new bootstrap.Modal(document.getElementById("confirmationModal"));
         modal.show();
     }
+
+        document.getElementById("searchBox").addEventListener("input", function () {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll("#usersTable tbody tr");
+
+        rows.forEach(row => {
+            const cells = Array.from(row.children);
+            const isVisible = cells.some(cell => cell.textContent.toLowerCase().includes(searchValue));
+            row.style.display = isVisible ? "" : "none";
+        });
+    });
+
 </script>
