@@ -1,5 +1,6 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -77,6 +78,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                   
                     var result = await _technicianService.AddAsync(technicianViewModel);
                     if (result)
                     {
