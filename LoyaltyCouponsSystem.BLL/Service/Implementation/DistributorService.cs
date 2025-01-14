@@ -2,41 +2,57 @@
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
+using LoyaltyCouponsSystem.DAL.Repo.Implementation;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Distributor = LoyaltyCouponsSystem.DAL.Entity.Distributor;
 
 namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 {
     public class DistributorService : IDistributorService
     {
         private readonly IDistributorRepo _distributorRepo;
+        private readonly ICustomerRepo _customerRepo;
 
-        public DistributorService(IDistributorRepo distributorRepo)
+        public DistributorService(IDistributorRepo distributorRepo, ICustomerRepo customerRepo)
         {
             _distributorRepo = distributorRepo;
+            _customerRepo = customerRepo;
         }
 
         public async Task<bool> AddAsync(DistributorViewModel distributorViewModel)
         {
 
-            if (distributorViewModel != null)
-            {
-                var distributor = new Distributor
-                {
-                    Name = distributorViewModel.Name,
-                    PhoneNumber1 = distributorViewModel.PhoneNumber1,
-                    Governate = distributorViewModel.SelectedGovernate,
-                    City = distributorViewModel.SelectedCity,
-                    Code = distributorViewModel.Code,
-                    IsDeleted = distributorViewModel.IsDeleted
-                };
+            if (distributorViewModel == null)
+                return false;
 
-                return await _distributorRepo.AddAsync(distributor);
-            }
-            return false;
+            // Map Distributor entity
+            var distributor = new Distributor
+            {
+                Name = distributorViewModel.Name,
+                PhoneNumber1 = distributorViewModel.PhoneNumber1,
+                Governate = distributorViewModel.SelectedGovernate,
+                City = distributorViewModel.SelectedCity,
+                Code = distributorViewModel.Code,
+                IsDeleted = distributorViewModel.IsDeleted,
+                CreatedBy = distributorViewModel.CreatedBy,
+                CreatedAt = distributorViewModel.CreatedAt,
+                DistributorCustomers = new List<DistributorCustomer>()
+            };
+
+            // Fetch Customer IDs from the repository based on selected customer codes
+            var customerIds = await _customerRepo.GetCustomerIdsByCodesAsync(distributorViewModel.SelectedCustomerCodes);
+
+            // Create DistributorCustomer mappings
+            distributor.DistributorCustomers = customerIds
+                .Select(customerId => new DistributorCustomer
+                {
+                    CustomerID = customerId
+                })
+                .ToList();
+            return await _distributorRepo.AddAsync(distributor);
         }
+
+
 
         public async Task<bool> DeleteAsync(int id)
         {
@@ -111,7 +127,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             return customers.Select(c => new SelectListItem
             {
-                Value = c.Code,        
+                Value = c.Code,
                 Text = $"{c.Code} - {c.Name}"
             }).ToList();
         }

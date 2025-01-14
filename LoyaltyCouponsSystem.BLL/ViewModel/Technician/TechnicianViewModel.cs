@@ -33,7 +33,7 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
         public List<SelectListItem> Cities { get; set; } = new List<SelectListItem>();
         public string SelectedGovernate { get; set; }
         public string SelectedCity { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
-
-
 }
