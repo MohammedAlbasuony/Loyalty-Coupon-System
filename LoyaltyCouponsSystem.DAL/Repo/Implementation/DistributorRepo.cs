@@ -76,9 +76,8 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             try
             {
                 return await _DBcontext.Distributors
-                    .Include(d => d.DistributorCustomers) // if related data is required
+                    .Include(d => d.DistributorCustomers).ThenInclude(x => x.Customer) // if related data is required
                     .ToListAsync();
-                return await _DBcontext.Distributors.ToListAsync();
             }
             catch (Exception ex)
             {

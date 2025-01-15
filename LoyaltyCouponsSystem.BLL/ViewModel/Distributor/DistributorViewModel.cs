@@ -1,4 +1,5 @@
 ﻿using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
+using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
@@ -23,6 +24,7 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Distributor
         public List<SelectListItem> Governates { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> Cities { get; set; } = new List<SelectListItem>();
         public List<string> SelectedCustomerCodes { get; set; }
+        public List<string>? SelectedCustomerNames { get; set; }
         public List<CustomerViewModel>? AvailableCustomers { get; set; }
         public List<SelectListItem> Customers { get; set; } = new List<SelectListItem>();
 

@@ -50,10 +50,10 @@
                             <td>@distributor.SelectedGovernate</td>
                             <td>@distributor.SelectedCity</td>
                         <td>
-                            @if (distributor.SelectedCustomerCodes != null && distributor.SelectedCustomerCodes.Any())
+                            @if (distributor.SelectedCustomerNames != null && distributor.SelectedCustomerNames.Any())
                             {
                                 <ul>
-                                    @foreach (var customerCode in distributor.SelectedCustomerCodes)
+                                    @foreach (var customerCode in distributor.SelectedCustomerNames)
                                     {
                                         <li>@customerCode</li>
                                     }

@@ -78,6 +78,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 IsDeleted = d.IsDeleted,
                 CreatedAt = d.CreatedAt,
                 CreatedBy = d.CreatedBy,
+                SelectedCustomerNames = d.DistributorCustomers.Where(dc => dc.Customer != null)
+                .Select(x => x.Customer.Name)
+                .Distinct().ToList()
             }).ToList();
         }
 

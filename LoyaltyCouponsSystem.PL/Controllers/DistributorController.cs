@@ -113,12 +113,12 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllDistributors()
         {
-            var customers = await _customerService.GetAllAsync();
-            var model = new DistributorViewModel
-            {
-                SelectedCustomerCodes = new List<string>(),
-                AvailableCustomers = customers // Populate the dropdown
-            };
+            //var customers = await _customerService.GetAllAsync();
+            //var model = new DistributorViewModel
+            //{
+            //    SelectedCustomerCodes = new List<string>(),
+            //    AvailableCustomers = customers // Populate the dropdown
+            //};
             var distributors = await _distributorService.GetAllAsync();
             return View(distributors);
         }
