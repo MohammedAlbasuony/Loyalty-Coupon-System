@@ -31,7 +31,8 @@
                         <th>City</th>
                         <th>Current Role</th>
                         <th>Status</th>
-                        <th>Actions</th>
+                        <th>Assign Role</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,7 +42,7 @@
                         {
                             continue; // Skip the row entirely
                         }
-                        <tr>
+                        <tr class="@(user.IsActive ? "" : "inactive")">
                             <td>@user.UserName</td>
                             <td>@user.NationalID</td>
                             <td>@user.PhoneNumber</td>
@@ -49,24 +50,35 @@
                             <td>@user.Governorate</td>
                             <td>@user.City</td>
                             <td>@user.Role</td>
-                            <td><span class="badge bg-success">Active</span></td>
                             <td>
-                                <div class="action-container d-flex align-items-center gap-3">
-                                    <form asp-action="AssignRole" asp-controller="Admin" method="post" class="d-flex align-items-center">
-                                        <input type="hidden" name="userId" value="@user.Id" />
-                                        <select name="roleName" class="form-select action-dropdown">
-                                            <option disabled selected>Select Role</option>
-                                            @foreach (var role in Model.AllRoles)
-                                            {
-                                                <option value="@role">@role</option>
-                                            }
-                                        </select>
-                                        <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
-                                            Assign Role
-                                        </button>
-                                    </form>
-                                </div>
-
+                                <span class="badge @(user.IsActive ? "bg-success" : "bg-danger")">
+                                    @(user.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td>
+                                <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <select name="roleName" class="form-select action-dropdown">
+                                        <option disabled selected>Select Role</option>
+                                        @foreach (var role in Model.AllRoles)
+                                        {
+                                            <option value="@role">@role</option>
+                                        }
+                                    </select>
+                                    <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
+                                        Assign Role
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form asp-action="ToggleActivation" asp-controller="Admin" method="post" class="action-form">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="button" class="btn btn-sm toggle-btn shadow"
+                                            onclick="toggleActivation(this, '@user.UserName', this.form)"
+                                            data-status="@user.IsActive">
+                                        @(user.IsActive ? "Deactivate" : "Activate")
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     }
@@ -83,33 +95,36 @@
                             <td>@user.Role</td>
                             <td><span class="badge bg-warning text-white">Pending</span></td>
                             <td>
-                                <div class="action-container d-flex flex-column align-items-start gap-2">
-                                    <form asp-action="AssignRole" asp-controller="Admin" method="post" class="d-flex align-items-center">
-                                        <input type="hidden" name="userId" value="@user.Id" />
-                                        <select name="roleName" class="form-select action-dropdown">
-                                            <option disabled selected>Select Role</option>
-                                            @foreach (var role in Model.AllRoles)
-                                            {
-                                                <option value="@role">@role</option>
-                                            }
-                                        </select>
-                                        <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
-                                            Assign Role
-                                        </button>
-                                    </form>
-                                    <form asp-action="ConfirmAccount" asp-controller="Admin" method="post">
-                                        <input type="hidden" name="userId" value="@user.Id" />
-                                        <button type="button" class="btn btn-warning btn-sm shadow confirm-btn" onclick="confirmAccount('@user.UserName', this.form)">
-                                            Confirm Account
-                                        </button>
-                                    </form>
-                                </div>
+                                <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <select name="roleName" class="form-select action-dropdown">
+                                        <option disabled selected>Select Role</option>
+                                        @foreach (var role in Model.AllRoles)
+                                        {
+                                            <option value="@role">@role</option>
+                                        }
+                                    </select>
+                                    <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
+                                        Assign Role
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form asp-action="ConfirmAccount" asp-controller="Admin" method="post" class="action-form">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="button" class="btn btn-warning btn-sm shadow confirm-btn" onclick="confirmAccount('@user.UserName', this.form)">
+                                        Confirm Account
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
+
+
+
     </div>
 
 
@@ -154,34 +169,23 @@ else
         text-align: center;
     }
 
-    .table th {
-        text-align: center;
-        background-color: #007bff !important;
-        color: #ffffff !important;
-        font-weight: bold;
-        padding: 12px;
-        text-transform: uppercase;
-    }
+        .table th {
+            text-align: center;
+            background-color: #007bff !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            padding: 12px;
+            text-transform: uppercase;
+        }
 
     .table-hover tbody tr:hover {
         background-color: #e9f5ff;
-    }
-
-    .btn-outline-primary:hover {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .btn-outline-danger:hover {
-        background-color: #dc3545;
-        color: white;
     }
 
     h1 {
         font-weight: bold;
         letter-spacing: 1px;
     }
-
 
     .modal-content {
         border-radius: 15px;
@@ -215,21 +219,18 @@ else
         transition: background 0.3s ease;
     }
 
-    .btn-danger:hover {
-        background-color: #cc0000;
-    }
+        .btn-danger:hover {
+            background-color: #cc0000;
+        }
 
     /* Dropdown Styling */
     .action-dropdown {
         border-radius: 8px;
         padding: 5px 10px;
         font-size: 14px;
-        width: auto;
-        max-width: 180px;
+        width: 100%;
         text-align: left;
         border: 1px solid #ddd;
-        transition: border-color 0.3s ease;
-        margin-right: 10px; /* Add margin to increase spacing */
     }
 
         .action-dropdown:focus {
@@ -237,37 +238,44 @@ else
             outline: none;
         }
 
-    /* Assign Button */
+    .assign-btn,
+    .toggle-btn,
+    .confirm-btn {
+        width: 100%;
+        text-align: center;
+        padding: 8px;
+        font-size: 13px;
+        font-weight: bold;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
     .assign-btn {
         background-color: #007bff;
         color: white;
-        border: none;
-        padding: 4px 8px; /* Smaller button size */
-        font-size: 12px;
-        font-weight: bold;
-        border-radius: 6px;
-        transition: all 0.3s ease;
     }
 
         .assign-btn:hover {
             background-color: #0056b3;
         }
 
-    /* Confirm Account Button */
     .confirm-btn {
         background-color: #ffc107;
         color: white;
-        border: none;
-        padding: 4px 8px;
-        font-size: 12px;
-        font-weight: bold;
-        border-radius: 6px;
-        transition: all 0.3s ease;
     }
 
         .confirm-btn:hover {
             background-color: #e0a800;
-            color: #FFFFFF
+        }
+
+    .toggle-btn {
+        background-color: #6c757d;
+        color: white;
+    }
+
+        .toggle-btn:hover {
+            background-color: #343a40;
         }
 
     #searchBox {
@@ -289,8 +297,71 @@ else
         margin-bottom: 15px;
     }
 
+    tr.inactive {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        text-decoration: line-through;
+    }
 
+    .action-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* Modernized Buttons Styling */
+    .btn {
+        font-size: 14px;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: #fff;
+        border: none;
+    }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: #fff;
+        border: none;
+    }
+
+        .btn-secondary:hover {
+            background-color: #343a40;
+        }
+
+    .action-form {
+        margin-bottom: 8px;
+    }
+
+    .badge {
+        padding: 6px 12px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: bold;
+    }
 </style>
+
+
 
 <script>
     let currentForm = null;
@@ -330,5 +401,19 @@ else
             row.style.display = isVisible ? "" : "none";
         });
     });
+
+     function toggleActivation(button, userName, form) {
+        const status = button.getAttribute("data-status") === "True";
+        const action = status ? "deactivate" : "activate";
+        const modalBody = document.getElementById("confirmationModalBody");
+
+        modalBody.innerHTML = `Are you sure you want to ${action} the account for <strong>${userName}</strong>?`;
+
+        const confirmButton = document.getElementById("confirmActionButton");
+        confirmButton.onclick = () => form.submit();
+
+        const modal = new bootstrap.Modal(document.getElementById("confirmationModal"));
+        modal.show();
+    }
 
 </script>

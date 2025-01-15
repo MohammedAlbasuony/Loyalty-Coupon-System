@@ -44,7 +44,8 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     Governorate = user.Governorate,
                     City = user.City,
                     Role = roles.FirstOrDefault(),
-                    EmailConfirmed = user.EmailConfirmed
+                    EmailConfirmed = user.EmailConfirmed,
+                    IsActive = user.IsActive // Assuming IsActive is part of the ApplicationUser class
                 };
 
                 if (user.EmailConfirmed == true)
@@ -61,6 +62,21 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             };
 
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleActivation(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                user.IsActive = !user.IsActive; // Toggle the IsActive property
+                await _userManager.UpdateAsync(user);
+
+                // Optionally, add logging or other actions here
+            }
+
+            return RedirectToAction("ManageUsers");
         }
 
 

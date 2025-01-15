@@ -21,7 +21,9 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Admin
         public string? Role { get; set; }
         public IEnumerable<string> Roles { get; set; } 
         public string SelectedRole { get; set; } 
-        public string FullName { get; set; } 
+        public string FullName { get; set; }
+        public bool IsActive { get; set; }
+
     }
     public class ManageUsersViewModel
     {
