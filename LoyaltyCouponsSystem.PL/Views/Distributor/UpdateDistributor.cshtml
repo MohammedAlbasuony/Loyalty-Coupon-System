@@ -3,31 +3,159 @@
 @{
     ViewData["Title"] = "Update Distributor";
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
-
 }
 
-<h1>Update Distributor</h1>
+<div class="container mt-5">
 
-<form asp-action="UpdateDistributor" method="post">
-    <div class="form-group">
-        <label>Code</label>
-        <input asp-for="Code" class="form-control" readonly />
+    <!-- Backward Button -->
+    <div class="mb-4">
+        <a href="@Url.Action("GetAllDistributors", "Distributor")" class="btn btn-outline-primary" style="border-radius: 30px;">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
     </div>
-    <div class="form-group">
-        <label>Name</label>
-        <input asp-for="Name" class="form-control" />
+
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <h1 class="display-5 text-primary"><b>Update Distributor</b></h1>
+        <p class="lead text-secondary">Make changes to the distributor details with ease.</p>
     </div>
-    <div class="form-group">
-        <label>Phone Number</label>
-        <input asp-for="PhoneNumber1" class="form-control" />
+
+    <!-- Form Section -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form asp-action="UpdateDistributor" method="post">
+                <input type="hidden" asp-for="Code" />
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <!-- Distributor Name and Code -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Name" class="form-label text-primary"><b>Name</b></label>
+                        <input asp-for="Name" class="form-control" placeholder="Enter distributor name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Code" class="form-label text-primary"><b>Distributor Code</b></label>
+                        <input asp-for="Code" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="PhoneNumber1" class="form-label text-primary"><b>Phone Number</b></label>
+                        <input asp-for="PhoneNumber1" class="form-control" placeholder="Enter phone number" />
+                        <span asp-validation-for="PhoneNumber1" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Governorate and City -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SelectedGovernate" class="form-label text-primary"><b>Governorate</b></label>
+                        <select asp-for="SelectedGovernate" asp-items="Model.Governates" class="form-select">
+                            <option value="" disabled selected>Choose a Governorate</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SelectedCity" class="form-label text-primary"><b>City</b></label>
+                        <select asp-for="SelectedCity" asp-items="Model.Cities" class="form-select">
+                            <option value="" disabled selected>Choose a City</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-custom">
+                        <i class="fas fa-save"></i> Update Distributor
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="form-group">
-        <label>Governate</label>
-        <select asp-for="SelectedGovernate" asp-items="Model.Governates" class="form-control"></select>
-    </div>
-    <div class="form-group">
-        <label>City</label>
-        <select asp-for="SelectedCity" asp-items="Model.Cities" class="form-control"></select>
-    </div>
-    <button type="submit" class="btn btn-primary">Update</button>
-</form>
+</div>
+
+<!-- Style Section -->
+<style>
+    .btn-outline-primary {
+        font-size: 14px;
+        padding: 8px 20px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        border: 2px solid #007bff;
+        color: #007bff;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+        }
+
+    .form-control, .form-select {
+        border-radius: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        font-size: 16px;
+        padding: 10px 15px;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        }
+
+    label {
+        font-weight: bold;
+    }
+
+    .btn-custom {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+        font-size: 16px;
+        border: none;
+        border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-custom:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+
+    h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .container {
+        margin-top: 50px;
+    }
+
+    .form-label {
+        color: #007bff;
+    }
+</style>
