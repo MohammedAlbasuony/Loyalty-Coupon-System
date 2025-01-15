@@ -7,7 +7,9 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
     {
         [Required(ErrorMessage = "Account Number is required.")]
         [StringLength(20, ErrorMessage = "Account Number must be less than 20 digits.")]
+        [UniqueCode(ErrorMessage = "This account number is already in use.")]
         public string Code { get; set; }
+
         public string Name { get; set; }
         public string NickName { get; set; }
 
@@ -19,6 +21,7 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
         [Required(ErrorMessage = "Phone number is required.")]
         [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits.")]
         [Display(Name = "Primary Phone Number")]
+        [UniquePhoneNumber(ErrorMessage = "This phone number is already in use.")]
         public int PhoneNumber1 { get; set; }
 
         [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits.")]

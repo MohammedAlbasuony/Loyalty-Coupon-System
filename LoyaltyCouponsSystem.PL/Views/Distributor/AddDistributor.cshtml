@@ -11,7 +11,6 @@
         Name = c.Text
     }).ToList();
 }
-
 <div class="container mt-5">
 
     <!-- Backward Button -->
@@ -45,6 +44,7 @@
                     </div>
                 </div>
 
+                <!-- Governate and City Selection -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label asp-for="SelectedGovernate" class="form-label text-primary"><b>Governate</b></label>
@@ -59,8 +59,9 @@
                             <option value="" disabled selected>Choose a City</option>
                         </select>
                     </div>
-
                 </div>
+
+                <!-- Phone Number -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label asp-for="PhoneNumber1" class="form-label text-primary"><b>Phone Number <span class="text-danger">*</span></b></label>
@@ -68,6 +69,7 @@
                     </div>
                 </div>
 
+                <!-- Customers -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label asp-for="SelectedCustomerCodes" class="form-label text-primary"><b>Select Customers</b></label>
@@ -89,7 +91,6 @@
     </div>
 </div>
 
-
 <!-- Scripts Section -->
 @section Scripts {
     <!-- Initialize Select2 for customer dropdown -->
@@ -101,10 +102,8 @@
                 width: '100%' // Adjust the dropdown to fit container width
             });
         });
-    </script>
 
-    <!-- Handle governate and city cascading functionality -->
-    <script>
+        // Handle governate and city cascading functionality
         const citiesByGovernate = {
             Cairo: ["Nasr City", "Heliopolis", "Maadi", "New Cairo"],
             Alexandria: ["Montaza", "Sidi Gaber", "Smouha"],
@@ -134,24 +133,32 @@
             "New Valley": ["Kharga", "Dakhla", "Farafra"]
         };
 
-        document.getElementById("governate").addEventListener("change", function () {
-            const governate = this.value;
-            const citySelect = document.getElementById("city");
-
-            citySelect.innerHTML = '<option value="" disabled selected>Choose a City</option>';
-
+        // Repopulate city list based on the selected governate (if present)
+        function updateCities(governate) {
+            const citySelect = $('#city');
+            citySelect.empty();
+            citySelect.append('<option value="" disabled selected>Choose a City</option>');
             if (governate && citiesByGovernate[governate]) {
-                citySelect.disabled = false;
-                citiesByGovernate[governate].forEach(city => {
-                    const option = document.createElement("option");
-                    option.value = city;
-                    option.textContent = city;
-                    citySelect.appendChild(option);
+                citiesByGovernate[governate].forEach(function (city) {
+                    citySelect.append('<option value="' + city + '">' + city + '</option>');
                 });
+                citySelect.prop('disabled', false);
             } else {
-                citySelect.disabled = true;
+                citySelect.prop('disabled', true);
             }
+        }
+
+        // On governate change, update city dropdown
+        $('#governate').on('change', function () {
+            const governate = $(this).val();
+            updateCities(governate);
         });
+
+        // If governate is already selected, update cities on page load
+        const selectedGovernate = $('#governate').val();
+        if (selectedGovernate) {
+            updateCities(selectedGovernate);
+        }
     </script>
 
     <!-- Include Select2 CSS and JS -->
@@ -159,7 +166,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 }
-
 
 <style>
     .btn-custom-backward {
@@ -199,14 +205,15 @@
         font-size: 16px;
         border: none;
         border-radius: 30px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
     }
 
         .btn-custom:hover {
             background-color: #0056b3;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
         }
-</style>
 
+    .select2-container {
+        width: 100% !important;
+    }
+</style>

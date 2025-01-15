@@ -38,7 +38,34 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.HasKey(l => new { l.LoginProvider, l.ProviderKey });
             });
 
+            // Ensure Code is unique
+            modelBuilder.Entity<Customer>()
+                .HasIndex(c => c.Code)
+                .IsUnique();
 
+            // Ensure PhoneNumber is unique
+            modelBuilder.Entity<Customer>()
+                .HasIndex(c => c.PhoneNumber)
+                .IsUnique();
+
+            // Ensure Code is unique
+            modelBuilder.Entity<Technician>()
+                .HasIndex(c => c.Code)
+                .IsUnique();
+
+            // Ensure PhoneNumber is unique
+            modelBuilder.Entity<Technician>()
+                .HasIndex(c => c.PhoneNumber1)
+                .IsUnique();
+            // Ensure Code is unique
+            modelBuilder.Entity<Distributor>()
+                .HasIndex(c => c.Code)
+                .IsUnique();
+
+            // Ensure PhoneNumber is unique
+            modelBuilder.Entity<Distributor>()
+                .HasIndex(c => c.PhoneNumber1)
+                .IsUnique();
 
             modelBuilder.Entity<DistributorCustomer>()
                 .HasKey(dc => new { dc.DistributorID, dc.CustomerID });

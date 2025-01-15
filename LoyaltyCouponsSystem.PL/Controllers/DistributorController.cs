@@ -24,61 +24,31 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AddDistributorAsync()
+        public async Task<IActionResult> AddDistributor()
         {
-            var distributorViewModel = new DistributorViewModel
+            var viewModel = new DistributorViewModel
             {
-
-                Governates = new List<SelectListItem>
-                {
-                new SelectListItem { Text = "Cairo", Value = "Cairo" },
-                new SelectListItem { Text = "Giza", Value = "Giza" },
-                new SelectListItem { Text = "Alexandria", Value = "Alexandria" },
-                new SelectListItem { Text = "Dakahlia", Value = "Dakahlia" },
-                new SelectListItem { Text = "Red Sea", Value = "Red Sea" },
-                new SelectListItem { Text = "Beheira", Value = "Beheira" },
-                new SelectListItem { Text = "Fayoum", Value = "Fayoum" },
-                new SelectListItem { Text = "Sharqia", Value = "Sharqia" },
-                new SelectListItem { Text = "Aswan", Value = "Aswan" },
-                new SelectListItem { Text = "Assiut", Value = "Assiut" },
-                new SelectListItem { Text = "Beni Suef", Value = "Beni Suef" },
-                new SelectListItem { Text = "Port Said", Value = "Port Said" },
-                new SelectListItem { Text = "Damietta", Value = "Damietta" },
-                new SelectListItem { Text = "Ismailia", Value = "Ismailia" },
-                new SelectListItem { Text = "Kafr El Sheikh", Value = "Kafr El Sheikh" },
-                new SelectListItem { Text = "Matruh", Value = "Matruh" },
-                new SelectListItem { Text = "Luxor", Value = "Luxor" },
-                new SelectListItem { Text = "Qalyubia", Value = "Qalyubia" },
-                new SelectListItem { Text = "Qena", Value = "Qena" },
-                new SelectListItem { Text = "Monufia", Value = "Monufia" },
-                new SelectListItem { Text = "North Sinai", Value = "North Sinai" },
-                new SelectListItem { Text = "Sohag", Value = "Sohag" },
-                new SelectListItem { Text = "South Sinai", Value = "South Sinai" },
-                new SelectListItem { Text = "New Valley", Value = "New Valley" },
-                new SelectListItem { Text = "Gharbia", Value = "Gharbia" },
-                new SelectListItem { Text = "Suez", Value = "Suez" }
-                },
+                Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync(),
                 Customers = await _distributorService.GetCustomersForDropdownAsync()
-
             };
-            return View(distributorViewModel);
+
+            return View(viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddDistributor(DistributorViewModel distributorViewModel)
+        public async Task<IActionResult> AddDistributor(DistributorViewModel model)
         {
             if (ModelState.IsValid)
             {
-
-                var result = await _distributorService.AddAsync(distributorViewModel);
-                if (result)
-                {
-                    return RedirectToAction("GetAllDistributors");
-                }
-                ModelState.AddModelError("", "Unable to add distributor. Please try again.");
+                // Logic to handle distributor saving
+                await _distributorService.AddAsync(model);
+                return RedirectToAction("Index", "Distributor");
             }
-            distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
-            return View(distributorViewModel);
+
+            // In case of error, re-render the form with errors
+            model.Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync();
+            model.Customers = await _distributorService.GetCustomersForDropdownAsync();
+            return View(model);
         }
 
         [HttpGet]
@@ -113,12 +83,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllDistributors()
         {
-            //var customers = await _customerService.GetAllAsync();
-            //var model = new DistributorViewModel
-            //{
-            //    SelectedCustomerCodes = new List<string>(),
-            //    AvailableCustomers = customers // Populate the dropdown
-            //};
+            
             var distributors = await _distributorService.GetAllAsync();
             return View(distributors);
         }

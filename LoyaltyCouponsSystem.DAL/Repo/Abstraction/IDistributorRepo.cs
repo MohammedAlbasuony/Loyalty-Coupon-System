@@ -9,7 +9,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Abstraction
         Task<List<Distributor>> GetAllAsync();
         Task<Distributor> GetByIdAsync(int id);
         Task<bool> UpdateAsync(Distributor distributor);
-        Task<List<Customer>> GetCustomersForDropdownAsync(); 
+        Task<List<Customer>> GetCustomersForDropdownAsync();
+        Task<bool> IsUniquePhoneNumberAsync(int phoneNumber);
+        Task<bool> IsUniqueCodeAsync(string code);
 
     }
 }
