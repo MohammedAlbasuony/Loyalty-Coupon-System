@@ -54,7 +54,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 Code = customer.Code,
                 Governate = customer.Governate,
                 City = customer.City,
-                PhoneNumber = customer.PhoneNumber
+                PhoneNumber = customer.PhoneNumber,
+                CreatedBy = customer.CreatedBy,
+                CreatedAt = customer.CreatedAt,
             }).ToList();
 
             return customerViewModels;

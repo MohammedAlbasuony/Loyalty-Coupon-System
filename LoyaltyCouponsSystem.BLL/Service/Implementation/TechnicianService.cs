@@ -62,7 +62,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 PhoneNumber2 = technician.PhoneNumber2,
                 PhoneNumber3 = technician.PhoneNumber3,
                 SelectedGovernate = technician.Governate,
-                SelectedCity = technician.City
+                SelectedCity = technician.City,
+                CreatedAt = technician.CreatedAt,
+                CreatedBy = technician.CreatedBy,
             }).ToList();
 
             foreach (var technicianViewModel in technicianViewModels)
