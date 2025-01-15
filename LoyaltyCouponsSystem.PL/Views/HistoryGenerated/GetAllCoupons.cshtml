@@ -2,98 +2,157 @@
 @model IEnumerable<CouponViewModel>
 
 @{
-    ViewData["Title"] = "Coupon List";
+    ViewData["Title"] = "Coupon History";
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
 }
 
-<div class="col-md-12">
-    <div class="card">
-        <div class="card-header">
-            <h4 class="card-title">Coupon History</h4>
-            <form method="get" class="form-inline">
-                <input type="text" name="serialNumber" class="form-control mr-2" placeholder="Search by Serial Number" value="@ViewContext.HttpContext.Request.Query["serialNumber"]" />
-                <button type="submit" class="btn btn-primary">Search</button>
+<div class="container mt-5">
+
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <h1 class="display-5 text-primary"><b>Coupon History</b></h1>
+        <p class="lead text-secondary">Search and view coupon records with ease.</p>
+    </div>
+
+    <!-- Search Section -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <form method="get" class="input-group">
+                <input type="text" name="serialNumber" class="form-control" placeholder="Search by Serial Number"
+                       value="@ViewContext.HttpContext.Request.Query["serialNumber"]">
+                <button type="submit" class="btn btn-custom">Search</button>
             </form>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>Serial Number</th>
-                            <th>Type Of Coupon</th>
-                            <th>Governorate</th>
-                            <th>Area</th>
-                            <th>Value</th>
-                            <th>Order In Year</th>
-                            <th>Status</th>
-                            <th>Creation Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@item.SerialNumber</td>
-                                <td>@item.TypeOfCoupone</td>
-                                <td>@item.GovernorateName</td>
-                                <td>@item.AreaName</td>
-                                <td>@item.Value</td>
-                                <td>@item.NumInYear</td>
-                                <td>@item.Status</td>
-                                <td>@item.CreationDateTime?.ToString("yyyy-MM-dd")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div>
-                <nav>
-                    <ul class="pagination">
-                        @if (ViewBag.CurrentPage > 1)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@(ViewBag.CurrentPage - 1)">Previous</a>
-                            </li>
-                        }
+    </div>
 
-                        @if (ViewBag.CurrentPage > 3)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=1">1</a>
-                            </li>
-                            <li class="page-item disabled">
-                                <a class="page-link">...</a>
-                            </li>
-                        }
+    <!-- Table Section -->
+    <div class="table-responsive">
+        <table class="table table-hover shadow-lg rounded border-light-modern">
+            <thead class="thead-dark bg-primary text-white">
+                <tr>
+                    <th>Serial Number</th>
+                    <th>Type of Coupon</th>
+                    <th>Governorate</th>
+                    <th>Area</th>
+                    <th>Value</th>
+                    <th>Order in Year</th>
+                    <th>Status</th>
+                    <th>Creation Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.SerialNumber</td>
+                        <td>@item.TypeOfCoupone</td>
+                        <td>@item.GovernorateName</td>
+                        <td>@item.AreaName</td>
+                        <td>@item.Value</td>
+                        <td>@item.NumInYear</td>
+                        <td>
+                            <span class="badge @(item.Status == "Active" ? "bg-success" : "bg-danger")">
+                                @item.Status
+                            </span>
+                        </td>
+                        <td>@item.CreationDateTime?.ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
-                        @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
-                        {
-                            <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
-                                <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@i">@i</a>
-                            </li>
-                        }
+    <!-- Pagination -->
+    <div class="mt-4 text-center">
+        <nav>
+            <ul class="pagination justify-content-center">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@(ViewBag.CurrentPage - 1)">Previous</a>
+                    </li>
+                }
 
-                        @if (ViewBag.CurrentPage < ViewBag.TotalPages - 2)
-                        {
-                            <li class="page-item disabled">
-                                <a class="page-link">...</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@ViewBag.TotalPages">@ViewBag.TotalPages</a>
-                            </li>
-                        }
+                @if (ViewBag.CurrentPage > 3)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=1">1</a>
+                    </li>
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
 
-                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@(ViewBag.CurrentPage + 1)">Next</a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
+                @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                {
+                    <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                        <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@i">@i</a>
+                    </li>
+                }
 
-            </div>
-        </div>
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages - 2)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    <li class="page-item">
+                        <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@ViewBag.TotalPages">@ViewBag.TotalPages</a>
+                    </li>
+                }
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="?serialNumber=@ViewContext.HttpContext.Request.Query["serialNumber"]&page=@(ViewBag.CurrentPage + 1)">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
     </div>
 </div>
+
+<style>
+    .btn-custom {
+        padding: 10px 20px;
+        border-radius: 30px;
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+
+    .form-control {
+        border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        }
+
+    .table {
+        border-radius: 12px;
+        overflow: hidden;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+    .thead-dark th {
+        background-color: #007bff !important;
+        color: #ffffff !important;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+</style>
