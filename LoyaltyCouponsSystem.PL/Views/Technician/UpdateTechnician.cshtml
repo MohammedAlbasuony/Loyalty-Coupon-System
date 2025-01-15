@@ -4,22 +4,158 @@
 @{
     ViewData["Title"] = "Update Technician";
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
-
 }
 
-<h1>Update Technician</h1>
+<div class="container mt-5">
+    <!-- Backward Button -->
+    <div class="mb-4">
+        <a href="@Url.Action("GetAllTechnicians", "Technician")" class="btn btn-outline-primary" style="border-radius: 30px;">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
 
-<form asp-action="UpdateTechnician" method="post">
-    <input type="hidden" asp-for="Code" />
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <h1 class="display-5 text-primary"><b>Update Technician</b></h1>
+        <p class="lead text-secondary">Make changes to the technician details with ease.</p>
     </div>
-    <div class="form-group">
-        <label asp-for="PhoneNumber1"></label>
-        <input asp-for="PhoneNumber1" class="form-control" />
-        <span asp-validation-for="PhoneNumber1" class="text-danger"></span>
+
+    <!-- Form Section -->
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <form asp-action="UpdateTechnician" method="post" id="technicianForm">
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <!-- Code and Name -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Code" class="form-label text-primary"><b>Code <span class="text-danger">*</span></b></label>
+                        <input asp-for="Code" class="form-control" placeholder="Enter technician code" readonly />
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Name" class="form-label text-primary"><b>Name <span class="text-danger">*</span></b></label>
+                        <input asp-for="Name" class="form-control" placeholder="Enter technician name" required />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Nickname and National ID -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="NickName" class="form-label text-primary"><b>Nick Name</b></label>
+                        <input asp-for="NickName" class="form-control" placeholder="Enter nickname" />
+                        <span asp-validation-for="NickName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="NationalID" class="form-label text-primary"><b>National ID</b></label>
+                        <input asp-for="NationalID" class="form-control" type="text" placeholder="Enter national ID" />
+                        <span asp-validation-for="NationalID" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Phone Numbers -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="PhoneNumber1" class="form-label text-primary"><b>Phone Number 1</b></label>
+                        <input asp-for="PhoneNumber1" class="form-control" type="text" placeholder="Enter phone number 1" />
+                        <span asp-validation-for="PhoneNumber1" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="PhoneNumber2" class="form-label text-primary"><b>Phone Number 2</b></label>
+                        <input asp-for="PhoneNumber2" class="form-control" type="text" placeholder="Enter phone number 2" />
+                        <span asp-validation-for="PhoneNumber2" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="PhoneNumber3" class="form-label text-primary"><b>Phone Number 3</b></label>
+                        <input asp-for="PhoneNumber3" class="form-control" type="text" placeholder="Enter phone number 3" />
+                        <span asp-validation-for="PhoneNumber3" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-custom">
+                        <i class="fas fa-save"></i> Update Technician
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary">Update Technician</button>
-</form>
+</div>
+
+@section Scripts {
+    <script>
+        const citiesByGovernate = {
+            Cairo: ["Nasr City", "Heliopolis", "Maadi", "New Cairo"],
+            Alexandria: ["Montaza", "Sidi Gaber", "Smouha"],
+            Giza: ["Dokki", "Haram", "6th of October"],
+            Aswan: ["Aswan City", "Kom Ombo", "Edfu"],
+        };
+
+        document.getElementById("Governate").addEventListener("change", function () {
+            const governate = this.value;
+            const citySelect = document.getElementById("City");
+
+            citySelect.innerHTML = '<option value="" disabled selected>Choose a City</option>';
+
+            if (governate && citiesByGovernate[governate]) {
+                citySelect.disabled = false;
+                citiesByGovernate[governate].forEach(city => {
+                    const option = document.createElement("option");
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            } else {
+                citySelect.disabled = true;
+            }
+        });
+    </script>
+}
+
+<style>
+    .btn-custom {
+        display: inline-block;
+        background-color: #007bff;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 10px 25px;
+        border-radius: 30px;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-custom:active {
+            background-color: #004085;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-custom i {
+            margin-right: 8px;
+        }
+    .form-control, .form-select {
+        border-radius: 20px;
+    }
+    .btn-outline-primary {
+        font-size: 14px;
+        padding: 8px 20px;
+        font-weight: bold;
+        border: 2px solid #007bff;
+        color: #007bff;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .btn-outline-primary:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
+</style>
