@@ -29,51 +29,54 @@
 
     <!-- Form Section -->
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <form asp-action="AddDistributor" method="post" id="addDistributorForm">
                 <div asp-validation-summary="All" class="text-danger"></div>
 
-                <!-- Code -->
-                <div class="form-group mb-3">
-                    <label asp-for="Code" class="form-label text-primary"><b>Code <span class="text-danger">*</span></b></label>
-                    <input asp-for="Code" class="form-control" placeholder="Enter distributor code" required />
+                <!-- Code and Name -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Code" class="form-label text-primary"><b>Code <span class="text-danger">*</span></b></label>
+                        <input asp-for="Code" class="form-control" placeholder="Enter distributor code" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Name" class="form-label text-primary"><b>Name <span class="text-danger">*</span></b></label>
+                        <input asp-for="Name" class="form-control" placeholder="Enter distributor name" required />
+                    </div>
                 </div>
 
-                <!-- Name -->
-                <div class="form-group mb-3">
-                    <label asp-for="Name" class="form-label text-primary"><b>Name <span class="text-danger">*</span></b></label>
-                    <input asp-for="Name" class="form-control" placeholder="Enter distributor name" required />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SelectedGovernate" class="form-label text-primary"><b>Governate</b></label>
+                        <select asp-for="SelectedGovernate" asp-items="Model.Governates" class="form-select" id="governate">
+                            <option value="" disabled selected>Choose a Governate</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SelectedCity" class="form-label text-primary"><b>City</b></label>
+                        <select asp-for="SelectedCity" class="form-select" id="city" disabled>
+                            <option value="" disabled selected>Choose a City</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="PhoneNumber1" class="form-label text-primary"><b>Phone Number <span class="text-danger">*</span></b></label>
+                        <input asp-for="PhoneNumber1" class="form-control" placeholder="Enter phone number" required />
+                    </div>
                 </div>
 
-                <!-- Phone Number -->
-                <div class="form-group mb-3">
-                    <label asp-for="PhoneNumber1" class="form-label text-primary"><b>Phone Number <span class="text-danger">*</span></b></label>
-                    <input asp-for="PhoneNumber1" class="form-control" placeholder="Enter phone number" required />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SelectedCustomerCodes" class="form-label text-primary"><b>Select Customers</b></label>
+                        <select asp-for="SelectedCustomerCodes" asp-items="Model.Customers" class="form-control select2" multiple>
+                            <option></option>
+                        </select>
+                    </div>
                 </div>
-
-                <!-- Governate -->
-                <div class="form-group mb-3">
-                    <label asp-for="SelectedGovernate" class="form-label text-primary"><b>Governate</b></label>
-                    <select asp-for="SelectedGovernate" asp-items="Model.Governates" class="form-select" id="governate">
-                        <option value="" disabled selected>Choose a Governate</option>
-                    </select>
-                </div>
-
-                <!-- City -->
-                <div class="form-group mb-3">
-                    <label asp-for="SelectedCity" class="form-label text-primary"><b>City</b></label>
-                    <select asp-for="SelectedCity" class="form-select" id="city" disabled>
-                        <option value="" disabled selected>Choose a City</option>
-                    </select>
-                </div>
-
-                <!-- Select Customer -->
-                <div class="form-group mb-3">
-                    <label asp-for="SelectedCustomerCodes" class="form-label text-primary"><b>Select Customer</b></label>
-                    <select asp-for="SelectedCustomerCodes" asp-items="Model.Customers" class="form-control select2" multiple>
-                        <option></option> <!-- Placeholder for dropdown -->
-                    </select>
-                </div>
+                <br />
 
                 <!-- Submit Button -->
                 <div class="text-center">
@@ -85,6 +88,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Scripts Section -->
 @section Scripts {
