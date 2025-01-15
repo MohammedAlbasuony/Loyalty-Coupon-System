@@ -49,7 +49,22 @@
                             <td>@distributor.PhoneNumber1</td>
                             <td>@distributor.SelectedGovernate</td>
                             <td>@distributor.SelectedCity</td>
-                            <td>@distributor.SelectedCustomerCodes</td>
+                        <td>
+                            @if (distributor.SelectedCustomerCodes != null && distributor.SelectedCustomerCodes.Any())
+                            {
+                                <ul>
+                                    @foreach (var customerCode in distributor.SelectedCustomerCodes)
+                                    {
+                                        <li>@customerCode</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span>No Customers</span>
+                            }
+                        </td>
+
                             <td>@distributor.CreatedBy</td>
                             <td>@distributor.CreatedAt</td>
                             <td>

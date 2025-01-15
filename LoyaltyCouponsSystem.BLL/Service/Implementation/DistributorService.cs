@@ -49,6 +49,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     CustomerID = customerId
                 })
                 .ToList();
+
             return await _distributorRepo.AddAsync(distributor);
         }
 
@@ -74,7 +75,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 SelectedGovernate = d.Governate,
                 SelectedCity = d.City,
                 Code = d.Code,
-                IsDeleted = d.IsDeleted
+                IsDeleted = d.IsDeleted,
+                CreatedAt = d.CreatedAt,
+                CreatedBy = d.CreatedBy,
             }).ToList();
         }
 

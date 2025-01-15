@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SkiaSharp;
 
 namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
 {
@@ -74,6 +75,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             try
             {
+                return await _DBcontext.Distributors
+                    .Include(d => d.DistributorCustomers) // if related data is required
+                    .ToListAsync();
                 return await _DBcontext.Distributors.ToListAsync();
             }
             catch (Exception ex)
