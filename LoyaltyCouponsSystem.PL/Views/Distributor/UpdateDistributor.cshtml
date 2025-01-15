@@ -25,6 +25,7 @@
         <div class="col-md-8">
             <form asp-action="UpdateDistributor" method="post">
                 <input type="hidden" asp-for="Code" />
+                <input hidden type="hidden" asp-for="DistributorID" />
                 <div asp-validation-summary="All" class="text-danger"></div>
 
                 <!-- Distributor Name and Code -->
@@ -53,13 +54,13 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label asp-for="SelectedGovernate" class="form-label text-primary"><b>Governorate</b></label>
-                        <select asp-for="SelectedGovernate" asp-items="Model.Governates" class="form-select">
+                        <select asp-for="SelectedGovernate" asp-items="Model.Governates" class="form-select" id="governate">
                             <option value="" disabled selected>Choose a Governorate</option>
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label asp-for="SelectedCity" class="form-label text-primary"><b>City</b></label>
-                        <select asp-for="SelectedCity" asp-items="Model.Cities" class="form-select">
+                        <select asp-for="SelectedCity" asp-items="Model.Cities" class="form-select" id="city" disabled>
                             <option value="" disabled selected>Choose a City</option>
                         </select>
                     </div>
@@ -75,6 +76,67 @@
         </div>
     </div>
 </div>
+
+@section script {
+    <script>
+        // Handle governate and city cascading functionality
+        const citiesByGovernate = {
+            Cairo: ["Nasr City", "Heliopolis", "Maadi", "New Cairo"],
+            Alexandria: ["Montaza", "Sidi Gaber", "Smouha"],
+            Giza: ["Dokki", "Haram", "6th of October"],
+            Dakahlia: ["Mansoura", "Mit Ghamr", "Talkha"],
+            "Red Sea": ["Hurghada", "Safaga", "El Qoseir"],
+            Beheira: ["Damanhour", "Rashid", "Kafr El-Dawwar"],
+            Fayoum: ["Fayoum City", "Tamiya", "Ibsheway"],
+            Sharqia: ["Zagazig", "Belbeis", "10th of Ramadan City"],
+            Aswan: ["Aswan City", "Kom Ombo", "Edfu"],
+            Assiut: ["Assiut City", "Manfalut", "Dayrout"],
+            "Beni Suef": ["Beni Suef City", "Nasser", "Ihnasya"],
+            "Port Said": ["Port Said City"],
+            Suez: ["Suez City"],
+            Matruh: ["Marsa Matruh", "Siwa", "Alamein"],
+            Qalyubia: ["Banha", "Shubra El-Kheima", "Qalyub"],
+            Gharbia: ["Tanta", "El-Mahalla", "Kafr El-Zayat"],
+            Monufia: ["Shebin El-Kom", "Sadat City", "Menouf"],
+            Qena: ["Qena City", "Nag Hammadi", "Qus"],
+            "North Sinai": ["Arish", "Sheikh Zuweid", "Rafah"],
+            Sohag: ["Sohag City", "Tahta", "Akhmim"],
+            "South Sinai": ["Sharm El-Sheikh", "Dahab", "Taba"],
+            "Kafr El Sheikh": ["Kafr El Sheikh City", "Desouk", "Balteem"],
+            Damietta: ["Damietta City", "Ras El Bar", "New Damietta"],
+            Ismailia: ["Ismailia City", "Fayed", "Qantara"],
+            Luxor: ["Luxor City", "Armant", "Esna"],
+            "New Valley": ["Kharga", "Dakhla", "Farafra"]
+        };
+
+        // Repopulate city list based on the selected governate (if present)
+        function updateCities(governate) {
+            const citySelect = $('#city');
+            citySelect.empty();
+            citySelect.append('<option value="" disabled selected>Choose a City</option>');
+            if (governate && citiesByGovernate[governate]) {
+                citiesByGovernate[governate].forEach(function (city) {
+                    citySelect.append('<option value="' + city + '">' + city + '</option>');
+                });
+                citySelect.prop('disabled', false);
+            } else {
+                citySelect.prop('disabled', true);
+            }
+        }
+
+        // On governate change, update city dropdown
+        $('#governate').on('change', function () {
+            const governate = $(this).val();
+            updateCities(governate);
+        });
+
+        // If governate is already selected, update cities on page load
+        const selectedGovernate = $('#governate').val();
+        if (selectedGovernate) {
+            updateCities(selectedGovernate);
+        }
+    </script>
+}
 
 <!-- Style Section -->
 <style>
