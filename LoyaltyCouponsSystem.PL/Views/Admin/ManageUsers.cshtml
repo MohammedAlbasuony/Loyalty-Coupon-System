@@ -29,7 +29,7 @@
                         <th>Optional Phone</th>
                         <th>Governorate</th>
                         <th>City</th>
-                        <th>Current Role</th>
+                        <th>Role</th>
                         <th>Status</th>
                         <th>Assign Role</th>
                         <th>Action</th>
@@ -65,6 +65,7 @@
                                             <option value="@role">@role</option>
                                         }
                                     </select>
+                                    <br />
                                     <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
                                         Assign Role
                                     </button>
@@ -73,13 +74,15 @@
                             <td>
                                 <form asp-action="ToggleActivation" asp-controller="Admin" method="post" class="action-form">
                                     <input type="hidden" name="userId" value="@user.Id" />
-                                    <button type="button" class="btn btn-sm toggle-btn shadow"
+                                    <button type="button"
+                                            class="btn btn-sm toggle-btn shadow @(user.IsActive ? "deactivate" : "activate")"
                                             onclick="toggleActivation(this, '@user.UserName', this.form)"
                                             data-status="@user.IsActive">
                                         @(user.IsActive ? "Deactivate" : "Activate")
                                     </button>
                                 </form>
                             </td>
+
                         </tr>
                     }
 
@@ -104,6 +107,7 @@
                                             <option value="@role">@role</option>
                                         }
                                     </select>
+                                    <br />
                                     <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
                                         Assign Role
                                     </button>
@@ -122,12 +126,7 @@
                 </tbody>
             </table>
         </div>
-
-
-
     </div>
-
-
 
 
     <!-- Confirmation Modals -->
@@ -163,201 +162,151 @@ else
 
 
 <style>
+    .table-responsive {
+        overflow-x: unset; /* Remove horizontal scrolling */
+        padding: 0;
+        margin: 0 auto;
+    }
+
     .table {
+        width: 100%;
         border-radius: 12px;
         overflow: hidden;
         text-align: center;
+        table-layout: auto; /* Allow table to auto-adjust column widths */
     }
 
-        .table th {
-            text-align: center;
-            background-color: #007bff !important;
-            color: #ffffff !important;
-            font-weight: bold;
-            padding: 12px;
-            text-transform: uppercase;
-        }
+    .table th,
+    .table td {
+        word-wrap: break-word; /* Wrap content within cells */
+        white-space: normal; /* Allow text wrapping */
+        text-align: center;
+        vertical-align: middle;
+        padding: 6px; /* Reduce padding for compactness */
+    }
+
+    .table th {
+        background-color: #007bff !important;
+        color: #ffffff !important;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
 
     .table-hover tbody tr:hover {
         background-color: #e9f5ff;
     }
 
+    .inactive-row {
+        background-color: #f0f0f0 !important; /* Light gray background */
+        color: #6c757d; /* Dimmed text color */
+    }
+
+
+        .inactive-row td {
+            text-decoration: line-through; /* Add strikethrough to text */
+        }
+
+    .active-row {
+        background-color: inherit; /* Reset to default background */
+        color: inherit; /* Reset to default text color */
+    }
+
+    .active-row td {
+        text-decoration: none; /* Remove strikethrough */
+    }
+
+
+
     h1 {
         font-weight: bold;
-        letter-spacing: 1px;
-    }
-
-    .modal-content {
-        border-radius: 15px;
-        background: #f9f9f9;
-    }
-
-    .modal-header {
-        background: linear-gradient(135deg, #007bff, #0056b3);
-        color: white;
-        font-weight: bold;
-    }
-
-    .modal-body {
-        font-size: 18px;
-        color: #333;
-        padding: 20px 30px;
-    }
-
-    .modal-footer {
-        border-top: none;
-        padding: 20px 30px;
     }
 
     .btn-danger {
         background-color: #ff4d4d;
         border: none;
         border-radius: 30px;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: bold;
         color: white;
         transition: background 0.3s ease;
     }
 
-        .btn-danger:hover {
-            background-color: #cc0000;
-        }
-
-    /* Dropdown Styling */
-    .action-dropdown {
-        border-radius: 8px;
-        padding: 5px 10px;
-        font-size: 14px;
-        width: 100%;
-        text-align: left;
-        border: 1px solid #ddd;
+    .btn-danger:hover {
+        background-color: #cc0000;
     }
-
-        .action-dropdown:focus {
-            border-color: #007bff;
-            outline: none;
-        }
 
     .assign-btn,
-    .toggle-btn,
     .confirm-btn {
-        width: 100%;
-        text-align: center;
-        padding: 8px;
-        font-size: 13px;
-        font-weight: bold;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-
-    .assign-btn {
         background-color: #007bff;
         color: white;
+        border: none;
+        padding: 4px 6px;
+        font-size: 11px;
+        font-weight: bold;
+        border-radius: 6px;
+        transition: all 0.3s ease;
     }
 
-        .assign-btn:hover {
-            background-color: #0056b3;
-        }
-
-    .confirm-btn {
-        background-color: #ffc107;
-        color: white;
+    .assign-btn:hover,
+    .confirm-btn:hover {
+        background-color: #0056b3;
     }
-
-        .confirm-btn:hover {
-            background-color: #e0a800;
-        }
 
     .toggle-btn {
-        background-color: #6c757d;
-        color: white;
-    }
-
-        .toggle-btn:hover {
-            background-color: #343a40;
-        }
-
-    #searchBox {
-        border-radius: 20px;
-        padding: 10px;
-        font-size: 16px;
-        width: 100%;
-        border: 2px solid #007bff;
-        background-color: #f9f9f9;
-        padding-left: 15px;
-    }
-
-        #searchBox::placeholder {
-            font-style: italic;
-            color: #aaa;
-        }
-
-    .input-group {
-        margin-bottom: 15px;
-    }
-
-    tr.inactive {
-        background-color: #f8f9fa;
-        color: #6c757d;
-        text-decoration: line-through;
-    }
-
-    .action-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    /* Modernized Buttons Styling */
-    .btn {
-        font-size: 14px;
-        padding: 8px 16px;
-        border-radius: 10px;
+        padding: 4px 6px;
+        font-size: 11px;
         font-weight: bold;
-        text-transform: uppercase;
+        border-radius: 6px;
         transition: all 0.3s ease;
     }
 
-    .btn-primary {
-        background-color: #007bff;
-        color: #fff;
-        border: none;
+    .toggle-btn.deactivate {
+        background-color: #dc3545;
+        color: white;
     }
 
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-    .btn-warning {
-        background-color: #ffc107;
-        color: #fff;
-        border: none;
+    .toggle-btn.deactivate:hover {
+        background-color: #b02a37;
     }
 
-        .btn-warning:hover {
-            background-color: #e0a800;
-        }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        color: #fff;
-        border: none;
+    .toggle-btn.activate {
+        background-color: #28a745;
+        color: white;
     }
 
-        .btn-secondary:hover {
-            background-color: #343a40;
-        }
+    .toggle-btn.activate:hover {
+        background-color: #218838;
+    }
 
-    .action-form {
-        margin-bottom: 8px;
+    .action-dropdown {
+        border-radius: 6px;
+        padding: 4px 6px;
+        font-size: 11px;
+        border: 1px solid #ddd;
+        background-color: #fff;
+        width: 120px;
+        transition: border-color 0.3s ease;
     }
 
     .badge {
-        padding: 6px 12px;
-        border-radius: 10px;
-        font-size: 12px;
+        padding: 3px 6px;
+        border-radius: 6px;
+        font-size: 10px;
         font-weight: bold;
+    }
+
+    #searchBox {
+        border-radius: 20px;
+        padding: 8px;
+        font-size: 14px;
+        width: 100%;
+        border: 2px solid #007bff;
+        background-color: #f9f9f9;
+    }
+
+    #searchBox::placeholder {
+        font-style: italic;
+        color: #aaa;
     }
 </style>
 
@@ -392,28 +341,115 @@ else
     }
 
         document.getElementById("searchBox").addEventListener("input", function () {
-        const searchValue = this.value.toLowerCase();
+        const searchValue = this.value.toLowerCase(); // Get the search value
         const rows = document.querySelectorAll("#usersTable tbody tr");
 
-        rows.forEach(row => {
-            const cells = Array.from(row.children);
-            const isVisible = cells.some(cell => cell.textContent.toLowerCase().includes(searchValue));
-            row.style.display = isVisible ? "" : "none";
+        rows.forEach((row) => {
+            // Get all the relevant cell values in the row
+            const username = row.children[0]?.textContent.toLowerCase(); // Username (1st column)
+            const nationalId = row.children[1]?.textContent.toLowerCase(); // National ID (2nd column)
+            const phoneNumber = row.children[2]?.textContent.toLowerCase(); // Phone Number (3rd column)
+            const optionalPhone = row.children[3]?.textContent.toLowerCase(); // Optional Phone (4th column)
+            const governorate = row.children[4]?.textContent.toLowerCase(); // Governorate (5th column)
+            const city = row.children[5]?.textContent.toLowerCase(); // City (6th column)
+            const role = row.children[6]?.textContent.toLowerCase(); // Current Role (7th column)
+            const status = row.children[7]?.textContent.toLowerCase().trim(); // Current Status (8th column)
+
+            // Handle exact match for "active", "inactive", or "pending" in Current Status
+            const isStatusMatch =
+                searchValue === "active" ? status === "active" :
+                searchValue === "inactive" ? status === "inactive" :
+                searchValue === "pending" ? status === "pending" :
+                status.includes(searchValue); // General match for other cases
+
+            // Check if the search matches any of the other columns
+            const isOtherMatch =
+                username.includes(searchValue) ||
+                nationalId.includes(searchValue) ||
+                phoneNumber.includes(searchValue) ||
+                optionalPhone.includes(searchValue) ||
+                governorate.includes(searchValue) ||
+                city.includes(searchValue) ||
+                role.includes(searchValue);
+
+            // Show/hide the row based on the match
+            row.style.display = isStatusMatch || isOtherMatch ? "" : "none";
         });
     });
 
-     function toggleActivation(button, userName, form) {
-        const status = button.getAttribute("data-status") === "True";
-        const action = status ? "deactivate" : "activate";
+
+
+            function toggleActivation(button, userName, form) {
+        const isActive = button.getAttribute("data-status") === "True";
+        const action = isActive ? "deactivate" : "activate";
         const modalBody = document.getElementById("confirmationModalBody");
 
         modalBody.innerHTML = `Are you sure you want to ${action} the account for <strong>${userName}</strong>?`;
 
         const confirmButton = document.getElementById("confirmActionButton");
-        confirmButton.onclick = () => form.submit();
+        confirmButton.onclick = () => {
+            form.submit();
+            const row = button.closest("tr");
+
+            if (isActive) {
+                // Deactivate row
+                row.classList.remove("active-row");
+                row.classList.add("inactive-row");
+                button.setAttribute("data-status", "False");
+                button.innerHTML = "Activate";
+                button.classList.remove("deactivate");
+                button.classList.add("activate");
+            } else {
+                // Activate row
+                row.classList.remove("inactive-row");
+                row.classList.add("active-row");
+                button.setAttribute("data-status", "True");
+                button.innerHTML = "Deactivate";
+                button.classList.remove("activate");
+                button.classList.add("deactivate");
+            }
+        };
 
         const modal = new bootstrap.Modal(document.getElementById("confirmationModal"));
         modal.show();
     }
+
+            document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.querySelector("#usersTable tbody");
+
+        function moveInactiveRowsToBottom() {
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
+            const activeRows = [];
+            const inactiveRows = [];
+
+            rows.forEach((row) => {
+                const status = row.querySelector("td:nth-child(8) span")?.textContent.toLowerCase().trim();
+                if (status === "inactive") {
+                    row.classList.add("inactive-row"); // Add class to inactive rows
+                    inactiveRows.push(row);
+                } else {
+                    row.classList.remove("inactive-row"); // Remove the class if not inactive
+                    activeRows.push(row);
+                }
+            });
+
+            // Clear the table body and append rows in the desired order
+            tableBody.innerHTML = "";
+            activeRows.forEach((row) => tableBody.appendChild(row));
+            inactiveRows.forEach((row) => tableBody.appendChild(row));
+        }
+
+        // Call the function initially to reorder the rows
+        moveInactiveRowsToBottom();
+
+        // Update the function to trigger after toggling activation
+        document.querySelectorAll(".toggle-btn").forEach((button) => {
+            button.addEventListener("click", function () {
+                setTimeout(() => moveInactiveRowsToBottom(), 100); // Slight delay to allow DOM update
+            });
+        });
+    });
+
+
 
 </script>
