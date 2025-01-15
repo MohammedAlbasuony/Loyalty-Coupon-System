@@ -20,7 +20,16 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
+        public async Task<bool> IsUniqueCodeAsync(string code)
+        {
+            return !await _DBcontext.Distributors.AnyAsync(d => d.Code == code);
+        }
 
+        // Check if PhoneNumber1 is unique
+        public async Task<bool> IsUniquePhoneNumberAsync(int phoneNumber)
+        {
+            return !await _DBcontext.Distributors.AnyAsync(d => d.PhoneNumber1 == phoneNumber);
+        }
         public async Task<List<int>> GetValidCustomerIdsAsync(List<string> customerCodes)
         {
             return await _DBcontext.Customers
@@ -34,6 +43,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             try
             {
+                // Ensure the Code and Phone Number are unique
+                if (!await IsUniqueCodeAsync(distributor.Code))
+                    throw new Exception("Code already exists.");
+                if (!await IsUniquePhoneNumberAsync(distributor.PhoneNumber1))
+                    throw new Exception("Phone number already exists.");
+
                 var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
                 distributor.CreatedBy = currentUser?.UserName;
                 distributor.CreatedAt = DateTime.UtcNow;
@@ -42,8 +57,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
             catch (Exception ex)
             {
-                // Log exception here
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Error adding distributor: {ex.Message}");
                 return false;
             }
         }
@@ -105,6 +119,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             try
             {
+                // Ensure the Code and Phone Number are unique
+                if (!await IsUniqueCodeAsync(distributor.Code))
+                    throw new Exception("Code already exists.");
+                if (!await IsUniquePhoneNumberAsync(distributor.PhoneNumber1))
+                    throw new Exception("Phone number already exists.");
+
                 var existingDistributor = await _DBcontext.Distributors
                     .Where(d => d.DistributorID == distributor.DistributorID)
                     .FirstOrDefaultAsync();

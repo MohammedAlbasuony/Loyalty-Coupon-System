@@ -19,12 +19,27 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
+        public async Task<bool> IsUniqueCodeAsync(string code)
+        {
+            return !await _DBcontext.Technicians.AnyAsync(t => t.Code == code);
+        }
 
+        // Check if PhoneNumber1 is unique
+        public async Task<bool> IsUniquePhoneNumberAsync(int phoneNumber)
+        {
+            return !await _DBcontext.Technicians.AnyAsync(t => t.PhoneNumber1 == phoneNumber);
+        }
         // Add method
         public async Task<bool> AddAsync(Technician technician)
         {
             try
             {
+                // Ensure the Code and Phone Number are unique
+                if (!await IsUniqueCodeAsync(technician.Code))
+                    throw new Exception("Code already exists.");
+                if (!await IsUniquePhoneNumberAsync(technician.PhoneNumber1))
+                    throw new Exception("Phone number already exists.");
+
                 var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
                 technician.CreatedBy = currentUser?.UserName;
                 technician.CreatedAt = DateTime.UtcNow;
@@ -93,6 +108,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             try
             {
+                // Ensure the Code and Phone Number are unique
+                if (!await IsUniqueCodeAsync(technician.Code))
+                    throw new Exception("Code already exists.");
+                if (!await IsUniquePhoneNumberAsync(technician.PhoneNumber1))
+                    throw new Exception("Phone number already exists.");
+
                 var existingTechnician = await _DBcontext.Technicians
                     .Where(t => t.Code == technician.Code)
                     .FirstOrDefaultAsync();
@@ -102,7 +123,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                     return false;
                 }
 
-                // Update the properties
+                // Update properties
                 existingTechnician.Name = technician.Name;
                 existingTechnician.NickName = technician.NickName;
                 existingTechnician.NationalID = technician.NationalID;

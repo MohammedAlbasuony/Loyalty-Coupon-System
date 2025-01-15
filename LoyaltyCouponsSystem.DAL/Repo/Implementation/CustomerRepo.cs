@@ -20,6 +20,15 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
+        public async Task<bool> IsUniquePhoneNumber(string phoneNumber)
+        {
+            return !await _DBcontext.Customers.AnyAsync(c => c.PhoneNumber == phoneNumber);
+        }
+
+        public async Task<bool> IsUniqueCode(string code)
+        {
+            return !await _DBcontext.Customers.AnyAsync(c => c.Code == code);
+        }
         public async Task<List<int>> GetCustomerIdsByCodesAsync(List<string> customerCodes)
         {
             return await _DBcontext.Customers
@@ -112,15 +121,20 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 if (customer == null)
                     throw new ArgumentNullException(nameof(customer));
 
+                // Ensure the Code and Phone Number are unique
+                if (!await IsUniqueCode(customer.Code))
+                    throw new Exception("Code already exists.");
+                if (!await IsUniquePhoneNumber(customer.PhoneNumber))
+                    throw new Exception("Phone number already exists.");
+
                 var existingCustomer = await _DBcontext.Customers
                     .FirstOrDefaultAsync(c => c.Code == customer.Code);
 
                 if (existingCustomer == null)
                     return false;
 
-                // Update the properties
+                // Update properties
                 existingCustomer.Name = customer.Name;
-                existingCustomer.Code = customer.Code;
                 existingCustomer.Governate = customer.Governate;
                 existingCustomer.City = customer.City;
                 existingCustomer.PhoneNumber = customer.PhoneNumber;
@@ -132,10 +146,10 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             {
                 Console.WriteLine($"Error updating customer: {ex.Message}");
                 return false;
-            }
+            }   
         }
 
-        // Check if a customer exists by ID (Code)
+        // Check if a customer exists by ID (Code)  
         public async Task<bool> ExistsAsync(string code)
         {
             try
