@@ -40,6 +40,7 @@
                     <th>Created By</th>
                     <th>Created At</th>
                     <th>Actions</th>
+                    <th>Details</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,6 +64,34 @@
                             <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@technician.Code')">
                                 <i class="fas fa-trash-alt"></i> Delete
                             </button>
+                        </td>
+                        <td>
+                            <button class="btn btn-outline-info btn-sm" data-bs-toggle="collapse" data-bs-target="#details-@technician.Code" aria-expanded="false" aria-controls="details-@technician.Code">
+                                Show Details
+                            </button>
+                        </td>
+                    </tr>
+                    <tr id="details-@technician.Code" class="collapse">
+                        <td colspan="10">
+                            <!-- Customers and Users Assigned to Technician -->
+                            <div>
+                                <h5>Assigned Customers:</h5>
+                                <ul>
+                                    @foreach (var customer in technician.SelectedCustomerNames)
+                                    {
+                                        <li>@technician.SelectedCustomerNames</li>
+                                    }
+                                </ul>
+                            </div>
+                            <div>
+                                <h5>Assigned Users:</h5>
+                                <ul>
+                                    @foreach (var user in technician.SelectedUserNames)
+                                    {
+                                        <li>@technician.SelectedUserNames</li>
+                                    }
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                 }

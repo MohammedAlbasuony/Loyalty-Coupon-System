@@ -5,6 +5,7 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
 {
     public class TechnicianViewModel
     {
+        public int TechnicianID { get; set; }
         [Required(ErrorMessage = "Account Number is required.")]
         [StringLength(20, ErrorMessage = "Account Number must be less than 20 digits.")]
         //[UniqueCode(ErrorMessage = "This account number is already in use.")]
@@ -29,11 +30,16 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
         [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits.")]
         [Display(Name = "Tertiary Phone Number")]
         public int? PhoneNumber3 { get; set; }
-
+        public List<string>? SelectedCustomerCodes { get; set; }
+        public List<string>? SelectedCustomerNames { get; set; }
+        public List<SelectListItem>? Customers { get; set; } = new List<SelectListItem>();
+        public List<SelectListItem>? Users { get; set; } = new List<SelectListItem>();
+        public List<string>? SelectedUserCodes { get; set; }
+        public List<string>? SelectedUserNames { get; set; }
         public List<SelectListItem> Governates { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> Cities { get; set; } = new List<SelectListItem>();
-        public string SelectedGovernate { get; set; }
-        public string SelectedCity { get; set; }
+        public string? SelectedGovernate { get; set; }
+        public string? SelectedCity { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
     }

@@ -29,6 +29,22 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             return !await _DBcontext.Technicians.AnyAsync(t => t.PhoneNumber1 == phoneNumber);
         }
+        public async Task<List<int>> GetValidCustomerIdsAsync(List<string> customerCodes)
+        {
+            return await _DBcontext.Customers
+             .Where(c => customerCodes.Contains(c.Code)) // Match codes to IDs
+             .Select(c => c.CustomerID)
+             .ToListAsync();
+        }
+        public async Task<List<string>> GetValidUserIdsAsync(List<string> userNamesOrEmails)
+        {
+            var users = await _userManager.Users
+                .Where(u => userNamesOrEmails.Contains(u.UserName) || userNamesOrEmails.Contains(u.Email))
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            return users;
+        }
         // Add method
         public async Task<bool> AddAsync(Technician technician)
         {
@@ -80,7 +96,29 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             try
             {
-                return await _DBcontext.Technicians.ToListAsync();
+                // Fetch all Technicians
+                var technicians = await _DBcontext.Technicians.ToListAsync();
+
+                // Fetch all Users (using UserManager)
+                var users = await _userManager.Users.ToListAsync();
+
+                // Fetch all Customers
+                var customers = await _DBcontext.Customers.ToListAsync();
+
+                // Iterate through each Technician
+                foreach (var technician in technicians)
+                {
+                    foreach (var user in technician.Users)
+                    {
+                        // Find the user with the same ID in the Users list
+                        var relatedUser = users.FirstOrDefault(u => u.Id == user.Id);
+
+                        // If user exists, assign its UserName or else set "No User"
+                        user.UserName = relatedUser?.UserName ?? "No User";
+                    }
+                }
+
+                return technicians;
             }
             catch (Exception ex)
             {
@@ -88,6 +126,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 return new List<Technician>();
             }
         }
+
+
+
 
         // Get by ID method
         public async Task<Technician> GetByIdAsync(string id)
@@ -142,5 +183,34 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 return false;
             }
         }
+        public async Task<List<Customer>> GetCustomersForDropdownAsync()
+        {
+            try
+            {
+                return await _DBcontext.Customers
+                    .Select(c => new Customer { Name = c.Name, Code = c.Code })
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching customers for dropdown: {ex.Message}");
+                return new List<Customer>();
+            }
+        }
+        public async Task<List<ApplicationUser>> GetUsersForDropdownAsync()
+        {
+            try
+            {
+                return await _userManager.Users
+                    .Select(u => new ApplicationUser { UserName = u.UserName, Id = u.Id }) // Adjust properties as needed
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching users for dropdown: {ex.Message}");
+                return new List<ApplicationUser>();
+            }
+        }
+
     }
 }

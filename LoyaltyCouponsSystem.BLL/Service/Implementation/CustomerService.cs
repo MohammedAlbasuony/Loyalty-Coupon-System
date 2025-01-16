@@ -26,9 +26,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     Code = customerViewModel.Code,
                     Governate = customerViewModel.Governate,
                     City = customerViewModel.City,
-                    PhoneNumber = customerViewModel.PhoneNumber
+                    PhoneNumber = customerViewModel.PhoneNumber,
+                    TechnicianId = customerViewModel.TechnicianID
                 };
-
                 return await _customerRepo.AddAsync(customer);
             }
             return false;
