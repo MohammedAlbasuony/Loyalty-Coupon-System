@@ -48,48 +48,26 @@
                         <td>@customer.PhoneNumber</td>
                         <td>@customer.CreatedBy</td>
                         <td>@customer.CreatedAt</td>
-                        <td>
-                            <span class="badge @(customer.IsActive ? "bg-success" : "bg-danger")">
-                                @(customer.IsActive ? "Active" : "Inactive")
-                            </span>
-                        </td>
-                        <td>
-                            <button class="btn toggle-btn btn-sm shadow @(customer.IsActive ? "btn-danger" : "btn-success")"
-                                    onclick="toggleActivation('@customer.Code', this, @(customer.IsActive))">
-                                @(customer.IsActive ? "Deactivate" : "Activate")
-                            </button>
-                        </td>
+                          <td> 
+                             <span class="badge @(customer.IsActive ? "bg-success" : "bg-danger")">
+                                  @(customer.IsActive ? "Active" : "Inactive") 
+                              </span> 
+                         </td> 
+                         <td> 
+                             <button class="btn toggle-btn btn-sm shadow @(customer.IsActive ? "btn-danger" : "btn-success")" 
+                                     onclick="toggleActivation('@customer.Code', this, @(customer.IsActive))"> 
+                                 @(customer.IsActive ? "Deactivate" : "Activate") 
+                             </button> 
+
+                            <a href="@Url.Action("UpdateCustomer", "Customer", new { id = customer.Code })" class="btn btn-outline-primary btn-sm me-2">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                        </td> 
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-                </thead>
-                <tbody>
-                    @foreach (var customer in Model)
-                    {
-                        <tr id="row-@customer.Code">
-                            <td>@customer.Name</td>
-                            <td>@customer.Code</td>
-                            <td>@customer.Governate</td>
-                            <td>@customer.City</td>
-                            <td>@customer.PhoneNumber</td>
-                            <td>@customer.CreatedBy</td>
-                            <td>@customer.CreatedAt</td>
-                            <td>
-                                <a href="@Url.Action("UpdateCustomer", "Customer", new { id = customer.Code })" class="btn btn-outline-primary btn-sm me-2">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                            <br>         <br>
-                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@customer.Code')">
-                                    <i class="fas fa-trash-alt"></i> Delete
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
 </div>
 
 <!-- Delete Confirmation Modal -->

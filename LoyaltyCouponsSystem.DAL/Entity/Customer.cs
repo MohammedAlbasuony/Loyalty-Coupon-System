@@ -28,5 +28,6 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public ICollection<DistributorCustomer> DistributorCustomers { get; set; }
         public int? TechnicianId { get; set; }
         public Technician Technician { get; set; }
+        public bool IsActive { get; set; }
     }
 }
