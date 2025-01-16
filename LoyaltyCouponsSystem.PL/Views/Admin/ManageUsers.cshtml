@@ -15,7 +15,7 @@
         <div class="row mb-4 justify-content-center">
             <div class="col-md-8">
                 <div class="input-group shadow-sm">
-                    <input type="text" id="searchBox" class="form-control" placeholder="Search ...">
+                    <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, National ID, Phone Number, Governorate, City, Role or Status...">
                 </div>
             </div>
         </div>
@@ -29,8 +29,8 @@
                         <th>Optional Phone</th>
                         <th>Governorate</th>
                         <th>City</th>
-                        <th>Role</th>
-                        <th>Status</th>
+                        <th>Current Role</th>
+                        <th>Current Status</th>
                         <th>Assign Role</th>
                         <th>Action</th>
                     </tr>
@@ -162,6 +162,11 @@ else
 
 
 <style>
+    .container {
+        max-width: 95%; /* Adjust container width to fit larger table */
+        margin: 0 auto; /* Center the container */
+    }
+
     .table-responsive {
         overflow-x: unset; /* Remove horizontal scrolling */
         padding: 0;
@@ -169,28 +174,31 @@ else
     }
 
     .table {
-        width: 100%;
+        width: 100%; /* Full width table */
         border-radius: 12px;
         overflow: hidden;
         text-align: center;
         table-layout: auto; /* Allow table to auto-adjust column widths */
     }
 
-    .table th,
-    .table td {
-        word-wrap: break-word; /* Wrap content within cells */
-        white-space: normal; /* Allow text wrapping */
-        text-align: center;
-        vertical-align: middle;
-        padding: 6px; /* Reduce padding for compactness */
-    }
+        .table th,
+        .table td {
+            word-wrap: break-word; /* Wrap content within cells */
+            white-space: normal; /* Allow text wrapping */
+            text-align: center;
+            vertical-align: middle;
+            padding: 15px; /* Increased padding for better spacing */
+            font-weight: 600; /* Bold text for better readability */
+            font-size: 14px; /* Larger font size for data */
+        }
 
-    .table th {
-        background-color: #007bff !important;
-        color: #ffffff !important;
-        font-weight: bold;
-        text-transform: uppercase;
-    }
+        .table th {
+            background-color: #007bff !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 16px; /* Larger font size for headers */
+        }
 
     .table-hover tbody tr:hover {
         background-color: #e9f5ff;
@@ -201,7 +209,6 @@ else
         color: #6c757d; /* Dimmed text color */
     }
 
-
         .inactive-row td {
             text-decoration: line-through; /* Add strikethrough to text */
         }
@@ -211,13 +218,12 @@ else
         color: inherit; /* Reset to default text color */
     }
 
-    .active-row td {
-        text-decoration: none; /* Remove strikethrough */
-    }
-
-
+        .active-row td {
+            text-decoration: none; /* Remove strikethrough */
+        }
 
     h1 {
+        font-size: 32px; /* Larger header size */
         font-weight: bold;
     }
 
@@ -231,57 +237,59 @@ else
         transition: background 0.3s ease;
     }
 
-    .btn-danger:hover {
-        background-color: #cc0000;
-    }
+        .btn-danger:hover {
+            background-color: #cc0000;
+        }
 
     .assign-btn,
     .confirm-btn {
         background-color: #007bff;
         color: white;
         border: none;
-        padding: 4px 6px;
-        font-size: 11px;
+        padding: 10px 15px; /* Adjust button size */
+        font-size: 14px; /* Larger font size */
         font-weight: bold;
         border-radius: 6px;
         transition: all 0.3s ease;
     }
 
-    .assign-btn:hover,
-    .confirm-btn:hover {
-        background-color: #0056b3;
-    }
+        .assign-btn:hover,
+        .confirm-btn:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+
 
     .toggle-btn {
-        padding: 4px 6px;
-        font-size: 11px;
+        padding: 10px 15px; /* Adjust button size */
+        font-size: 14px; /* Larger font size */
         font-weight: bold;
         border-radius: 6px;
         transition: all 0.3s ease;
     }
 
-    .toggle-btn.deactivate {
-        background-color: #dc3545;
-        color: white;
-    }
+        .toggle-btn.deactivate {
+            background-color: #dc3545;
+            color: white;
+        }
 
-    .toggle-btn.deactivate:hover {
-        background-color: #b02a37;
-    }
+            .toggle-btn.deactivate:hover {
+                background-color: #b02a37;
+            }
 
-    .toggle-btn.activate {
-        background-color: #28a745;
-        color: white;
-    }
+        .toggle-btn.activate {
+            background-color: #28a745;
+            color: white;
+        }
 
-    .toggle-btn.activate:hover {
-        background-color: #218838;
-    }
+            .toggle-btn.activate:hover {
+                background-color: #218838;
+            }
 
     .action-dropdown {
         border-radius: 6px;
-        padding: 4px 6px;
-        font-size: 11px;
+        padding: 10px 15px; /* Adjust dropdown size */
+        font-size: 14px; /* Larger font size */
         border: 1px solid #ddd;
         background-color: #fff;
         width: 120px;
@@ -289,9 +297,9 @@ else
     }
 
     .badge {
-        padding: 3px 6px;
+        padding: 5px 10px; /* Adjust badge size */
         border-radius: 6px;
-        font-size: 10px;
+        font-size: 14px; /* Larger font size */
         font-weight: bold;
     }
 
@@ -304,10 +312,10 @@ else
         background-color: #f9f9f9;
     }
 
-    #searchBox::placeholder {
-        font-style: italic;
-        color: #aaa;
-    }
+        #searchBox::placeholder {
+            font-style: italic;
+            color: #aaa;
+        }
 </style>
 
 
