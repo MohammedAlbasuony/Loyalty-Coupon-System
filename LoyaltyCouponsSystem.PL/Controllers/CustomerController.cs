@@ -1,5 +1,7 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using DocumentFormat.OpenXml.InkML;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
+using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
@@ -7,9 +9,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
     public class CustomerController : Controller
     {
         private readonly ICustomerService _customerService;
+        private readonly ApplicationDbContext _DBcontext;
 
-        public CustomerController(ICustomerService customerService)
+        public CustomerController(ApplicationDbContext context, ICustomerService customerService)
         {
+            _DBcontext = context;
             _customerService = customerService;
         }
 
@@ -29,6 +33,25 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var result = await _customerService.GetByIdAsync(id);
             return View(result);
         }
+
+
+        [HttpPost]
+        public IActionResult ToggleActivation(string customerCode, [FromBody] bool isActive)
+        {
+            // Find customer in the database using the code
+            var customer = _DBcontext.Customers.FirstOrDefault(c => c.Code == customerCode);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+
+            // Update the customer's active status
+            customer.IsActive = isActive;
+            _DBcontext.SaveChanges();
+
+            return Ok();
+        }
+
 
         [HttpGet]
         public IActionResult AddCustomer()

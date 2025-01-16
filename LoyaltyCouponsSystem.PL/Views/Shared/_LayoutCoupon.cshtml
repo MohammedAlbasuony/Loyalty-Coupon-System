@@ -317,7 +317,6 @@
             },
         });
     </script>
-        @RenderSection("Scripts", required: false)
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="~/assets/css/bootstrap.min.css" />
@@ -396,7 +395,7 @@
                         <li class="nav-item">
                             <a href="@Url.Action("Dashboard", "Admin")">
                                 <i class="fas fa-tachometer-alt"></i>
-                                <p>Home</p>
+                                <span>Home</span>
                             </a>
                         </li>
 
@@ -404,7 +403,7 @@
                         <li class="nav-item">
                             <a href="@Url.Action("ManageUsers", "Admin")">
                                 <i class="fas fa-user-tie"></i>
-                                <p>Manage Users</p>
+                                <span>Manage Users</span>
                             </a>
                         </li>
 
@@ -412,23 +411,23 @@
                         <li class="nav-item">
                             <a data-bs-toggle="collapse" href="#manageUsers" aria-expanded="false" class="collapsed">
                                 <i class="fas fa-users"></i>
-                                <p>Manage Customers</p>
+                                <span>Manage Customers</span>
                                 <span class="caret"></span>
                             </a>
                             <div class="collapse" id="manageUsers">
                                 <ul class="nav nav-collapse">
                                     <li>
-                                        <a href="@Url.Action("Index", "Customer")">
+                                        <a href="@Url.Action("GetAllCustomers", "Customer")">
                                             <span class="sub-item">Manage Merchant</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="@Url.Action("Index", "Distributor")">
+                                        <a href="@Url.Action("GetAllDistributors", "Distributor")">
                                             <span class="sub-item">Manage Distributor</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="@Url.Action("Index", "Technician")">
+                                        <a href="@Url.Action("GetAllTechnicians", "Technician")">
                                             <span class="sub-item">Manage Technician</span>
                                         </a>
                                     </li>
@@ -440,7 +439,7 @@
                         <li class="nav-item">
                             <a data-bs-toggle="collapse" href="#qrCodes" aria-expanded="false" class="collapsed">
                                 <i class="fas fa-qrcode"></i>
-                                <p>QR Codes</p>
+                                <span>QR Codes</span>
                                 <span class="caret"></span>
                             </a>
                             <div class="collapse" id="qrCodes">
@@ -463,7 +462,7 @@
                         <li class="nav-item">
                             <a data-bs-toggle="collapse" href="#exchangePermission" aria-expanded="false" class="collapsed">
                                 <i class="fas fa-exchange-alt"></i>
-                                <p>Exchange Permission</p>
+                                <span>Exchange Permission</span>
                                 <span class="caret"></span>
                             </a>
                             <div class="collapse" id="exchangePermission">
@@ -513,8 +512,10 @@
             sidebar.classList.toggle("collapsed");
         });
     </script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
+
 
 
 

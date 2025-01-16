@@ -10,7 +10,7 @@
 @if (User.IsInRole("SuperAdmin"))
 {
     <div class="container mt-4">
-        <b><h1 class="text-primary text-center">Manage Users</h1></b>
+        <h1 class="text-primary text-center"><b>Manage Users</b></h1>
         <br />
         <div class="row mb-4 justify-content-center">
             <div class="col-md-8">
@@ -170,7 +170,8 @@ else
     .table-responsive {
         overflow-x: unset; /* Remove horizontal scrolling */
         padding: 0;
-        margin: 0 auto;
+        margin-left: auto; /* Move the table 2px to the left */
+        margin-right: auto; /* Ensure it's still centered within the layout */
     }
 
     .table {
@@ -259,7 +260,6 @@ else
             color: white;
         }
 
-
     .toggle-btn {
         padding: 10px 15px; /* Adjust button size */
         font-size: 14px; /* Larger font size */
@@ -317,6 +317,7 @@ else
             color: #aaa;
         }
 </style>
+
 
 
 
