@@ -46,7 +46,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                     throw new ArgumentNullException(nameof(customer));
                 var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
                 customer.CreatedBy = currentUser?.UserName;
-                customer.CreatedAt = DateTime.UtcNow;
+                customer.CreatedAt = DateTime.Now;
                 await _DBcontext.Customers.AddAsync(customer);
                 await _DBcontext.SaveChangesAsync();
                 return true;
@@ -97,7 +97,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
         }
 
-        // Get customer by ID (Code)
+        // Get customer by Code
         public async Task<Customer> GetByIdAsync(string code)
         {
             try
@@ -112,6 +112,34 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 return null;
             }
         }
+        //Get customer by ID
+        public async Task<Customer> GetByCustomerIdAsync(int customerId)
+        {
+            try
+            {
+                return await _DBcontext.Customers
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.CustomerID == customerId);  // Assuming CustomerID is the unique identifier
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching customer by CustomerID: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<List<Customer>> GetCustomersByIdsAsync(List<int> customerIds)
+        {
+            if (customerIds == null || customerIds.Count == 0)
+            {
+                return new List<Customer>(); // Return an empty list if no IDs are provided
+            }
+
+            // Fetch the customers from the database using the provided IDs
+            return await _DBcontext.Customers
+                .Where(c => customerIds.Contains(c.CustomerID))
+                .ToListAsync();
+        }
 
         // Update an existing customer
         public async Task<bool> UpdateAsync(Customer customer)
@@ -121,12 +149,8 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 if (customer == null)
                     throw new ArgumentNullException(nameof(customer));
 
-                // Ensure the Code and Phone Number are unique
-                if (!await IsUniqueCode(customer.Code))
-                    throw new Exception("Code already exists.");
-                if (!await IsUniquePhoneNumber(customer.PhoneNumber))
-                    throw new Exception("Phone number already exists.");
-
+                
+                
                 var existingCustomer = await _DBcontext.Customers
                     .FirstOrDefaultAsync(c => c.Code == customer.Code);
 
@@ -135,9 +159,11 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
 
                 // Update properties
                 existingCustomer.Name = customer.Name;
+                existingCustomer.Code = customer.Code;
                 existingCustomer.Governate = customer.Governate;
                 existingCustomer.City = customer.City;
                 existingCustomer.PhoneNumber = customer.PhoneNumber;
+                existingCustomer.TechnicianId = customer.TechnicianId;
 
                 await _DBcontext.SaveChangesAsync();
                 return true;

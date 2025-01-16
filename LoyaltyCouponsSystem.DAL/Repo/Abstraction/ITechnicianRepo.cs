@@ -1,4 +1,5 @@
-﻿using LoyaltyCouponsSystem.DAL.Entity;
+﻿using LoyaltyCouponsSystem.DAL.DB;
+using LoyaltyCouponsSystem.DAL.Entity;
 
 namespace LoyaltyCouponsSystem.DAL.Repo.Abstraction
 {
@@ -9,5 +10,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Abstraction
         Task<List<Technician>> GetAllAsync();
         Task<Technician> GetByIdAsync(string id);
         Task<bool> UpdateAsync(Technician technician);
+        Task<List<string>> GetValidUserIdsAsync(List<string> userNamesOrEmails);
+        Task<List<int>> GetValidCustomerIdsAsync(List<string> customerCodes);
+        Task<List<Customer>> GetCustomersForDropdownAsync();
+        Task<List<ApplicationUser>> GetUsersForDropdownAsync();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using LoyaltyCouponsSystem.BLL.ViewModel.Admin;
+using LoyaltyCouponsSystem.DAL.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,6 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
         Task<bool> DeleteUserAsync(string userId);
         Task<bool> AssignRoleToUserAsync(string userId, string roleName);
         Task<bool> UpdateUserRoleName(string userId, string roleName);
+
     }
 }

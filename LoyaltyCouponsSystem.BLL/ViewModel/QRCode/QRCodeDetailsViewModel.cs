@@ -20,17 +20,9 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.QRCode
 
         public float CouponSize{ get; set; }
 
-        
-
-        public float VerticalSpacing { get; set; }
-
-        public float HorizontalSpacing { get; set; }
-
-        public int CouponsPerRow { get; set; }
-
-
+       
         [Display(Name = "Governorate")]
-        public int GovernorateId { get; set; }
+        public int? GovernorateId { get; set; }
 
 
 
@@ -38,7 +30,7 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.QRCode
 
         [Display(Name = "Area")]
 
-        public int AreaId { get; set; }
+        public int? AreaId { get; set; }
         public IEnumerable<Area>? Areas { get; set; } = new List<Area>();
 
 

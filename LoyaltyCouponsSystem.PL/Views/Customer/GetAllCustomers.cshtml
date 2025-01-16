@@ -1,4 +1,4 @@
-﻿@using LoyaltyCouponsSystem.BLL.ViewModel.Customer
+@using LoyaltyCouponsSystem.BLL.ViewModel.Customer
 @model List<CustomerViewModel>
 
 @{
@@ -64,6 +64,32 @@
             </tbody>
         </table>
     </div>
+                </thead>
+                <tbody>
+                    @foreach (var customer in Model)
+                    {
+                        <tr id="row-@customer.Code">
+                            <td>@customer.Name</td>
+                            <td>@customer.Code</td>
+                            <td>@customer.Governate</td>
+                            <td>@customer.City</td>
+                            <td>@customer.PhoneNumber</td>
+                            <td>@customer.CreatedBy</td>
+                            <td>@customer.CreatedAt</td>
+                            <td>
+                                <a href="@Url.Action("UpdateCustomer", "Customer", new { id = customer.Code })" class="btn btn-outline-primary btn-sm me-2">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                            <br>         <br>
+                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@customer.Code')">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 </div>
 
 <!-- Delete Confirmation Modal -->

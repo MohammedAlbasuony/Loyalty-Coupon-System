@@ -59,26 +59,12 @@
                 <!-- مسلسل الكوبون -->
                 <div class="col-md-6">
                     <label for="SerialNumber" class="form-label">مسلسل الكوبون:</label>
-                    <input type="text" class="form-control" id="SerialNumber" name="Serialnumber" required>
+                    <div class="input-group">
+                        <span class="input-group-text" id="currentYear"></span>
+                        <input type="text" class="form-control" id="SerialNumber" name="Serialnumber" required>
+                    </div>
                 </div>
 
-                <!-- عدد الكوبونات في الصف -->
-                <div class="col-md-6">
-                    <label for="couponsPerRow" class="form-label">Coupons Per Row:</label>
-                    <input type="number" class="form-control" id="couponsPerRow" name="CouponsPerRow" value="5" min="1" />
-                </div>
-
-                <!-- المسافة الأفقية -->
-                <div class="col-md-6">
-                    <label for="horizontalSpacing" class="form-label">المسافة الأفقية بين الكوبونات (cm):</label>
-                    <input type="number" step="0.1" class="form-control" id="horizontalSpacing" name="HorizontalSpacing" value="0.5" />
-                </div>
-
-                <!-- المسافة الرأسية -->
-                <div class="col-md-6">
-                    <label for="verticalSpacing" class="form-label">المسافة الرأسية بين الكوبونات (cm):</label>
-                    <input type="number" step="0.1" class="form-control" id="verticalSpacing" name="VerticalSpacing" value="1" />
-                </div>
 
                 <!-- حجم الكوبون -->
                 <div class="col-md-6">
@@ -88,12 +74,13 @@
 
                 <!-- زر الإرسال -->
                 <div class="col-12">
-                    <button type="submit" class="btn btn-primary w-100">إنشاء الكوبونات</button>
+                    <button type="submit" id="submitButton" class="btn btn-primary w-100">إنشاء الكوبونات</button>
                 </div>
             </div>
         </div>
     </form>
 
+</div>
     @section Scripts {
         <script>
             $(document).ready(function () {
@@ -143,10 +130,48 @@
                     }
                 });
             });
+                       // Script to set the current year in the input group
+            document.getElementById('currentYear').innerText = new Date().getFullYear();
+
+            //  document.getElementById('submitButton').addEventListener('click', async function () {
+            //   // عطل الزر بعد الضغط
+            //   const button = this;
+            //   button.disabled = true;
+            //   button.innerText = 'جاري الإرسال...';
+
+            //   try {
+            //     // إرسال الطلب إلى الـ Action في الـ Controller
+            //     const response = await fetch('@Url.Action("DetailsOfCoupones", "GenerateQRCode")', {
+            //       method: 'POST',
+            //       headers: {
+            //         'Content-Type': 'application/json',
+            //         'RequestVerificationToken': '@Html.AntiForgeryToken()' // لحماية الـ CSRF
+            //       },
+            //       body: JSON.stringify({
+            //         // البيانات المرسلة (أضف البيانات هنا إذا لزم الأمر)
+            //         data: 'yourDataHere'
+            //       })
+            //     });
+
+            //     if (response.ok) {
+            //       // الطلب نجح
+            //       button.innerText = 'تم الإرسال بنجاح';
+            //     } else {
+            //       // الطلب فشل
+            //       button.innerText = 'فشل الإرسال';
+            //       button.disabled = false; // إعادة تفعيل الزر
+            //     }
+            //   } catch (error) {
+            //     // خطأ أثناء الطلب
+            //     button.innerText = 'حدث خطأ أثناء الإرسال';
+            //     button.disabled = false; // إعادة تفعيل الزر
+            //   }
+            // });
+
+
         </script>
     }
 
 
 
 
-</div>

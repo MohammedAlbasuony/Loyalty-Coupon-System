@@ -119,15 +119,10 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             try
             {
-                // Ensure the Code and Phone Number are unique
-                if (!await IsUniqueCodeAsync(distributor.Code))
-                    throw new Exception("Code already exists.");
-                if (!await IsUniquePhoneNumberAsync(distributor.PhoneNumber1))
-                    throw new Exception("Phone number already exists.");
-
                 var existingDistributor = await _DBcontext.Distributors
-                    .Where(d => d.DistributorID == distributor.DistributorID)
-                    .FirstOrDefaultAsync();
+                .Where(d => d.DistributorID == distributor.DistributorID && d.IsDeleted == false)
+                .FirstOrDefaultAsync();
+
 
                 if (existingDistributor == null)
                 {
@@ -140,6 +135,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 existingDistributor.Governate = distributor.Governate;
                 existingDistributor.City = distributor.City;
 
+                _DBcontext.Update(existingDistributor);
                 await _DBcontext.SaveChangesAsync();
                 return true;
             }

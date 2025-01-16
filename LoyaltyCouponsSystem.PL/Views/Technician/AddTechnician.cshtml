@@ -4,7 +4,16 @@
 @{
     ViewData["Title"] = "Add Technician";
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
-
+    var simplifiedCustomers = Model.Customers.Select(c => new
+    {
+        Code = c.Value,
+        Name = c.Text
+    }).ToList();
+    var simplifiedUser = Model.Users.Select(c => new
+    {
+        Code = c.Value,
+        Name = c.Text
+    }).ToList();
 }
 
 <div class="container mt-5">
@@ -96,7 +105,28 @@
                     </div>
                 </div>
 
+                <!-- Customers -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SelectedCustomerCodes" class="form-label text-primary"><b>Select Customers</b></label>
+                        <select asp-for="SelectedCustomerCodes" asp-items="Model.Customers" class="form-control select2" multiple>
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+
+              <!-- Users -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SelectedUserCodes" class="form-label text-primary"><b>Select Represintatives</b></label>
+                        <select asp-for="SelectedUserCodes" asp-items="Model.Users" class="form-control select2" multiple>
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+
                 <br />
+
                 <!-- Submit Button -->
                 <div class="text-center">
                     <button type="submit" class="btn btn-custom">
@@ -111,6 +141,13 @@
 
 @section Scripts {
     <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: "Search and Select Customers", // Placeholder for search
+                allowClear: true, // Allow clearing selections
+                width: '100%' // Adjust the dropdown to fit container width
+            });
+        });
             const citiesByGovernate = {
             Cairo: ["Nasr City", "Heliopolis", "Maadi", "New Cairo"],
             Alexandria: ["Montaza", "Sidi Gaber", "Smouha"],
@@ -159,8 +196,11 @@
             }
         });
     </script>
+ <!-- Include Select2 CSS and JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 }
-
 <style>
 
     .btn-outline-primary {

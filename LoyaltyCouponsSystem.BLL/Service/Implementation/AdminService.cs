@@ -1,6 +1,7 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Admin;
 using LoyaltyCouponsSystem.DAL.DB;
+using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,14 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             _userManager = userManager;
             _roleManager = roleManager;
         }
+        public async Task<IEnumerable<Representative>> GetAllRepresentativesAsync()
+        {
+            return await dbContext.Representatives
+                .Include(r => r.ApplicationUser) // Include related ApplicationUser data
+                .Include(r => r.Coupons) // Include related Coupons if necessary
+                .ToListAsync();
+        }
+
 
         public async Task<IEnumerable<AdminUserViewModel>> GetAllUsersAsync()
         {

@@ -21,6 +21,8 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _adminService = adminService;
         }
 
+       
+
         [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> ManageUsers()
         {

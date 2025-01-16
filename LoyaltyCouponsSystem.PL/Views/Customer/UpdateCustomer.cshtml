@@ -1,5 +1,4 @@
-﻿@using LoyaltyCouponsSystem.BLL.ViewModel.Customer
-@model CustomerViewModel
+﻿@model LoyaltyCouponsSystem.BLL.ViewModel.Customer.UpdateCustomerViewModel
 
 @{
     ViewData["Title"] = "Update Customer";
@@ -25,7 +24,9 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <form asp-action="UpdateCustomer" method="post">
-                <input type="hidden" asp-for="Code" />
+                <!-- Hidden field to pass CustomerID -->
+                <input type="hidden" asp-for="CustomerID" />
+
                 <div asp-validation-summary="All" class="text-danger"></div>
 
                 <!-- Customer Name and Code -->
@@ -38,6 +39,7 @@
                     <div class="col-md-6 mb-3">
                         <label asp-for="Code" class="form-label text-primary"><b>Customer Code</b></label>
                         <input asp-for="Code" class="form-control" placeholder="Enter customer code" readonly />
+                        <span asp-validation-for="Code" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -205,7 +207,7 @@
         Matruh: ["Marsa Matruh", "Siwa", "Alamein"],
         Qalyubia: ["Banha", "Shubra El-Kheima", "Qalyub"],
         Gharbia: ["Tanta", "El-Mahalla", "Kafr El-Zayat"],
-        Monufia: ["Shebin El-Kom", "Sadat City", "Menouf"],
+        Monufia: ["Shebin El Kom", "Sadat City", "Menouf"],
         Qena: ["Qena City", "Nag Hammadi", "Qus"],
         "North Sinai": ["Arish", "Sheikh Zuweid", "Rafah"],
         Sohag: ["Sohag City", "Tahta", "Akhmim"],

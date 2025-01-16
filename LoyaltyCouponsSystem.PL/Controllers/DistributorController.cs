@@ -54,12 +54,16 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [HttpGet]
         public async Task<IActionResult> UpdateDistributor(int id)
         {
+            // Fetch distributor details by ID
             var distributorViewModel = await _distributorService.GetByIdAsync(id);
             if (distributorViewModel != null)
             {
+                // Fetch the dropdown options for Governates and Customers
+                distributorViewModel.Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync();
                 distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
-                return View(distributorViewModel);
+                return View(distributorViewModel); // Return the View with the populated ViewModel
             }
+
             return NotFound();
         }
 
@@ -71,11 +75,13 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 var result = await _distributorService.UpdateAsync(distributorViewModel);
                 if (result)
                 {
-                    return RedirectToAction("GetAllDistributors");
+                    return RedirectToAction("GetAllDistributors"); // Redirect to list after successful update
                 }
+
                 ModelState.AddModelError("", "Unable to update distributor. Please try again.");
             }
 
+            // If update fails, re-populate the dropdowns and return the view again
             distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
             return View(distributorViewModel);
         }
