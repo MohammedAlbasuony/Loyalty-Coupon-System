@@ -7,14 +7,8 @@
 }
 
 <div class="container mt-4">
-    <!-- Backward Button -->
-    <div class="mb-3">
-        <a href="@Url.Action("Index", "Technician")" class="btn btn-custom-backward">
-            <i class="fas fa-arrow-left"></i> Back
-        </a>
-    </div>
 
-    <b><h1 class="text-primary text-center">All Technicians</h1></b>
+    <h1 class="text-primary text-center"><b>All Technicians</b></h1>
 
     <!-- Search Filters -->
     <div class="row mb-4 justify-content-center">
@@ -25,6 +19,7 @@
         </div>
     </div>
 
+    
     <!-- Table -->
     <div class="table-responsive">
         <table id="technicianTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
@@ -173,29 +168,7 @@
             color: #aaa;
         }
 
-    .btn-custom-backward {
-        font-size: 14px;
-        padding: 8px 20px;
-        font-weight: bold;
-        display: inline-flex;
-        align-items: center;
-        border: 2px solid #007bff;
-        color: #007bff;
-        border-radius: 30px;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-
-        .btn-custom-backward i {
-            margin-right: 5px;
-        }
-
-        .btn-custom-backward:hover {
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-        }
-
+    
     h1 {
         font-weight: bold;
         letter-spacing: 1px;
