@@ -1,6 +1,5 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
-using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
@@ -13,21 +12,13 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         {
             _customerService = customerService;
         }
-
         public IActionResult Index()
         {
             return View();
         }
-
         public async Task<IActionResult> GetAllCustomers()
         {
             var result = await _customerService.GetAllAsync();
-            return View(result);
-        }
-
-        public async Task<IActionResult> GetCustomerById(string id)
-        {
-            var result = await _customerService.GetByIdAsync(id);
             return View(result);
         }
 
@@ -53,11 +44,10 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View(customerViewModel);
         }
 
-
         public async Task<IActionResult> DeleteCustomer(string id)
         {
             await _customerService.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(GetAllCustomers));
         }
 
         [HttpGet]
@@ -68,19 +58,34 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             {
                 return NotFound();
             }
-            return View(customer);
+
+            var updateCustomerViewModel = new UpdateCustomerViewModel
+            {
+                Name = customer.Name,
+                Code = customer.Code,
+                Governate = customer.Governate,
+                City = customer.City,
+                PhoneNumber = customer.PhoneNumber,
+                TechnicianID = customer.TechnicianID
+            };
+
+            return View(updateCustomerViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateCustomer(CustomerViewModel customerViewModel)
+        public async Task<IActionResult> UpdateCustomer(UpdateCustomerViewModel updateCustomerViewModel)
         {
             if (ModelState.IsValid)
             {
-                await _customerService.UpdateAsync(customerViewModel);
-                return RedirectToAction("GetAllCustomers");
+                var result = await _customerService.UpdateAsync(updateCustomerViewModel);
+                if (result)
+                {
+                    return RedirectToAction("GetAllCustomers");
+                }
+                ModelState.AddModelError("", "Failed to update customer");
             }
-            return View(customerViewModel);
+
+            return View(updateCustomerViewModel);
         }
     }
-
 }

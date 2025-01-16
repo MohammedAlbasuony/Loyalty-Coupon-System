@@ -14,6 +14,6 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
         Task<bool> DeleteAsync(string id);
         Task<List<CustomerViewModel>> GetAllAsync();
         Task<CustomerViewModel> GetByIdAsync(string id);
-        Task<bool> UpdateAsync(CustomerViewModel customerViewModel);
+        Task<bool> UpdateAsync(UpdateCustomerViewModel updateCustomerViewModel);
     }
 }
