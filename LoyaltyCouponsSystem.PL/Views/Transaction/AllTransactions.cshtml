@@ -1,41 +1,102 @@
-﻿@model List<LoyaltyCouponsSystem.DAL.Entity.Transaction> 
+﻿@model List<LoyaltyCouponsSystem.DAL.Entity.Transaction>
 
 @{
     ViewData["Title"] = "All Transactions";
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
 }
 
-<h1>All Transactions</h1>
+<div class="container mt-5">
+    
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            
-            <th>Customer Name</th>
-            <th>Technician Name</th>
-            <th>Coupon Type</th>
-            <th>Coupon Sort</th>
-            <th>Sequence Number</th>
-            <th>Governate</th>
-            <th>City</th>
-            <th>Created By</th>
-            <th>Created At</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var transaction in Model)
-        {
-            <tr>
-                <td>@transaction.Customer.Name</td> 
-                <td>@transaction.Technician.Name</td> 
-                <td>@transaction.CouponType</td>
-                <td>@transaction.CouponSort</td>
-                <td>@transaction.SequenceNumber</td>
-                <td>@transaction.Governate</td>
-                <td>@transaction.City</td>
-                <td>@transaction.CreatedBy</td>
-                <td>@transaction.Timestamp</td>
-            </tr>
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <h1 class="display-5 text-primary"><b>All Transactions</b></h1>
+        <p class="lead text-secondary">View all transaction records with detailed information.</p>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-responsive">
+        <table class="table table-hover shadow-lg rounded border-light-modern">
+            <thead class="thead-dark bg-primary text-white">
+                <tr>
+                    <th>Exchange Permission </th>
+                    <th>Customer Name</th>
+                    <th>Technician Name</th>
+                    <th>Coupon Type</th>
+                    <th>Coupon Sort</th>
+                    <th>Sequence Number</th>
+                    <th>Governorate</th>
+                    <th>City</th>
+                    <th>Created By</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var transaction in Model)
+                {
+                    <tr>
+                        <td>@transaction.ExchangePermission</td>
+                 
+                        <td>@transaction.Customer.Name</td>
+                        <td>@transaction.Technician.Name</td>
+                        <td>@transaction.CouponType</td>
+                        <td>@transaction.CouponSort</td>
+                        <td>@transaction.SequenceNumber</td>
+                        <td>@transaction.Governate</td>
+                        <td>@transaction.City</td>
+                        <td>@transaction.CreatedBy</td>
+                        <td>@transaction.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .btn-outline-primary {
+        font-size: 14px;
+        padding: 8px 20px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        border: 2px solid #007bff;
+        color: #007bff;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+        .btn-outline-primary i {
+            margin-right: 5px;
         }
-    </tbody>
-</table>
+
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+        }
+
+    .table {
+        border-radius: 12px;
+        overflow: hidden;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+    .thead-dark th {
+        background-color: #007bff !important;
+        color: #ffffff !important;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #e9f5ff;
+    }
+</style>

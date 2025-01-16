@@ -26,5 +26,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public string? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
         public ICollection<DistributorCustomer> DistributorCustomers { get; set; }
+        public int? TechnicianId { get; set; }
+        public Technician Technician { get; set; }
     }
 }

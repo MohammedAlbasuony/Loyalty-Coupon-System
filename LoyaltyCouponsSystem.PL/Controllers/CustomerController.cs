@@ -1,5 +1,6 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
+using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoyaltyCouponsSystem.PL.Controllers

@@ -15,7 +15,7 @@
         <div class="row mb-4 justify-content-center">
             <div class="col-md-8">
                 <div class="input-group shadow-sm">
-                    <input type="text" id="searchBox" class="form-control" placeholder="Search ...">
+                    <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, National ID, Phone Number, Governorate, City, Role or Status...">
                 </div>
             </div>
         </div>
@@ -30,8 +30,9 @@
                         <th>Governorate</th>
                         <th>City</th>
                         <th>Current Role</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>Current Status</th>
+                        <th>Assign Role</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,7 +42,7 @@
                         {
                             continue; // Skip the row entirely
                         }
-                        <tr>
+                        <tr class="@(user.IsActive ? "" : "inactive")">
                             <td>@user.UserName</td>
                             <td>@user.NationalID</td>
                             <td>@user.PhoneNumber</td>
@@ -49,25 +50,39 @@
                             <td>@user.Governorate</td>
                             <td>@user.City</td>
                             <td>@user.Role</td>
-                            <td><span class="badge bg-success">Active</span></td>
                             <td>
-                                <div class="action-container d-flex align-items-center gap-3">
-                                    <form asp-action="AssignRole" asp-controller="Admin" method="post" class="d-flex align-items-center">
-                                        <input type="hidden" name="userId" value="@user.Id" />
-                                        <select name="roleName" class="form-select action-dropdown">
-                                            <option disabled selected>Select Role</option>
-                                            @foreach (var role in Model.AllRoles)
-                                            {
-                                                <option value="@role">@role</option>
-                                            }
-                                        </select>
-                                        <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
-                                            Assign Role
-                                        </button>
-                                    </form>
-                                </div>
-
+                                <span class="badge @(user.IsActive ? "bg-success" : "bg-danger")">
+                                    @(user.IsActive ? "Active" : "Inactive")
+                                </span>
                             </td>
+                            <td>
+                                <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <select name="roleName" class="form-select action-dropdown">
+                                        <option disabled selected>Select Role</option>
+                                        @foreach (var role in Model.AllRoles)
+                                        {
+                                            <option value="@role">@role</option>
+                                        }
+                                    </select>
+                                    <br />
+                                    <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
+                                        Assign Role
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form asp-action="ToggleActivation" asp-controller="Admin" method="post" class="action-form">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="button"
+                                            class="btn btn-sm toggle-btn shadow @(user.IsActive ? "deactivate" : "activate")"
+                                            onclick="toggleActivation(this, '@user.UserName', this.form)"
+                                            data-status="@user.IsActive">
+                                        @(user.IsActive ? "Deactivate" : "Activate")
+                                    </button>
+                                </form>
+                            </td>
+
                         </tr>
                     }
 
@@ -83,27 +98,28 @@
                             <td>@user.Role</td>
                             <td><span class="badge bg-warning text-white">Pending</span></td>
                             <td>
-                                <div class="action-container d-flex flex-column align-items-start gap-2">
-                                    <form asp-action="AssignRole" asp-controller="Admin" method="post" class="d-flex align-items-center">
-                                        <input type="hidden" name="userId" value="@user.Id" />
-                                        <select name="roleName" class="form-select action-dropdown">
-                                            <option disabled selected>Select Role</option>
-                                            @foreach (var role in Model.AllRoles)
-                                            {
-                                                <option value="@role">@role</option>
-                                            }
-                                        </select>
-                                        <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
-                                            Assign Role
-                                        </button>
-                                    </form>
-                                    <form asp-action="ConfirmAccount" asp-controller="Admin" method="post">
-                                        <input type="hidden" name="userId" value="@user.Id" />
-                                        <button type="button" class="btn btn-warning btn-sm shadow confirm-btn" onclick="confirmAccount('@user.UserName', this.form)">
-                                            Confirm Account
-                                        </button>
-                                    </form>
-                                </div>
+                                <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <select name="roleName" class="form-select action-dropdown">
+                                        <option disabled selected>Select Role</option>
+                                        @foreach (var role in Model.AllRoles)
+                                        {
+                                            <option value="@role">@role</option>
+                                        }
+                                    </select>
+                                    <br />
+                                    <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
+                                        Assign Role
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form asp-action="ConfirmAccount" asp-controller="Admin" method="post" class="action-form">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="button" class="btn btn-warning btn-sm shadow confirm-btn" onclick="confirmAccount('@user.UserName', this.form)">
+                                        Confirm Account
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     }
@@ -111,8 +127,6 @@
             </table>
         </div>
     </div>
-
-
 
 
     <!-- Confirmation Modals -->
@@ -148,149 +162,163 @@ else
 
 
 <style>
+    .container {
+        max-width: 95%; /* Adjust container width to fit larger table */
+        margin: 0 auto; /* Center the container */
+    }
+
+    .table-responsive {
+        overflow-x: unset; /* Remove horizontal scrolling */
+        padding: 0;
+        margin: 0 auto;
+    }
+
     .table {
+        width: 100%; /* Full width table */
         border-radius: 12px;
         overflow: hidden;
         text-align: center;
+        table-layout: auto; /* Allow table to auto-adjust column widths */
     }
 
-    .table th {
-        text-align: center;
-        background-color: #007bff !important;
-        color: #ffffff !important;
-        font-weight: bold;
-        padding: 12px;
-        text-transform: uppercase;
-    }
+        .table th,
+        .table td {
+            word-wrap: break-word; /* Wrap content within cells */
+            white-space: normal; /* Allow text wrapping */
+            text-align: center;
+            vertical-align: middle;
+            padding: 15px; /* Increased padding for better spacing */
+            font-weight: 600; /* Bold text for better readability */
+            font-size: 14px; /* Larger font size for data */
+        }
+
+        .table th {
+            background-color: #007bff !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 16px; /* Larger font size for headers */
+        }
 
     .table-hover tbody tr:hover {
         background-color: #e9f5ff;
     }
 
-    .btn-outline-primary:hover {
-        background-color: #007bff;
-        color: white;
+    .inactive-row {
+        background-color: #f0f0f0 !important; /* Light gray background */
+        color: #6c757d; /* Dimmed text color */
     }
 
-    .btn-outline-danger:hover {
-        background-color: #dc3545;
-        color: white;
+        .inactive-row td {
+            text-decoration: line-through; /* Add strikethrough to text */
+        }
+
+    .active-row {
+        background-color: inherit; /* Reset to default background */
+        color: inherit; /* Reset to default text color */
     }
+
+        .active-row td {
+            text-decoration: none; /* Remove strikethrough */
+        }
 
     h1 {
+        font-size: 32px; /* Larger header size */
         font-weight: bold;
-        letter-spacing: 1px;
-    }
-
-
-    .modal-content {
-        border-radius: 15px;
-        background: #f9f9f9;
-    }
-
-    .modal-header {
-        background: linear-gradient(135deg, #007bff, #0056b3);
-        color: white;
-        font-weight: bold;
-    }
-
-    .modal-body {
-        font-size: 18px;
-        color: #333;
-        padding: 20px 30px;
-    }
-
-    .modal-footer {
-        border-top: none;
-        padding: 20px 30px;
     }
 
     .btn-danger {
         background-color: #ff4d4d;
         border: none;
         border-radius: 30px;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: bold;
         color: white;
         transition: background 0.3s ease;
     }
 
-    .btn-danger:hover {
-        background-color: #cc0000;
-    }
-
-    /* Dropdown Styling */
-    .action-dropdown {
-        border-radius: 8px;
-        padding: 5px 10px;
-        font-size: 14px;
-        width: auto;
-        max-width: 180px;
-        text-align: left;
-        border: 1px solid #ddd;
-        transition: border-color 0.3s ease;
-        margin-right: 10px; /* Add margin to increase spacing */
-    }
-
-        .action-dropdown:focus {
-            border-color: #007bff;
-            outline: none;
+        .btn-danger:hover {
+            background-color: #cc0000;
         }
 
-    /* Assign Button */
-    .assign-btn {
+    .assign-btn,
+    .confirm-btn {
         background-color: #007bff;
         color: white;
         border: none;
-        padding: 4px 8px; /* Smaller button size */
-        font-size: 12px;
+        padding: 10px 15px; /* Adjust button size */
+        font-size: 14px; /* Larger font size */
         font-weight: bold;
         border-radius: 6px;
         transition: all 0.3s ease;
     }
 
-        .assign-btn:hover {
-            background-color: #0056b3;
-        }
-
-    /* Confirm Account Button */
-    .confirm-btn {
-        background-color: #ffc107;
-        color: white;
-        border: none;
-        padding: 4px 8px;
-        font-size: 12px;
-        font-weight: bold;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-    }
-
+        .assign-btn:hover,
         .confirm-btn:hover {
-            background-color: #e0a800;
-            color: #FFFFFF
+            background-color: #0056b3;
+            color: white;
         }
+
+
+    .toggle-btn {
+        padding: 10px 15px; /* Adjust button size */
+        font-size: 14px; /* Larger font size */
+        font-weight: bold;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+        .toggle-btn.deactivate {
+            background-color: #dc3545;
+            color: white;
+        }
+
+            .toggle-btn.deactivate:hover {
+                background-color: #b02a37;
+            }
+
+        .toggle-btn.activate {
+            background-color: #28a745;
+            color: white;
+        }
+
+            .toggle-btn.activate:hover {
+                background-color: #218838;
+            }
+
+    .action-dropdown {
+        border-radius: 6px;
+        padding: 10px 15px; /* Adjust dropdown size */
+        font-size: 14px; /* Larger font size */
+        border: 1px solid #ddd;
+        background-color: #fff;
+        width: 120px;
+        transition: border-color 0.3s ease;
+    }
+
+    .badge {
+        padding: 5px 10px; /* Adjust badge size */
+        border-radius: 6px;
+        font-size: 14px; /* Larger font size */
+        font-weight: bold;
+    }
 
     #searchBox {
         border-radius: 20px;
-        padding: 10px;
-        font-size: 16px;
+        padding: 8px;
+        font-size: 14px;
         width: 100%;
         border: 2px solid #007bff;
         background-color: #f9f9f9;
-        padding-left: 15px;
     }
 
         #searchBox::placeholder {
             font-style: italic;
             color: #aaa;
         }
-
-    .input-group {
-        margin-bottom: 15px;
-    }
-
-
 </style>
+
+
 
 <script>
     let currentForm = null;
@@ -321,14 +349,115 @@ else
     }
 
         document.getElementById("searchBox").addEventListener("input", function () {
-        const searchValue = this.value.toLowerCase();
+        const searchValue = this.value.toLowerCase(); // Get the search value
         const rows = document.querySelectorAll("#usersTable tbody tr");
 
-        rows.forEach(row => {
-            const cells = Array.from(row.children);
-            const isVisible = cells.some(cell => cell.textContent.toLowerCase().includes(searchValue));
-            row.style.display = isVisible ? "" : "none";
+        rows.forEach((row) => {
+            // Get all the relevant cell values in the row
+            const username = row.children[0]?.textContent.toLowerCase(); // Username (1st column)
+            const nationalId = row.children[1]?.textContent.toLowerCase(); // National ID (2nd column)
+            const phoneNumber = row.children[2]?.textContent.toLowerCase(); // Phone Number (3rd column)
+            const optionalPhone = row.children[3]?.textContent.toLowerCase(); // Optional Phone (4th column)
+            const governorate = row.children[4]?.textContent.toLowerCase(); // Governorate (5th column)
+            const city = row.children[5]?.textContent.toLowerCase(); // City (6th column)
+            const role = row.children[6]?.textContent.toLowerCase(); // Current Role (7th column)
+            const status = row.children[7]?.textContent.toLowerCase().trim(); // Current Status (8th column)
+
+            // Handle exact match for "active", "inactive", or "pending" in Current Status
+            const isStatusMatch =
+                searchValue === "active" ? status === "active" :
+                searchValue === "inactive" ? status === "inactive" :
+                searchValue === "pending" ? status === "pending" :
+                status.includes(searchValue); // General match for other cases
+
+            // Check if the search matches any of the other columns
+            const isOtherMatch =
+                username.includes(searchValue) ||
+                nationalId.includes(searchValue) ||
+                phoneNumber.includes(searchValue) ||
+                optionalPhone.includes(searchValue) ||
+                governorate.includes(searchValue) ||
+                city.includes(searchValue) ||
+                role.includes(searchValue);
+
+            // Show/hide the row based on the match
+            row.style.display = isStatusMatch || isOtherMatch ? "" : "none";
         });
     });
+
+
+
+            function toggleActivation(button, userName, form) {
+        const isActive = button.getAttribute("data-status") === "True";
+        const action = isActive ? "deactivate" : "activate";
+        const modalBody = document.getElementById("confirmationModalBody");
+
+        modalBody.innerHTML = `Are you sure you want to ${action} the account for <strong>${userName}</strong>?`;
+
+        const confirmButton = document.getElementById("confirmActionButton");
+        confirmButton.onclick = () => {
+            form.submit();
+            const row = button.closest("tr");
+
+            if (isActive) {
+                // Deactivate row
+                row.classList.remove("active-row");
+                row.classList.add("inactive-row");
+                button.setAttribute("data-status", "False");
+                button.innerHTML = "Activate";
+                button.classList.remove("deactivate");
+                button.classList.add("activate");
+            } else {
+                // Activate row
+                row.classList.remove("inactive-row");
+                row.classList.add("active-row");
+                button.setAttribute("data-status", "True");
+                button.innerHTML = "Deactivate";
+                button.classList.remove("activate");
+                button.classList.add("deactivate");
+            }
+        };
+
+        const modal = new bootstrap.Modal(document.getElementById("confirmationModal"));
+        modal.show();
+    }
+
+            document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.querySelector("#usersTable tbody");
+
+        function moveInactiveRowsToBottom() {
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
+            const activeRows = [];
+            const inactiveRows = [];
+
+            rows.forEach((row) => {
+                const status = row.querySelector("td:nth-child(8) span")?.textContent.toLowerCase().trim();
+                if (status === "inactive") {
+                    row.classList.add("inactive-row"); // Add class to inactive rows
+                    inactiveRows.push(row);
+                } else {
+                    row.classList.remove("inactive-row"); // Remove the class if not inactive
+                    activeRows.push(row);
+                }
+            });
+
+            // Clear the table body and append rows in the desired order
+            tableBody.innerHTML = "";
+            activeRows.forEach((row) => tableBody.appendChild(row));
+            inactiveRows.forEach((row) => tableBody.appendChild(row));
+        }
+
+        // Call the function initially to reorder the rows
+        moveInactiveRowsToBottom();
+
+        // Update the function to trigger after toggling activation
+        document.querySelectorAll(".toggle-btn").forEach((button) => {
+            button.addEventListener("click", function () {
+                setTimeout(() => moveInactiveRowsToBottom(), 100); // Slight delay to allow DOM update
+            });
+        });
+    });
+
+
 
 </script>
