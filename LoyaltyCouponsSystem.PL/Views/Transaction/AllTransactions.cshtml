@@ -19,6 +19,7 @@
         <table class="table table-hover shadow-lg rounded border-light-modern">
             <thead class="thead-dark bg-primary text-white">
                 <tr>
+                    <th>Exchange Permission </th>
                     <th>Customer Name</th>
                     <th>Technician Name</th>
                     <th>Coupon Type</th>
@@ -34,6 +35,8 @@
                 @foreach (var transaction in Model)
                 {
                     <tr>
+                        <td>@transaction.ExchangePermission</td>
+                 
                         <td>@transaction.Customer.Name</td>
                         <td>@transaction.Technician.Name</td>
                         <td>@transaction.CouponType</td>

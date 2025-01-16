@@ -13,7 +13,11 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         [Key]
         public string ApplicationUserId { get; set; } 
         public virtual ApplicationUser ApplicationUser { get; set; }
-        public string Number { get; set; } 
+        public string NationalId { get; set; }
+        public string PhoneNumber { get; set; } 
+        public string OptionalPhoneNumber { get; set; } 
+        public string Governate { get; set; } 
+        public string City { get; set; } 
         public string ApprovalStatus { get; set; } 
         public ICollection<Coupon> Coupons { get; set; }
     }

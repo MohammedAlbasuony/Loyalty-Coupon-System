@@ -24,7 +24,7 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Customer
         [RegularExpression(@"^01[0-9]{9}$", ErrorMessage = "Phone number must follow the format 01xxxxxxxxx.")]
         //[UniquePhoneNumber(ErrorMessage = "This phone number is already in use.")]
         public string? PhoneNumber { get; set; }
-
+        public int? TechnicianID { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
     }

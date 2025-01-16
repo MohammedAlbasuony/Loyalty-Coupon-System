@@ -1,7 +1,10 @@
-﻿namespace LoyaltyCouponsSystem.DAL.Entity
+﻿using LoyaltyCouponsSystem.DAL.DB;
+
+namespace LoyaltyCouponsSystem.DAL.Entity
 {
     public class Technician
     {
+        
         public int TechnicianID { get; set; }
         public string Name { get; set; }
         public string NickName { get; set; }       
@@ -15,5 +18,13 @@
         public ICollection<Coupon> Coupons { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public Technician()
+        {
+            Customers = new List<Customer>();
+            Users = new List<ApplicationUser>();
+        }
+        public ICollection<Customer> Customers { get; set; }
+        public ICollection<ApplicationUser> Users { get; set; } 
+
     }
 }

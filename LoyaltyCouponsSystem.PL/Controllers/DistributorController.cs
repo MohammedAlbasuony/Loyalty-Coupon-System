@@ -55,13 +55,13 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         public async Task<IActionResult> UpdateDistributor(int id)
         {
             // Fetch distributor details by ID
-            var updateVM = await _distributorService.GetByIdAsync(id);
-            if (updateVM != null)
+            var distributorViewModel = await _distributorService.GetByIdAsync(id);
+            if (distributorViewModel != null)
             {
                 // Fetch the dropdown options for Governates and Customers
-                updateVM.Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync();
-                updateVM.Customers = await _distributorService.GetCustomersForDropdownAsync();
-                return View(updateVM); // Return the View with the populated ViewModel
+                distributorViewModel.Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync();
+                distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
+                return View(distributorViewModel); // Return the View with the populated ViewModel
             }
 
             return NotFound();

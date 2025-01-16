@@ -166,15 +166,24 @@ namespace LoyaltyCouponsSystem.DAL.DB
             });
 
 
+            modelBuilder.Entity<ApplicationUser>()
+           .HasOne(u => u.Technician) 
+           .WithMany(t => t.Users) 
+           .HasForeignKey(u => u.TechnicianId) 
+           .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Customer>()
+                .HasOne(c => c.Technician)
+                .WithMany(t => t.Customers)
+                .HasForeignKey(c => c.TechnicianId);
 
 
+            modelBuilder.Entity<Technician>()
+                .HasMany(t => t.Customers)
+                .WithOne(c => c.Technician)
+                .HasForeignKey(c => c.TechnicianId);
+              
 
-
-            modelBuilder.Entity<Technician>(entity =>
-            {
-                entity.HasKey(e => e.TechnicianID);
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            });
 
             modelBuilder.Entity<Employee>(entity =>
             {

@@ -113,6 +113,19 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
         }
 
+        public async Task<List<Customer>> GetCustomersByIdsAsync(List<int> customerIds)
+        {
+            if (customerIds == null || customerIds.Count == 0)
+            {
+                return new List<Customer>(); // Return an empty list if no IDs are provided
+            }
+
+            // Fetch the customers from the database using the provided IDs
+            return await _DBcontext.Customers
+                .Where(c => customerIds.Contains(c.CustomerID))
+                .ToListAsync();
+        }
+
         // Update an existing customer
         public async Task<bool> UpdateAsync(Customer customer)
         {
@@ -138,6 +151,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 existingCustomer.Governate = customer.Governate;
                 existingCustomer.City = customer.City;
                 existingCustomer.PhoneNumber = customer.PhoneNumber;
+                existingCustomer.TechnicianId = customer.TechnicianId;
 
                 await _DBcontext.SaveChangesAsync();
                 return true;
