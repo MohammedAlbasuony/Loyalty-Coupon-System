@@ -1,5 +1,6 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.Service.Implementation;
+using LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateExcel;
 using LoyaltyCouponsSystem.BLL.Service.Implementation.GeneratePDF;
 using LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateQR;
 using LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateWord;
@@ -95,6 +96,33 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GenerateCouponsExcel(
+    List<Coupon> coupons,
+    string baseURL,
+    float qrCodeSizeCm)
+        {
+            if (coupons == null || !coupons.Any())
+            {
+                return BadRequest("No coupons provided.");
+            }
+
+            try
+            {
+                var generateExcelWithCoupons = new clsGenerateExcelWithCoupons();
+                byte[] excelData = await generateExcelWithCoupons.GenerateExcelWithCouponsAsync(
+                    coupons, baseURL, qrCodeSizeCm);
+
+                return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Coupons.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> GetMaxSerialNumber()
         {
@@ -115,51 +143,58 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> DetailsOfCoupones(QRCodeDetailsViewModel detailsVM)
         {
             if (detailsVM == null)
             {
                 return BadRequest("Details are missing.");
             }
+            
+                // قائمة الـ QR Codes
+                var qrCodesList = new List<Coupon>();
+                var serviceToMangeCounters = new ServiceToMangeCounters(_context);
+                int currentYear = DateTime.Now.Year;
 
-            // قائمة الـ QR Codes
-            var qrCodesList = new List<Coupon>();
-            var serviceToMangeCounters = new ServiceToMangeCounters(_context);
-            int currentYear = DateTime.Now.Year;
-          
 
-            // إنشاء الكوبونات
-            for (int i = 0; i < detailsVM.Count; i++)
-            {
-                ServiceToSetSerialNumber serialNumber = new ServiceToSetSerialNumber();
-                var couponDetails = new Coupon
+                // إنشاء الكوبونات
+                for (int i = 0; i < detailsVM.Count; i++)
                 {
-                    
-                    TypeOfCoupone = detailsVM.TypeOfCoupon,
-                    Value = detailsVM.Value,
-                    GovernorateId = detailsVM.GovernorateId,
-                    AreaId = detailsVM.AreaId,
-                    NumInYear = await serviceToMangeCounters.GetNextNumInYearAsync(),
-                    SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber, i)
-                }; 
+                    ServiceToSetSerialNumber serialNumber = new ServiceToSetSerialNumber();
+                    var couponDetails = new Coupon
+                    {
 
-                await _context.Coupons.AddAsync(couponDetails);
-                await _context.SaveChangesAsync();
-                qrCodesList.Add(couponDetails);
-            }
+                        TypeOfCoupone = detailsVM.TypeOfCoupon,
+                        Value = detailsVM.Value,
+                        GovernorateId = detailsVM.GovernorateId,
+                        AreaId = detailsVM.AreaId,
+                        NumInYear = await serviceToMangeCounters.GetNextNumInYearAsync(),
+                        SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber, i)
+                    };
 
-            await serviceToMangeCounters.UpdateMaxSerialNumAsync(detailsVM.SerialNumber, detailsVM.Count);
+                    await _context.Coupons.AddAsync(couponDetails);
+                    await _context.SaveChangesAsync();
+                    qrCodesList.Add(couponDetails);
+                }
 
-            // إنشاء QR Codes
-            var generateListOfCoupons = new GenerateListOfCoupons();
-            string baseUrl = $"{Request.Scheme}://{Request.Host}";
-            var qrCodesAsBytes = generateListOfCoupons.GenerateQRCodesAsync(qrCodesList, baseUrl);
+                await serviceToMangeCounters.UpdateMaxSerialNumAsync(detailsVM.SerialNumber, detailsVM.Count);
 
-            // إنشاء ملف PDF من QR Codes
-           // return await GenerateCouponsPDF(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
+                // إنشاء QR Codes
+                var generateListOfCoupons = new GenerateListOfCoupons();
+                string baseUrl = $"{Request.Scheme}://{Request.Host}";
+                var qrCodesAsBytes = generateListOfCoupons.GenerateQRCodesAsync(qrCodesList, baseUrl);
 
-            // إنشاء ملف Word من QR Codes
-            return await GenerateCouponsWord(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
+                // إنشاء ملف PDF من QR Codes
+                // return await GenerateCouponsPDF(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
+
+                // إنشاء ملف Word من QR Codes
+                // return await GenerateCouponsWord(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
+                // إنشاء ملف Excel من QR Codes
+                return await GenerateCouponsExcel(qrCodesList, baseUrl, detailsVM.CouponSize);
+           
+
+
 
         }
 

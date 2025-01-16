@@ -28,7 +28,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateQR
                 using (var qrCodeImage = new Bitmap(new MemoryStream(qrCodeBytes)))
                 {
                     // Define the dimensions for the combined image (QR + text)
-                    int combinedWidth = qrCodeImage.Width+100;
+                    int combinedWidth = qrCodeImage.Width+125;
                     int combinedHeight = qrCodeImage.Height + 150; // Extra height for the serial number text
 
                     using (var combinedImage = new Bitmap(combinedWidth, combinedHeight))

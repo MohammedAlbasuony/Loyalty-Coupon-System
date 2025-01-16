@@ -33,8 +33,8 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public int Value { get; set; }
 
         public int? GovernorateId { get; set; }
-        public Governorate Governorates { get; set; }
-        public Area Areas { get; set; }
+        public Governorate? Governorates { get; set; }
+        public Area? Areas { get; set; }
         public int? AreaId { get; set; }
         public long NumInYear { get; set; }
 
