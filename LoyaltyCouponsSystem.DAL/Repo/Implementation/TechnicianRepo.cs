@@ -58,7 +58,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
 
                 var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
                 technician.CreatedBy = currentUser?.UserName;
-                technician.CreatedAt = DateTime.UtcNow;
+                technician.CreatedAt = DateTime.Now;
                 await _DBcontext.Technicians.AddAsync(technician);
                 await _DBcontext.SaveChangesAsync();
                 return true;
@@ -149,12 +149,6 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             try
             {
-                // Ensure the Code and Phone Number are unique
-                if (!await IsUniqueCodeAsync(technician.Code))
-                    throw new Exception("Code already exists.");
-                if (!await IsUniquePhoneNumberAsync(technician.PhoneNumber1))
-                    throw new Exception("Phone number already exists.");
-
                 var existingTechnician = await _DBcontext.Technicians
                     .Where(t => t.Code == technician.Code)
                     .FirstOrDefaultAsync();
@@ -173,7 +167,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 existingTechnician.PhoneNumber3 = technician.PhoneNumber3;
                 existingTechnician.Governate = technician.Governate;
                 existingTechnician.City = technician.City;
-
+                existingTechnician.Code = technician.Code;
+                existingTechnician.Users = technician.Users;
+                existingTechnician.Customers = technician.Customers;
                 await _DBcontext.SaveChangesAsync();
                 return true;
             }

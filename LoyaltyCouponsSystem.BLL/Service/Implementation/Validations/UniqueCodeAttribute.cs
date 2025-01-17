@@ -1,4 +1,5 @@
 ﻿using LoyaltyCouponsSystem.DAL.DB;
+using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,23 +8,34 @@ public class UniqueCodeAttribute : ValidationAttribute
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
         var context = (ApplicationDbContext)validationContext.GetService(typeof(ApplicationDbContext));
-        string code = value?.ToString()?.Trim();  // Trim the code to remove leading/trailing spaces
+        var entityType = validationContext.ObjectType; // Get the type of the entity being validated
+        string code = value?.ToString()?.Trim(); // Trim the code to remove leading/trailing spaces
 
         if (string.IsNullOrEmpty(code)) return ValidationResult.Success;
 
-        // Use EF.Functions.Like() for case-insensitive comparison
-        var existsCustomer = context.Customers
-            .Any(c => EF.Functions.Like(c.Code, code));
-
-        var existsDistributor = context.Distributors
-            .Any(d => EF.Functions.Like(d.Code, code) && !d.IsDeleted);
-
-        var existsTechnician = context.Technicians
-            .Any(t => EF.Functions.Like(t.Code, code));
-
-        if (existsCustomer || existsDistributor || existsTechnician)
+        if (entityType == typeof(Customer))
         {
-            return new ValidationResult("The account number (Code) is already in use.");
+            var existsCustomer = context.Customers.Any(c => EF.Functions.Like(c.Code, code));
+            if (existsCustomer)
+            {
+                return new ValidationResult("The code is already in use for a customer.");
+            }
+        }
+        else if (entityType == typeof(Distributor))
+        {
+            var existsDistributor = context.Distributors.Any(d => EF.Functions.Like(d.Code, code));
+            if (existsDistributor)
+            {
+                return new ValidationResult("The code is already in use for a distributor.");
+            }
+        }
+        else if (entityType == typeof(Technician))
+        {
+            var existsTechnician = context.Technicians.Any(t => EF.Functions.Like(t.Code, code));
+            if (existsTechnician)
+            {
+                return new ValidationResult("The code is already in use for a technician.");
+            }
         }
 
         return ValidationResult.Success;

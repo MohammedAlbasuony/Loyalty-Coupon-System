@@ -164,7 +164,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         }
 
 
-        public async Task<TechnicianViewModel> GetByIdAsync(string id)
+        public async Task<UpdateTechnicianViewModel> GetByIdAsync(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
@@ -172,8 +172,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
                 if (technician != null)
                 {
-                    var technicianViewModel = new TechnicianViewModel
+                    var updateTechnicianViewModel = new UpdateTechnicianViewModel
                     {
+                        TechnicianID = technician.TechnicianID,
                         Code = technician.Code,
                         Name = technician.Name,
                         NickName = technician.NickName,
@@ -183,37 +184,44 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         PhoneNumber3 = technician.PhoneNumber3,
                         SelectedGovernate = technician.Governate,
                         SelectedCity = technician.City,
-                        
+                        Customers = await GetCustomersForDropdownAsync(),
+                        Users = await GetUsersForDropdownAsync(),
                     };
 
-                    PopulateDropdowns(technicianViewModel);
-                    return technicianViewModel;
+                    return updateTechnicianViewModel;
                 }
             }
             return null;
         }
 
-        public async Task<bool> UpdateAsync(TechnicianViewModel technicianViewModel)
+        public async Task<bool> UpdateAsync(UpdateTechnicianViewModel TechnicianViewModel)
         {
-            if (technicianViewModel != null)
+            if (TechnicianViewModel != null)
             {
-                var technician = new Technician
+                // Fetch the existing technician entity from the database
+                var existingTechnician = await _technicianRepo.GetByIdAsync(TechnicianViewModel.Code);
+                if (existingTechnician == null)
                 {
-                    Code = technicianViewModel.Code,
-                    Name = technicianViewModel.Name,
-                    NickName = technicianViewModel.NickName,
-                    NationalID = technicianViewModel.NationalID,
-                    PhoneNumber1 = technicianViewModel.PhoneNumber1,
-                    PhoneNumber2 = technicianViewModel.PhoneNumber2,
-                    PhoneNumber3 = technicianViewModel.PhoneNumber3,
-                    Governate = technicianViewModel.SelectedGovernate,
-                    City = technicianViewModel.SelectedCity
-                };
+                    return false; // Technician not found
+                }
 
-                return await _technicianRepo.UpdateAsync(technician);
+                // Update the fields
+                existingTechnician.Code = TechnicianViewModel.Code;
+                existingTechnician.Name = TechnicianViewModel.Name;
+                existingTechnician.NickName = TechnicianViewModel.NickName;
+                existingTechnician.NationalID = TechnicianViewModel.NationalID;
+                existingTechnician.PhoneNumber1 = TechnicianViewModel.PhoneNumber1;
+                existingTechnician.PhoneNumber2 = TechnicianViewModel.PhoneNumber2;
+                existingTechnician.PhoneNumber3 = TechnicianViewModel.PhoneNumber3;
+                existingTechnician.Governate = TechnicianViewModel.SelectedGovernate;
+                existingTechnician.City = TechnicianViewModel.SelectedCity;
+
+                // Save the updated entity
+                return await _technicianRepo.UpdateAsync(existingTechnician);
             }
             return false;
         }
+
         public async Task<List<SelectListItem>> GetCustomersForDropdownAsync()
         {
             var customers = await _technicianRepo.GetCustomersForDropdownAsync();

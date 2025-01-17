@@ -104,28 +104,27 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             await _technicianService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
-
         [HttpGet]
-
         public async Task<IActionResult> UpdateTechnician(string id)
         {
-            var technician = await _technicianService.GetByIdAsync(id);
+            var technician = await _technicianService.GetByIdAsync(id); 
             if (technician == null)
             {
                 return NotFound();
             }
-            return View(technician);
+            return View(technician); 
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> UpdateTechnician(TechnicianViewModel technicianViewModel)
+        public async Task<IActionResult> UpdateTechnician(UpdateTechnicianViewModel updateTechnicianViewModel)
         {
             if (ModelState.IsValid)
             {
-                await _technicianService.UpdateAsync(technicianViewModel);
+                await _technicianService.UpdateAsync(updateTechnicianViewModel);
                 return RedirectToAction("GetAllTechnicians");
             }
-            return View(technicianViewModel);
+            return View(updateTechnicianViewModel);
         }
     }
 }
