@@ -12,7 +12,6 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public decimal PurchaseAmount { get; set; }
         public string? TransactionType { get; set; }
         public DateTime Timestamp { get; set; }
-
         public string? Governate { get; set; }
         public string? City { get; set; }
         public int CustomerID { get; set; }
@@ -24,5 +23,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public int SequenceNumber { get; set; }
         public string ExchangePermission { get; set; }
         public string? CreatedBy { get; set; }
+        public int SequenceStart { get; set; }
+        public int SequenceEnd { get; set; }
     }
 }

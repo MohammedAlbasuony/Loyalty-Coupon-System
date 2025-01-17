@@ -120,8 +120,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                             SequenceNumber = seqNum,
                             ExchangePermission = ExchangePermissionNum,
                             CreatedBy = transaction.CreatedBy,
-                            
-
+                            SequenceStart = transaction.StartSequenceNumber,
+                            SequenceEnd = transaction.EndSequenceNumber,
                         };
 
                         await _repository.AddTransactionAsync(newTransaction);

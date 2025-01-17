@@ -1,5 +1,4 @@
 ﻿@model List<LoyaltyCouponsSystem.DAL.Entity.Transaction>
-
 @{
     ViewData["Title"] = "All Transactions";
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
@@ -40,7 +39,7 @@
                         <td>@transaction.Technician.Name</td>
                         <td>@transaction.CouponType</td>
                         <td>@transaction.CouponSort</td>
-                        <td>@transaction.SequenceNumber</td>
+                        <td>@transaction.SequenceStart - @transaction.SequenceEnd</td>
                         <td>@transaction.Governate</td>
                         <td>@transaction.City</td>
                         <td>@transaction.CreatedBy</td>
