@@ -8,6 +8,7 @@
 <form asp-action="AssignQRCode" method="post" id="assignForm" class="shadow-lg p-4 bg-white rounded">
     <h2 class="text-center text-primary mb-4">Exchange Permmision </h2>
 
+
     <div class="row g-3">
         <!-- Select Customer -->
         <div class="col-md-6">
@@ -55,14 +56,15 @@
 
         <!-- Exchange Permission -->
         <div class="col-md-6">
-            <label for="ExchangePermission" class="form-label fw-bold">Exchange Permission</label>
+            <label for="ExchangePermission" class="form-label fw-bold">Exchange Permission Number</label>
             <input asp-for="ExchangePermission" name="Transactions[0].ExchangePermission" class="form-control" placeholder="Enter exchange permission number" required />
         </div>
     </div>
 
-        <!-- Dynamic Coupon Fields -->
-        <div id="couponFieldsContainer" class="row g-3">
-            <div class="col-md-6">
+    <!-- Dynamic Coupon Fields -->
+    <div id="couponFieldsContainer" class="mt-4">
+        <div class="row g-3 align-items-center couponFields">
+            <div class="col-md-3">
                 <label for="CouponSort" class="form-label fw-bold">Coupon Sort</label>
                 <select name="Transactions[0].SelectedCouponSort" class="form-select" required>
                     <option value="">Select Coupon Sort</option>
@@ -72,7 +74,7 @@
                     }
                 </select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <label for="CouponType" class="form-label fw-bold">Coupon Type</label>
                 <select name="Transactions[0].SelectedCouponType" class="form-select" required>
                     <option value="">Select Coupon Type</option>
@@ -82,24 +84,28 @@
                     }
                 </select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <label for="StartSequenceNumber" class="form-label fw-bold">Start Sequence Number</label>
                 <input type="number" name="Transactions[0].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <label for="EndSequenceNumber" class="form-label fw-bold">End Sequence Number</label>
                 <input type="number" name="Transactions[0].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
             </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-danger removeFieldsButton">Remove</button>
+            </div>
         </div>
+    </div>
 
-        <!-- Add Another Button -->
-        <div class="col-12 text-center">
-            <button type="button" class="btn btn-outline-secondary mt-3" id="addFieldsButton">Add Another</button>
-        </div>
+    <!-- Add Another Button -->
+    <div class="text-center mt-3">
+        <button type="button" class="btn btn-outline-secondary" id="addFieldsButton">Add Another</button>
+    </div>
 
     <!-- Submit Button -->
-    <div class="col-12 text-center">
-        <button type="submit" class="btn btn-primary mt-5 px-4 py-2 rounded-pill shadow-sm" style="font-size: 16px;">Assign</button>
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-primary mt-3 px-4 py-2 rounded-pill shadow-sm" style="font-size: 16px;">Assign</button>
     </div>
 </form>
 
@@ -109,53 +115,65 @@
 
 @section Scripts {
     <script>
-        let index = 1; // Initialize index to 1 (since the first set of fields is already rendered with index 0)
 
-        // Handle dynamic addition of fields for coupon sort, coupon type, and sequence numbers
+         let index = 1; // Initialize index for dynamic rows
+
+        // Add new row
         document.getElementById("addFieldsButton").addEventListener("click", function () {
-            var container = document.getElementById("couponFieldsContainer");
-
-            var newFields = document.createElement("div");
-            newFields.classList.add("couponFields", "mt-4");
+            const container = document.getElementById("couponFieldsContainer");
+            const newFields = document.createElement("div");
+            newFields.classList.add("row", "g-3", "align-items-center", "couponFields", "mt-2");
             newFields.innerHTML = `
-                <hr>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="CouponSort" class="form-label fw-bold">Coupon Sort</label>
-                        <select name="Transactions[${index}].SelectedCouponSort" class="form-select" required>
-                            <option value="">Select Coupon Sort</option>
+                <div class="col-md-3">
+                    <label for="CouponSort" class="form-label fw-bold">Coupon Sort</label>
+                    <select name="Transactions[${index}].SelectedCouponSort" class="form-select" required>
+                        <option value="">Select Coupon Sort</option>
         @foreach (var sort in Model.CouponSorts)
         {
-                                    <option value="@sort.Value">@sort.Text</option>
+                                <option value="@sort.Value">@sort.Text</option>
         }
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="CouponType" class="form-label fw-bold">Coupon Type</label>
-                        <select name="Transactions[${index}].SelectedCouponType" class="form-select" required>
-                            <option value="">Select Coupon Type</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="CouponType" class="form-label fw-bold">Coupon Type</label>
+                    <select name="Transactions[${index}].SelectedCouponType" class="form-select" required>
+                        <option value="">Select Coupon Type</option>
         @foreach (var type in Model.CouponTypes)
         {
-                                    <option value="@type.Value">@type.Text</option>
+                                <option value="@type.Value">@type.Text</option>
         }
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="StartSequenceNumber" class="form-label fw-bold">Start Sequence Number</label>
-                        <input type="number" name="Transactions[${index}].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="EndSequenceNumber" class="form-label fw-bold">End Sequence Number</label>
-                        <input type="number" name="Transactions[${index}].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
-                    </div>
-                </div>`;
-
-            // Append new fields to the container
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="StartSequenceNumber" class="form-label fw-bold">Start Sequence Number</label>
+                    <input type="number" name="Transactions[${index}].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
+                </div>
+                <div class="col-md-3">
+                    <label for="EndSequenceNumber" class="form-label fw-bold">End Sequence Number</label>
+                    <input type="number" name="Transactions[${index}].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger removeFieldsButton">Remove</button>
+                </div>
+            `;
             container.appendChild(newFields);
-
-            // Increment index for the next set of fields
             index++;
         });
+
+        // Remove row
+        document.addEventListener("click", function (event) {
+            if (event.target.classList.contains("removeFieldsButton")) {
+                const fieldGroup = event.target.closest(".couponFields");
+                fieldGroup.remove();
+            }
+        });
+
+
+
+
+
+
+
 
         // Make the city dropdown dynamic based on selected governate
         document.getElementById("Governate").addEventListener("change", function () {
@@ -264,5 +282,7 @@
         margin-top: 20px;
         margin-bottom: 20px;
     }
+
+    
 </style>
 
