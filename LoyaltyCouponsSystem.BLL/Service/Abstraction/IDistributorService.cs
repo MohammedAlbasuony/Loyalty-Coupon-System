@@ -9,7 +9,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
         Task<bool> DeleteAsync(int id);
         Task<List<DistributorViewModel>> GetAllAsync();
         Task<DistributorViewModel> GetByIdAsync(int id);
-        Task<bool> UpdateAsync(DistributorViewModel distributorViewModel);
+        Task<bool> UpdateAsync(UpdateVM DistributorViewModel);
         Task<List<SelectListItem>> GetCustomersForDropdownAsync();
         Task<IEnumerable<SelectListItem>> GetGovernatesForDropdownAsync();
     }
