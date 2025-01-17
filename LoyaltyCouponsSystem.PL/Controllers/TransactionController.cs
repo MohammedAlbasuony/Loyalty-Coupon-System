@@ -14,12 +14,26 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
         public async Task<IActionResult> AllTransactions()
         {
-            var transactions = (await _context.Transactions
-                .Include(t => t.Customer) 
-                .Include(t => t.Technician)
-                .ToListAsync()).DistinctBy(a => new {a.ExchangePermission,});
+            var transactions = await _context.Transactions
+        .Include(t => t.Customer)
+        .Include(t => t.Technician)
+        .ToListAsync();
 
-            return View(transactions);
+            var distinctTransactions = transactions
+                .GroupBy(a => new
+                {
+                    a.ExchangePermission,
+                    a.SequenceStart,
+                    a.SequenceEnd,
+                    a.TechnicianID,
+                    a.CustomerID,
+                    a.CouponSort,
+                    a.CouponType
+                })
+                .Select(g => g.First()) // Select the first transaction for each group
+                .ToList();
+
+            return View(distinctTransactions);
         }
 
     }
