@@ -28,7 +28,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         
         public int ?StorekeeperID { get; set; }
 
-        public int? EmployeWhoGenerateID { get; set; }
+        public string? CreatedBy { get; set; }
 
         public int Value { get; set; }
 

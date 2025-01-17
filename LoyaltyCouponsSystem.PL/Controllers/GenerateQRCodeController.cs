@@ -8,6 +8,7 @@ using LoyaltyCouponsSystem.BLL.ViewModel.QRCode;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.PL.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -19,16 +20,23 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         private readonly ILogger<GenerateQRCodeController> _logger;
         private readonly IQRCodeGeneratorHelper _QRCodeGeneratorHelper;
         private readonly ApplicationDbContext _context;
+        //ForGeneratedBy
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-    
+
         public GenerateQRCodeController(
             ILogger<GenerateQRCodeController> logger,
             IQRCodeGeneratorHelper QRCodeGeneratorHelper,
-            ApplicationDbContext context)
+            ApplicationDbContext context
+            , UserManager<ApplicationUser> userManager,
+            IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _QRCodeGeneratorHelper = QRCodeGeneratorHelper;
             _context = context;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IActionResult> GetAreas(int governorateId)
@@ -142,6 +150,43 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View(viewModel);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> PrintingExistingCoupones(string FromSerialNum ,string ToSerialNum, int Size=3)
+        {
+            if (FromSerialNum == null|| ToSerialNum==null)
+            {
+                return BadRequest("Details are missing.");
+            }
+
+            // قائمة الـ QR Codes
+            var qrCodesList = _context.Coupons.Where(c => string.Compare(c.SerialNumber, FromSerialNum) >= 0 &&
+                                         string.Compare(c.SerialNumber, ToSerialNum) <= 0).ToList();
+
+            
+
+            // إنشاء QR Codes
+            var generateListOfCoupons = new GenerateListOfCoupons();
+            string baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var qrCodesAsBytes = generateListOfCoupons.GenerateQRCodesAsync(qrCodesList, baseUrl);
+
+            // إنشاء ملف PDF من QR Codes
+            // return await GenerateCouponsPDF(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
+
+            // إنشاء ملف Word من QR Codes
+            // return await GenerateCouponsWord(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
+            // إنشاء ملف Excel من QR Codes
+            return await GenerateCouponsExcel(qrCodesList, baseUrl,  Size);
+
+
+
+
+        }
+
+
+
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
 
@@ -156,29 +201,52 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 var qrCodesList = new List<Coupon>();
                 var serviceToMangeCounters = new ServiceToMangeCounters(_context);
                 int currentYear = DateTime.Now.Year;
+                var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
+                ServiceToSetSerialNumber serialNumber = new ServiceToSetSerialNumber();
 
 
-                // إنشاء الكوبونات
-                for (int i = 0; i < detailsVM.Count; i++)
-                {
-                    ServiceToSetSerialNumber serialNumber = new ServiceToSetSerialNumber();
-                    var couponDetails = new Coupon
-                    {
 
-                        TypeOfCoupone = detailsVM.TypeOfCoupon,
-                        Value = detailsVM.Value,
-                        GovernorateId = detailsVM.GovernorateId,
-                        AreaId = detailsVM.AreaId,
-                        NumInYear = await serviceToMangeCounters.GetNextNumInYearAsync(),
-                        SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber, i)
-                    };
+                  // إنشاء الكوبونات
+               for (int i = 0; i < detailsVM.Count; i++)
+                   {
+                       var couponDetails = new Coupon
+                       {
 
-                    await _context.Coupons.AddAsync(couponDetails);
-                    await _context.SaveChangesAsync();
-                    qrCodesList.Add(couponDetails);
-                }
+                           TypeOfCoupone = detailsVM.TypeOfCoupon,
+                           Value = detailsVM.Value,
+                           GovernorateId = detailsVM.GovernorateId,
+                           AreaId = detailsVM.AreaId,
+                           NumInYear = await serviceToMangeCounters.GetNextNumInYearAsync(),
+                           SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber, i),
+                           CreatedBy = currentUser?.UserName
 
-                await serviceToMangeCounters.UpdateMaxSerialNumAsync(detailsVM.SerialNumber, detailsVM.Count);
+                       };
+
+                       await _context.Coupons.AddAsync(couponDetails);
+                       await _context.SaveChangesAsync();
+                       qrCodesList.Add(couponDetails);
+               }
+            
+               QRCodeTransactionGenerated qRCodeTransactionGenerated =new()
+               {
+                NumberOfCoupones = qrCodesList.Count,
+                FromSerialNumber= serialNumber.GetSerialNumber(detailsVM.SerialNumber, 0),
+                ToSerialNumber=serialNumber.GetSerialNumber(detailsVM.SerialNumber, qrCodesList.Count),
+                GeneratedBy= currentUser?.UserName,
+                Value=detailsVM.Value,
+                TypeOfCoupone= detailsVM.TypeOfCoupon,
+                GovernorateID = detailsVM.GovernorateId,
+                AreaId = detailsVM.AreaId,
+                CreationDateTime=DateTime.Now
+
+
+
+               };
+                await _context.qRCodeTransactionGenerateds.AddAsync(qRCodeTransactionGenerated);
+                await _context.SaveChangesAsync();
+
+
+            await serviceToMangeCounters.UpdateMaxSerialNumAsync(detailsVM.SerialNumber, detailsVM.Count);
 
                 // إنشاء QR Codes
                 var generateListOfCoupons = new GenerateListOfCoupons();

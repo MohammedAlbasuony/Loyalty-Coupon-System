@@ -52,6 +52,8 @@
                             <th>Order In Year</th>
                             <th>Status</th>
                             <th>Creation Date</th>
+                            <th>Created By</th>
+                            <th>Scaned By</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,6 +68,14 @@
                                 <td>@item.NumInYear</td>
                                 <td>@item.Status</td>
                                 <td>@item.CreationDateTime?.ToString("yyyy-MM-dd")</td>
+                                <td>@item.CreatedBy</td>
+                                <td>
+                                    <form asp-action="GetAllCoupons" method="get" style="display:inline;">
+                                        @* <input type="hidden" name="fromSequence" value="@item.FromSerialNumber" />
+                                        <input type="hidden" name="toSequence" value="@item.ToSerialNumber" /> *@
+                                        <button type="submit" class="btn btn-primary"> Scaned By</button>
+                                    </form>
+                                </td>
                             </tr>
                         }
                     </tbody>

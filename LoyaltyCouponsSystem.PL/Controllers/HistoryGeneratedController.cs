@@ -1,6 +1,7 @@
 ﻿
 using LoyaltyCouponsSystem.BLL.ViewModel.QRCode;
 using LoyaltyCouponsSystem.DAL.DB;
+using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,9 +25,15 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         public async Task< IActionResult> Index()
         {
            
+       
+            var Result = await _context.qRCodeTransactionGenerateds
+               
+                .ToListAsync();
 
-            return View();
+            return View(Result);
         }
+        
+
         [HttpGet]
 
         public IActionResult GetAllCoupons(
@@ -90,7 +97,8 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     Value = c.Value,
                     NumInYear = c.NumInYear,
                     Status = c.Status,
-                    CreationDateTime = c.CreationDateTime
+                    CreationDateTime = c.CreationDateTime,
+                    CreatedBy=c.CreatedBy
                 })
                 .ToList();
 
