@@ -186,6 +186,28 @@
     .form-label {
         color: #007bff;
     }
+
+    .form-select {
+        border-radius: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        font-size: 16px;
+        padding: 10px 15px;
+        border: 1px solid #007bff;
+        color: #555;
+        background-color: #fff;
+        appearance: none; /* For consistent cross-browser dropdown styling */
+    }
+
+        .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        }
+
+        .form-select:disabled {
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+
 </style>
 
 
@@ -219,14 +241,14 @@
         "New Valley": ["Kharga", "Dakhla", "Farafra"]
     };
 
-    document.getElementById("governate").addEventListener("change", function () {
+        document.getElementById("governate").addEventListener("change", function () {
         const governate = this.value;
         const citySelect = document.getElementById("city");
 
         citySelect.innerHTML = '<option value="" disabled selected>Choose a City</option>';
 
         if (governate && citiesByGovernate[governate]) {
-            citySelect.disabled = false;
+            citySelect.disabled = false; // Enable the dropdown
             citiesByGovernate[governate].forEach(city => {
                 const option = document.createElement("option");
                 option.value = city;
@@ -234,7 +256,8 @@
                 citySelect.appendChild(option);
             });
         } else {
-            citySelect.disabled = true;
+            citySelect.disabled = true; // Keep it disabled if no governate selected
         }
     });
+
 </script>

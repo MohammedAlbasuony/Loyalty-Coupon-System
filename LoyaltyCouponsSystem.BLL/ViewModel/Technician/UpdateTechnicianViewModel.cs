@@ -1,14 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
 {
-    public class TechnicianViewModel
+    public class UpdateTechnicianViewModel
     {
         public int TechnicianID { get; set; }
         [Required(ErrorMessage = "Account Number is required.")]
         [StringLength(20, ErrorMessage = "Account Number must be less than 20 digits.")]
-        [UniqueCode(ErrorMessage = "This account number is already in use.")]
         public string Code { get; set; }
         [Required(ErrorMessage = "Name is required.")]
         public string Name { get; set; }
@@ -21,7 +25,6 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
         [Required(ErrorMessage = "Phone number is required.")]
         [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits.")]
         [Display(Name = "Primary Phone Number")]
-        [UniquePhoneNumber(ErrorMessage = "This phone number is already in use.")]
         public int PhoneNumber1 { get; set; }
 
         [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits.")]
