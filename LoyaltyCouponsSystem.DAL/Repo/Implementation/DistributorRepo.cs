@@ -62,17 +62,15 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
         }
 
-        // Delete method
         public async Task<bool> DeleteAsync(int id)
         {
             try
             {
-
                 var user = await _DBcontext.Users.FindAsync(id);
                 if (user != null)
                 {
-                    user.IsDeleted = true;
-                    await _DBcontext.SaveChangesAsync();
+                    _DBcontext.Users.Remove(user); 
+                    await _DBcontext.SaveChangesAsync(); 
                     return true;
                 }
                 return false;
@@ -83,6 +81,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 return false;
             }
         }
+
 
         // Get all method
         public async Task<List<Distributor>> GetAllAsync()
