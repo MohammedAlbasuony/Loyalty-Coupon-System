@@ -26,9 +26,7 @@
                     <th>Exchange Permission</th>
                     <th>Customer Name</th>
                     <th>Technician Name</th>
-                    <th>Coupon Type</th>
-                    <th>Coupon Sort</th>
-                    <th>Sequence Number</th>
+                    <th>Number of Coupon Types</th>
                     <th>Governorate</th>
                     <th>City</th>
                     <th>Created By</th>
@@ -42,9 +40,43 @@
                         <td>@transaction.ExchangePermission</td>
                         <td>@transaction.Customer.Name</td>
                         <td>@transaction.Technician.Name</td>
-                        <td>@transaction.CouponType</td>
-                        <td>@transaction.CouponSort</td>
-                        <td>@transaction.SequenceStart - @transaction.SequenceEnd</td>
+                        <td>
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#couponModal-@transaction.TransactionID">
+                                Coupons Type
+                            </button>
+                            <!-- Modal for Coupon Details -->
+                            <div class="modal fade" id="couponModal-@transaction.TransactionID" tabindex="-1" aria-labelledby="couponModalLabel-@transaction.TransactionID" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="couponModalLabel-@transaction.TransactionID">Coupon Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <table class="table table-bordered text-center">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Coupon Type</th>
+                                                        <th>Coupon Sort</th>
+                                                        <th>Sequence Number</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>@transaction.CouponType</td>
+                                                        <td>@transaction.CouponSort</td>
+                                                        <td>@transaction.SequenceStart - @transaction.SequenceEnd</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
                         <td>@transaction.Governate</td>
                         <td>@transaction.City</td>
                         <td>@transaction.CreatedBy</td>
@@ -56,28 +88,39 @@
     </div>
 </div>
 
+<script>
+    document.getElementById("searchBox").addEventListener("input", function () {
+        const searchValue = this.value.toLowerCase(); // Get search term
+        const rows = document.querySelectorAll("#transactionsTable tbody tr");
+
+        rows.forEach(row => {
+            const cells = Array.from(row.children); // Get all cells in the row
+            const isVisible = cells.some(cell => cell.textContent.toLowerCase().includes(searchValue));
+            row.style.display = isVisible ? "" : "none"; // Show/hide rows based on search
+        });
+    });
+</script>
+
 <style>
-    .btn-outline-primary {
-        font-size: 14px;
-        padding: 8px 20px;
-        font-weight: bold;
-        display: inline-flex;
-        align-items: center;
-        border: 2px solid #007bff;
-        color: #007bff;
-        transition: all 0.3s ease;
-        text-decoration: none;
+    .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+        color: #fff;
     }
 
-        .btn-outline-primary i {
-            margin-right: 5px;
+        .btn-info:hover {
+            background-color: #138496;
+            border-color: #117a8b;
         }
 
-        .btn-outline-primary:hover {
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-        }
+    .modal-content {
+        border-radius: 10px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .modal-backdrop {
+        backdrop-filter: blur(5px);
+    }
 
     .table {
         border-radius: 12px;
@@ -86,7 +129,8 @@
         margin-top: 20px;
     }
 
-        .table th, .table td {
+        .table th,
+        .table td {
             text-align: center;
             vertical-align: middle;
             padding: 10px;
@@ -112,17 +156,5 @@
 
         #searchBox::placeholder {
             color: #aaa;
+        }
 </style>
-
-<script>
-    document.getElementById("searchBox").addEventListener("input", function () {
-        const searchValue = this.value.toLowerCase(); // Get search term
-        const rows = document.querySelectorAll("#transactionsTable tbody tr");
-
-        rows.forEach(row => {
-            const cells = Array.from(row.children); // Get all cells in the row
-            const isVisible = cells.some(cell => cell.textContent.toLowerCase().includes(searchValue));
-            row.style.display = isVisible ? "" : "none"; // Show/hide rows based on search
-        });
-    });
-</script>
