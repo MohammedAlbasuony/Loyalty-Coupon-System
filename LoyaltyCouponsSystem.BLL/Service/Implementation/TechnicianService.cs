@@ -67,20 +67,19 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     }
                 }
 
-                var users = new List<ApplicationUser>(); // List to hold the users
-                foreach (var userCode in technicianViewModel.SelectedUserCodes)
+                var allUsers = await _userManager.Users.Where(u => technicianViewModel.SelectedUserCodes.Contains(u.Id))
+                    .ToListAsync();
+
+                // Filter the users asynchronously based on their role
+                var users = new List<ApplicationUser>();
+                foreach (var user in allUsers)
                 {
-                    Console.WriteLine($"Searching for user: {userCode}"); // Debugging line
-                    var user = await _userManager.FindByIdAsync(userCode); // Find by username or another identifier
-                    if (user != null)
+                    if (await _userManager.IsInRoleAsync(user, "Representative"))
                     {
-                        users.Add(user); // Add the found user to the list
-                    }
-                    else
-                    {
-                        Console.WriteLine($"User {userCode} not found."); // Debugging line
+                        users.Add(user);
                     }
                 }
+                
 
                 if (users == null || !users.Any())
                 {
@@ -227,14 +226,25 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         }
         public async Task<List<SelectListItem>> GetUsersForDropdownAsync()
         {
-            var users = await _technicianRepo.GetUsersForDropdownAsync();
+            // Fetch all users from the database
+            var allUsers = await _userManager.Users.ToListAsync();
 
-            return users.Select(u => new SelectListItem
+            // Filter the users asynchronously by role
+            var representatives = new List<ApplicationUser>();
+            foreach (var user in allUsers)
             {
-                Value = u.Id, // or another unique identifier if needed
-                Text = $"{u.UserName}" // or any other property you'd like to display
+                if (await _userManager.IsInRoleAsync(user, "Representative"))
+                {
+                    representatives.Add(user);
+                }
+            }
+            return representatives.Select(u => new SelectListItem
+            {
+                Value = u.Id,
+                Text = $"{u.UserName}" 
             }).ToList();
         }
+
 
 
         private void PopulateDropdowns(TechnicianViewModel viewModel)
