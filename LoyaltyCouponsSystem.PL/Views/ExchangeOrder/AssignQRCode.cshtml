@@ -116,7 +116,7 @@
 @section Scripts {
     <script>
 
-         let index = 1; // Initialize index for dynamic rows
+                        let index = 1; // Initialize index for dynamic rows
 
         // Add new row
         document.getElementById("addFieldsButton").addEventListener("click", function () {
@@ -157,6 +157,7 @@
                 </div>
             `;
             container.appendChild(newFields);
+
             index++;
         });
 
@@ -167,6 +168,19 @@
                 fieldGroup.remove();
             }
         });
+
+        // Hide "Remove" button for the first row initially
+        document.addEventListener("DOMContentLoaded", function () {
+            const firstFieldGroup = document.querySelector(".couponFields");
+            if (firstFieldGroup) {
+                const firstRemoveButton = firstFieldGroup.querySelector(".removeFieldsButton");
+                if (firstRemoveButton) {
+                    firstRemoveButton.style.display = "none"; // Hide remove button for the first row
+                }
+            }
+        });
+
+
 
 
 

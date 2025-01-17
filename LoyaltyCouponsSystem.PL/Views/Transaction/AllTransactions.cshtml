@@ -5,20 +5,25 @@
 }
 
 <div class="container mt-5">
-    
-
     <!-- Header Section -->
     <div class="text-center mb-4">
         <h1 class="display-5 text-primary"><b>All Transactions</b></h1>
         <p class="lead text-secondary">View all transaction records with detailed information.</p>
     </div>
 
+    <!-- Search Box -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <input type="text" id="searchBox" class="form-control" placeholder="Search all fields..." />
+        </div>
+    </div>
+
     <!-- Table Section -->
     <div class="table-responsive">
-        <table class="table table-hover shadow-lg rounded border-light-modern">
+        <table id="transactionsTable" class="table table-hover shadow-lg rounded border-light-modern">
             <thead class="thead-dark bg-primary text-white">
                 <tr>
-                    <th>Exchange Permission </th>
+                    <th>Exchange Permission</th>
                     <th>Customer Name</th>
                     <th>Technician Name</th>
                     <th>Coupon Type</th>
@@ -97,4 +102,27 @@
     .table-hover tbody tr:hover {
         background-color: #e9f5ff;
     }
+
+    #searchBox {
+        border-radius: 10px;
+        padding: 10px;
+        border: 2px solid #007bff;
+        font-size: 16px;
+    }
+
+        #searchBox::placeholder {
+            color: #aaa;
 </style>
+
+<script>
+    document.getElementById("searchBox").addEventListener("input", function () {
+        const searchValue = this.value.toLowerCase(); // Get search term
+        const rows = document.querySelectorAll("#transactionsTable tbody tr");
+
+        rows.forEach(row => {
+            const cells = Array.from(row.children); // Get all cells in the row
+            const isVisible = cells.some(cell => cell.textContent.toLowerCase().includes(searchValue));
+            row.style.display = isVisible ? "" : "none"; // Show/hide rows based on search
+        });
+    });
+</script>
