@@ -19,7 +19,6 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Customer
         [Required(ErrorMessage = "Governate is required.")]
         public string? Governate { get; set; }
 
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "City must contain only letters and spaces.")]
         [Required(ErrorMessage = "City is required.")]
         public string? City { get; set; }
 

@@ -105,20 +105,18 @@
                     </div>
                 </div>
 
-                <!-- Customers -->
                 <div class="row">
+                    <!-- Select Customers -->
                     <div class="col-md-6 mb-3">
                         <label asp-for="SelectedCustomerCodes" class="form-label text-primary"><b>Select Customers</b></label>
                         <select asp-for="SelectedCustomerCodes" asp-items="Model.Customers" class="form-control select2" multiple>
                             <option></option>
                         </select>
                     </div>
-                </div>
 
-              <!-- Users -->
-                <div class="row">
+                    <!-- Select Representatives -->
                     <div class="col-md-6 mb-3">
-                        <label asp-for="SelectedUserCodes" class="form-label text-primary"><b>Select Represintatives</b></label>
+                        <label asp-for="SelectedUserCodes" class="form-label text-primary"><b>Select Representatives</b></label>
                         <select asp-for="SelectedUserCodes" asp-items="Model.Users" class="form-control select2" multiple>
                             <option></option>
                         </select>
