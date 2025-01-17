@@ -14,10 +14,10 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
         public async Task<IActionResult> AllTransactions()
         {
-            var transactions = await _context.Transactions
+            var transactions = (await _context.Transactions
                 .Include(t => t.Customer) 
                 .Include(t => t.Technician)
-                .ToListAsync();
+                .ToListAsync()).DistinctBy(a => new {a.ExchangePermission,});
 
             return View(transactions);
         }
