@@ -48,11 +48,11 @@
                         <td>@customer.PhoneNumber</td>
                         <td>@customer.CreatedBy</td>
                         <td>@customer.CreatedAt</td>
-                          <td> 
-                             <span class="badge @(customer.IsActive ? "bg-success" : "bg-danger")">
-                                  @(customer.IsActive ? "Active" : "Inactive") 
-                              </span> 
-                         </td> 
+                        <td>
+                            <span class="badge @(customer.IsActive ? "bg-success" : "bg-danger")">
+                                @(customer.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
                          <td> 
                              <button class="btn toggle-btn btn-sm shadow @(customer.IsActive ? "btn-danger" : "btn-success")" 
                                      onclick="toggleActivation('@customer.Code', this, @(customer.IsActive))"> 
@@ -132,6 +132,7 @@
 
         .btn-add-customer:hover {
             background-color: #0056b3;
+            color:white;
         }
 
     .toggle-btn {
@@ -223,28 +224,19 @@
         });
     });
 
-    function toggleActivation(customerCode, button, isActive) {
-        const newStatus = !isActive;
-
-        fetch(`/Customer/ToggleActivation/${customerCode}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ isActive: newStatus }),
+    // Activate/Deactivate Toggle button
+                function toggleActivation(customerCode, button) {
+        fetch(`/Customer/ToggleActivation?customerCode=${customerCode}`, {
+            method: "POST"
         })
         .then(response => {
             if (response.ok) {
+                // Update the UI dynamically
                 const row = button.closest("tr");
                 const badge = row.querySelector(".badge");
+                const isActive = badge.innerText === "Active";
 
-                if (newStatus) {
-                    badge.classList.remove("bg-danger");
-                    badge.classList.add("bg-success");
-                    badge.innerText = "Active";
-
-                    button.classList.remove("btn-success");
-                    button.classList.add("btn-danger");
-                    button.innerText = "Deactivate";
-                } else {
+                if (isActive) {
                     badge.classList.remove("bg-success");
                     badge.classList.add("bg-danger");
                     badge.innerText = "Inactive";
@@ -252,14 +244,22 @@
                     button.classList.remove("btn-danger");
                     button.classList.add("btn-success");
                     button.innerText = "Activate";
-                }
+                } else {
+                    badge.classList.remove("bg-danger");
+                    badge.classList.add("bg-success");
+                    badge.innerText = "Active";
 
-                button.setAttribute("onclick", `toggleActivation('${customerCode}', this, ${newStatus})`);
+                    button.classList.remove("btn-success");
+                    button.classList.add("btn-danger");
+                    button.innerText = "Deactivate";
+                }
             } else {
                 alert("Failed to update customer status.");
             }
         })
         .catch(error => console.error("Error:", error));
     }
+
+
 
 </script>
