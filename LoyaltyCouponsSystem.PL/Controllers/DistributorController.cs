@@ -42,7 +42,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             {
                 // Logic to handle distributor saving
                 await _distributorService.AddAsync(model);
-                return RedirectToAction("Index", "Distributor");
+                return RedirectToAction("GetAllDistributors", "Distributor");
             }
 
             // In case of error, re-render the form with errors
