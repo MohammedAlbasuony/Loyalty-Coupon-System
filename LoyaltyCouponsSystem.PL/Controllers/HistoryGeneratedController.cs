@@ -1,4 +1,7 @@
 ﻿
+using Autofac.Core;
+using DocumentFormat.OpenXml.Wordprocessing;
+using iTextSharp.text;
 using LoyaltyCouponsSystem.BLL.ViewModel.QRCode;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
@@ -22,17 +25,96 @@ namespace LoyaltyCouponsSystem.PL.Controllers
       
        
 
-        public async Task< IActionResult> Index()
+        public async Task< IActionResult> Index(
+          
+    string fromSequence = "",
+    string toSequence = "",
+    string typeOfCoupon = "",
+    string governorate = "",
+    string area = "",
+    string status = "",
+    int page = 1,
+    int pageSize = 100)
         {
-           
-       
-            var Result = await _context.qRCodeTransactionGenerateds
-               
-                .ToListAsync();
 
-            return View(Result);
+            var query = _context.qRCodeTransactionGenerateds
+                    .Include(c => c.Governorates) // ربط المحافظات
+                    .Include(c => c.Areas)        // ربط المناطق
+                    .OrderBy(c => c.CreationDateTime) // ترتيب حسب Serial Number
+                    .AsQueryable();
+
+            if (!string.IsNullOrEmpty(fromSequence) && !string.IsNullOrEmpty(toSequence))
+            {
+                query = query.Where(c => c.FromSerialNumber== fromSequence ||
+                                         c.ToSerialNumber== toSequence);
+            }
+            if (!string.IsNullOrEmpty(typeOfCoupon))
+            {
+                query = query.Where(c => c.TypeOfCoupone.Contains(typeOfCoupon));
+            }
+            if (!string.IsNullOrEmpty(governorate))
+            {
+                query = query.Where(c => c.Governorates != null && c.Governorates.Name.Contains(governorate));
+            }
+            if (!string.IsNullOrEmpty(area))
+            {
+                query = query.Where(c => c.Areas != null && c.Areas.Name.Contains(area));
+            }
+
+            // إجمالي عدد العناصر بعد التصفية
+            int totalCount = query.Count();
+
+            // تطبيق الترقيم
+            var paginatedCoupons = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new HistoryTransactionGeneratedQRVM
+                {
+                    FromSerialNumber=c.FromSerialNumber,
+                    ToSerialNumber=c.ToSerialNumber,
+                    TypeOfCoupone = c.TypeOfCoupone,
+                    Governorate = c.Governorates != null ? c.Governorates.Name : "N/A",
+                    Area = c.Areas != null ? c.Areas.Name : "N/A",
+                    Value = c.Value,
+                    CreationDateTime = c.CreationDateTime,
+                    GeneratedBy = c.GeneratedBy
+                    ,NumberOfCoupones=c.NumberOfCoupones
+                })
+                .ToList();
+
+            // تمرير بيانات الصفحة
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+            ViewBag.Governorates = GetGovernorates();
+
+            return View(paginatedCoupons);
+
+           
         }
-        
+
+        public IEnumerable<string> GetGovernorates()
+        {
+            return _context.Governorates.Select(g => g.Name).ToList();
+        }
+
+        [HttpGet]
+        public JsonResult GetAreas(string governorate)
+        {
+            if (string.IsNullOrEmpty(governorate))
+            {
+                return Json(new List<string>());
+            }
+
+            var areas = GetAreasByGovernorate(governorate); // Fetch areas based on governorate
+            return Json(areas);
+        }
+        public IEnumerable<string> GetAreasByGovernorate(string governorate)
+        {
+            return _context.Areas
+                .Where(a => a.Governorate.Name == governorate)
+                .Select(a => a.Name)
+                .ToList();
+        }
 
         [HttpGet]
 
@@ -105,6 +187,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             // تمرير بيانات الصفحة
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+            ViewBag.Governorates = GetGovernorates();
 
             return View(paginatedCoupons);
         }
