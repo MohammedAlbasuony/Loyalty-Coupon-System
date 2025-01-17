@@ -52,7 +52,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> UpdateDistributor(int id)
+        public async Task<IActionResult> UpdateDistributor(string id)
         {
             // Fetch distributor details by ID
             var distributorViewModel = await _distributorService.GetByIdAsync(id);

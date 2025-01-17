@@ -100,19 +100,22 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
         }
 
-        // Get by ID method
-        public async Task<Distributor> GetByIdAsync(int id)
+        // Get by Code method
+        public async Task<Distributor> GetByCodeAsync(string code)
         {
             try
             {
-                return await _DBcontext.Distributors.Where(d => d.DistributorID == id).FirstOrDefaultAsync();
+                return await _DBcontext.Distributors
+                    .Where(d => d.Code == code)
+                    .FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching distributor by ID: {ex.Message}");
+                Console.WriteLine($"Error fetching distributor by Code: {ex.Message}");
                 return null;
             }
         }
+
 
         // Update method
         public async Task<bool> UpdateAsync(Distributor distributor)

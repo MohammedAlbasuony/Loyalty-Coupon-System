@@ -84,11 +84,11 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             }).ToList();
         }
 
-        public async Task<DistributorViewModel> GetByIdAsync(int id)
+        public async Task<DistributorViewModel> GetByIdAsync(string id)
         {
-            if (id > 0)
+            if (id != null)
             {
-                var distributor = await _distributorRepo.GetByIdAsync(id);
+                var distributor = await _distributorRepo.GetByCodeAsync(id);
                 if (distributor != null)
                 {
                     return new DistributorViewModel
