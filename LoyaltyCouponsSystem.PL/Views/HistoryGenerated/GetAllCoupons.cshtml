@@ -22,16 +22,37 @@
                         <input type="text" name="toSequence" class="form-control" placeholder="To Sequence (String)" value="@ViewContext.HttpContext.Request.Query["toSequence"]" />
                     </div>
                     <div class="col">
-                        <input type="text" name="typeOfCoupon" class="form-control" placeholder="Type Of Coupon" value="@ViewContext.HttpContext.Request.Query["typeOfCoupon"]" />
+                        <select name="typeOfCoupon" class="form-select" @* class="form-control" *@>
+                            <option disabled selected>اختر نوع الكوبون</option>
+                            <option value="راك ثيرم">راك ثيرم</option>
+                            <option value="صرف جي تكس">صرف جي تكس</option>
+                            <option value="اقطار كبيرة وهودذا">اقطار كبيرة وهودذا</option>
+                            <option value="كعب راك ثيرم">كعب راك ثيرم</option>
+                            <option value="كعب صرف جي تكس">كعب صرف جي تكس</option>
+                            <option value="كعب اقطار كبيرة وهودذا">كعب اقطار كبيرة وهودذا</option>
+                        </select>
+                   </div>
+                    <div class="col">
+                        <select id="governorate" name="governorate" class="form-select">
+                            <option disabled selected>Select Governorate</option>
+                            @foreach (var governorate in ViewBag.Governorates as IEnumerable<string>)
+                            {
+                                <option value="@governorate">@governorate</option>
+                            }
+                        </select>
                     </div>
                     <div class="col">
-                        <input type="text" name="governorate" class="form-control" placeholder="Governorate" value="@ViewContext.HttpContext.Request.Query["governorate"]" />
+                        <select id="area" name="area" class="form-select" disabled>
+                            <option disabled selected>Select Area</option>
+                        </select>
                     </div>
                     <div class="col">
-                        <input type="text" name="area" class="form-control" placeholder="Area" value="@ViewContext.HttpContext.Request.Query["area"]" />
-                    </div>
-                    <div class="col">
-                        <input type="text" name="status" class="form-control" placeholder="Status" value="@ViewContext.HttpContext.Request.Query["status"]" />
+                        <select name="status" class="form-select">
+                                <option disabled selected>Select Status</option>
+                                <option value="Created">Created</option>
+                                <option value="ScannedFromRepresentative">Scanned from Representative</option>
+                                <option value="Closed">Closed</option>
+                            </select>
                     </div>
                     <div class="col">
                         <button type="submit" class="btn btn-primary">Filter</button>
@@ -52,6 +73,8 @@
                             <th>Order In Year</th>
                             <th>Status</th>
                             <th>Creation Date</th>
+                            <th>Created By</th>
+                            <th>Scaned By</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,6 +89,14 @@
                                 <td>@item.NumInYear</td>
                                 <td>@item.Status</td>
                                 <td>@item.CreationDateTime?.ToString("yyyy-MM-dd")</td>
+                                <td>@item.CreatedBy</td>
+                                <td>
+                                    <form asp-action="GetAllCoupons" method="get" style="display:inline;">
+                                        @* <input type="hidden" name="fromSequence" value="@item.FromSerialNumber" />
+                                        <input type="hidden" name="toSequence" value="@item.ToSerialNumber" /> *@
+                                        <button type="submit" class="btn btn-primary"> Scaned By</button>
+                                    </form>
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -121,3 +152,30 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('governorate').addEventListener('change', function () {
+        const governorate = this.value;
+        const areaDropdown = document.getElementById('area');
+
+        if (governorate) {
+             areaDropdown.disabled = false;
+            fetch(`/HistoryGenerated/GetAreas?governorate=${governorate}`)
+          
+                .then(response => response.json())
+                .then(data => {
+                    areaDropdown.innerHTML = '<option disabled selected>Select Area</option>';
+                    data.forEach(area => {
+                        const option = document.createElement('option');
+                        option.value = area;
+                        option.textContent = area;
+                        areaDropdown.appendChild(option);
+                    });
+                    areaDropdown.disabled = false;
+                });
+        } else {
+            areaDropdown.innerHTML = '<option value="">Select Area</option>';
+            areaDropdown.disabled = true;
+        }
+    });
+</script>

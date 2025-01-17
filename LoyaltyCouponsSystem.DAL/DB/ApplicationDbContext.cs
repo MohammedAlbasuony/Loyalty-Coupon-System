@@ -28,6 +28,8 @@ namespace LoyaltyCouponsSystem.DAL.DB
 
         public DbSet<QRScanLog> QRScanLogs { get; set; }
 
+        public DbSet<QRCodeTransactionGenerated> qRCodeTransactionGenerateds { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder); // Always call base first for Identity configuration

@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250116225401_CreatedByAndHistoryTransactionQRGenerated")]
+    partial class CreatedByAndHistoryTransactionQRGenerated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -323,9 +326,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -486,8 +486,8 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<int?>("AreaId")
-                        .HasColumnType("int");
+                    b.Property<string>("Areas")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ClosureDate")
                         .HasColumnType("datetime2");
@@ -502,8 +502,8 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<string>("GeneratedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("GovernorateID")
-                        .HasColumnType("int");
+                    b.Property<string>("Governorate")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("NumberOfCoupones")
                         .HasColumnType("int");
@@ -724,13 +724,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<decimal>("PurchaseAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("SequenceEnd")
-                        .HasColumnType("int");
-
                     b.Property<int>("SequenceNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SequenceStart")
                         .HasColumnType("int");
 
                     b.Property<int>("TechnicianID")

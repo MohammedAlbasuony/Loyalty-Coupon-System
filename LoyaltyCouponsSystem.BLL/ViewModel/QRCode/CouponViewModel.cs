@@ -16,5 +16,6 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.QRCode
         public long? NumInYear { get; set; }
         public string Status { get; set; }
         public DateTime? CreationDateTime { get; set; }
+        public string CreatedBy { get; set; }
     }
 }
