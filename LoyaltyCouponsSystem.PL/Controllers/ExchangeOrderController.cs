@@ -36,7 +36,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         {
             await _service.AssignQRCodeAsync(selectedCustomerCode, selectedTechnicianCode, selectedGovernate, selectedCity, transactions);
             TempData["SuccessMessage"] = "All assignments saved successfully.";
-            return RedirectToAction(nameof(AssignQRCode));
+            return RedirectToAction("AllTransactions", "Transaction");
         }
     }
 }
