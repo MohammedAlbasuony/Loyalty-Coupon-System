@@ -5,44 +5,47 @@
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
 }
 
+<!-- Search Filters and Add Button -->
 <div class="container mt-4">
-    
     <h1 class="text-primary text-center"><b>All Distributors</b></h1>
 
-        <!-- Search Filters -->
-        <div class="row mb-4 justify-content-center">
-            <div class="col-md-8">
-                <div class="input-group shadow-sm">
-                    <input type="text" id="searchBox" class="form-control" placeholder="Search by Code, Name, Phone Number, Governorate, or City...">
-                </div>
+    <!-- Search Filters and Add Button -->
+    <div class="row mb-4 justify-content-center">
+        <div class="col-md-8">
+            <div class="input-group shadow-sm">
+                <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, Code, Governorate, City, or Phone Number...">
+                <a href="@Url.Action("AddDistributor", "Distributor")" class="btn btn-add-customer ms-2">
+                    <i class="fas fa-plus"></i> Add New Distributor
+                </a>
             </div>
         </div>
+    </div>
 
-        <!-- Table -->
-        <div class="table-responsive">
-            <table id="distributorTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
-                <thead class="thead-dark bg-primary text-white">
-                    <tr>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th>Phone Number</th>
-                        <th>Governorate</th>
-                        <th>City</th>
-                        <th>Customers</th>
-                        <th>Created By</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var distributor in Model)
-                    {
-                        <tr id="row-@distributor.Code">
-                            <td>@distributor.Code</td>
-                            <td>@distributor.Name</td>
-                            <td>@distributor.PhoneNumber1</td>
-                            <td>@distributor.SelectedGovernate</td>
-                            <td>@distributor.SelectedCity</td>
+    <!-- Table -->
+    <div class="table-responsive">
+        <table id="distributorTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
+            <thead class="thead-dark bg-primary text-white">
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Phone Number</th>
+                    <th>Governorate</th>
+                    <th>City</th>
+                    <th>Customers</th>
+                    <th>Created By</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var distributor in Model)
+                {
+                    <tr id="row-@distributor.Code">
+                        <td>@distributor.Code</td>
+                        <td>@distributor.Name</td>
+                        <td>@distributor.PhoneNumber1</td>
+                        <td>@distributor.SelectedGovernate</td>
+                        <td>@distributor.SelectedCity</td>
                         <td>
                             @if (distributor.SelectedCustomerNames != null && distributor.SelectedCustomerNames.Any())
                             {
@@ -91,19 +94,19 @@
                             <td>@distributor.CreatedAt</td>
                             <td>
                             <a href="@Url.Action("UpdateDistributor", "Distributor", new { id = distributor.Code })" class="btn btn-outline-primary btn-sm me-2">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <br /><br />
-                                <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@distributor.Code')">
-                                    <i class="fas fa-trash-alt"></i> Delete
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@distributor.Code')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
+
 
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -125,7 +128,7 @@
 </div>
 
 <style>
-    
+    /* Table Styling */
     .table {
         border-radius: 12px;
         overflow: hidden;
@@ -160,11 +163,9 @@
         border-radius: 20px;
         padding: 10px;
         font-size: 16px;
-        width: 100%;
         border: 2px solid #007bff;
         background-color: #f9f9f9;
-        padding-left: 35px;
-        position: relative;
+        width: 75%; /* Adjust width as needed */
     }
 
         #searchBox::placeholder {
@@ -172,13 +173,30 @@
             color: #aaa;
         }
 
-    
+    .btn-add-customer {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+        border-radius: 30px;
+        padding: 10px 20px;
+    }
+
+        .btn-add-customer:hover {
+            background-color: #0056b3;
+            color: white;
+        }
 
     h1 {
+        font-family: 'Verdana', sans-serif;
         font-weight: bold;
         letter-spacing: 1px;
     }
 
+    .d-flex {
+        display: flex !important;
+        gap: 10px; 
+        align-items: center; 
+    }
 </style>
 
 <script>
