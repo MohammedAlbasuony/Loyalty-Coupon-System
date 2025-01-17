@@ -58,7 +58,9 @@
                                 <span>No Customers</span>
                             }
                         </td>
-
+                        <td>@distributor.CreatedBy</td>
+                        <td>@distributor.CreatedAt</td>
+                        <td>
 
                         <!-- Modal for Showing Selected Customers -->
                         <div class="modal fade" id="customersModal-@distributor.DistributorID" tabindex="-1" aria-labelledby="customersModalLabel-@distributor.DistributorID" aria-hidden="true">
@@ -94,11 +96,6 @@
                             <td>@distributor.CreatedBy</td>
                             <td>@distributor.CreatedAt</td>
                             <td>
-
-                        <td>@distributor.CreatedBy</td>
-                        <td>@distributor.CreatedAt</td>
-                        <td>
-
                             <a href="@Url.Action("UpdateDistributor", "Distributor", new { id = distributor.Code })" class="btn btn-outline-primary btn-sm me-2">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
