@@ -90,7 +90,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
         public async Task<bool> UpdateAsync(UpdateCustomerViewModel updateCustomerViewModel)
         {
-            if (updateCustomerViewModel != null && !string.IsNullOrEmpty(updateCustomerViewModel.Code))  // Use CustomerID instead of Code
+            if (updateCustomerViewModel != null && !string.IsNullOrEmpty(updateCustomerViewModel.Code)) 
             {
                 // Fetch the customer using the new identifier (CustomerID)
                 var existingCustomer = await _customerRepo.GetByIdAsync(updateCustomerViewModel.Code);

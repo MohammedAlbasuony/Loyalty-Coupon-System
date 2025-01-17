@@ -68,11 +68,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateDistributor(DistributorViewModel distributorViewModel)
+        public async Task<IActionResult> UpdateDistributor(UpdateVM DistributorViewModel)
         {
             if (ModelState.IsValid)
             {
-                var result = await _distributorService.UpdateAsync(distributorViewModel);
+                var result = await _distributorService.UpdateAsync(DistributorViewModel);
                 if (result)
                 {
                     return RedirectToAction("GetAllDistributors"); // Redirect to list after successful update
@@ -82,8 +82,8 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
 
             // If update fails, re-populate the dropdowns and return the view again
-            distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
-            return View(distributorViewModel);
+            DistributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
+            return View(DistributorViewModel);
         }
 
         [HttpGet]

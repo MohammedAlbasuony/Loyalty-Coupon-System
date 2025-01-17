@@ -51,7 +51,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
 
                 var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
                 distributor.CreatedBy = currentUser?.UserName;
-                distributor.CreatedAt = DateTime.UtcNow;
+                distributor.CreatedAt = DateTime.Now;
                 _DBcontext.Distributors.Add(distributor);
                 return await _DBcontext.SaveChangesAsync() > 0; // Returns true only if changes were saved
             }

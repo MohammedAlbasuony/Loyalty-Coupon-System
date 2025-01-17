@@ -106,19 +106,19 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             return null;
         }
 
-        public async Task<bool> UpdateAsync(DistributorViewModel distributorViewModel)
+        public async Task<bool> UpdateAsync(UpdateVM DistributorViewModel)
         {
-            if (distributorViewModel != null)
+            if (DistributorViewModel != null)
             {
                 var distributor = new Distributor
                 {
-                    DistributorID = distributorViewModel.DistributorID,
-                    Name = distributorViewModel.Name,
-                    PhoneNumber1 = distributorViewModel.PhoneNumber1,
-                    Governate = distributorViewModel.SelectedGovernate,
-                    City = distributorViewModel.SelectedCity,
-                    Code = distributorViewModel.Code,
-                    IsDeleted = distributorViewModel.IsDeleted
+                    DistributorID = DistributorViewModel.DistributorID,
+                    Name = DistributorViewModel.Name,
+                    PhoneNumber1 = DistributorViewModel.PhoneNumber1,
+                    Governate = DistributorViewModel.SelectedGovernate,
+                    City = DistributorViewModel.SelectedCity,
+                    Code = DistributorViewModel.Code,
+                    IsDeleted = DistributorViewModel.IsDeleted
                 };
 
                 return await _distributorRepo.UpdateAsync(distributor);

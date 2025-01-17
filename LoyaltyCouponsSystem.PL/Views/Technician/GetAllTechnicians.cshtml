@@ -226,6 +226,74 @@
 </style>
 
 <script>
+        function addCustomer(technicianCode) {
+        const input = document.getElementById(`addCustomerInput-${technicianCode}`);
+        const customerName = input.value.trim();
+
+        if (customerName) {
+            // Add the customer to the list
+            const list = document.getElementById(`customerList-${technicianCode}`);
+            const newItem = document.createElement('li');
+            newItem.id = `customer-${customerName}`;
+            newItem.innerHTML = `${customerName}
+                <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeCustomer('${technicianCode}', '${customerName}')">
+                    Remove
+                </button>`;
+            list.appendChild(newItem);
+
+            // Clear the input field
+            input.value = '';
+
+            // TODO: Send an AJAX request to update the backend
+        } else {
+            alert('Please enter a customer name.');
+        }
+    }
+
+    function removeCustomer(technicianCode, customerName) {
+        const item = document.getElementById(`customer-${customerName}`);
+        if (item) {
+            item.remove();
+
+            // TODO: Send an AJAX request to update the backend
+        }
+    }
+
+    function addUser(technicianCode) {
+        const input = document.getElementById(`addUserInput-${technicianCode}`);
+        const userName = input.value.trim();
+
+        if (userName) {
+            // Add the user to the list
+            const list = document.getElementById(`userList-${technicianCode}`);
+            const newItem = document.createElement('li');
+            newItem.id = `user-${userName}`;
+            newItem.innerHTML = `${userName}
+                <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeUser('${technicianCode}', '${userName}')">
+                    Remove
+                </button>`;
+            list.appendChild(newItem);
+
+            // Clear the input field
+            input.value = '';
+
+            // TODO: Send an AJAX request to update the backend
+        } else {
+            alert('Please enter a user name.');
+        }
+    }
+
+    function removeUser(technicianCode, userName) {
+        const item = document.getElementById(`user-${userName}`);
+        if (item) {
+            item.remove();
+
+            // TODO: Send an AJAX request to update the backend
+        }
+    }
+
+
+
     let deleteTechnicianId = null;
 
     // Confirmation Modal
