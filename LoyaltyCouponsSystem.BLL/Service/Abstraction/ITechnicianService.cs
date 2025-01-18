@@ -6,9 +6,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
     public interface ITechnicianService
     {
         Task<bool> AddAsync(TechnicianViewModel technicianViewModel);
-        Task<bool> DeleteAsync(string id);
+        Task<bool> DeleteAsync(int id);
         Task<List<TechnicianViewModel>> GetAllAsync();
-        Task<UpdateTechnicianViewModel> GetByIdAsync(string id);
+        Task<UpdateTechnicianViewModel> GetByIdAsync(int id);
         Task<bool> UpdateAsync(UpdateTechnicianViewModel TechnicianViewModel);
         Task<List<SelectListItem>> GetCustomersForDropdownAsync();
         Task<List<SelectListItem>> GetUsersForDropdownAsync();
