@@ -57,7 +57,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 City = customer.City,
                 PhoneNumber = customer.PhoneNumber,
                 CreatedBy = customer.CreatedBy,
-                CreatedAt = customer.CreatedAt
+                CreatedAt = customer.CreatedAt,
+                UpdatedBy = customer.UpdatedBy,
+                UpdatedAt = customer.UpdatedAt,
             }).ToList();
 
             return customerViewModels;
@@ -102,6 +104,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     existingCustomer.City = updateCustomerViewModel.City;
                     existingCustomer.PhoneNumber = updateCustomerViewModel.PhoneNumber;
                     existingCustomer.TechnicianId = updateCustomerViewModel.TechnicianID;
+                    existingCustomer.UpdatedAt = DateTime.Now;
+                    existingCustomer.UpdatedBy = updateCustomerViewModel.UpdatedBy;
+                    
 
                     return await _customerRepo.UpdateAsync(existingCustomer); 
                 }

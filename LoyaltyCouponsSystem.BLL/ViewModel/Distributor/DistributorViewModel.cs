@@ -25,7 +25,8 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Distributor
 
         public string? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
-
+        public string? UpdatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         public string? SelectedGovernate { get; set; }
         public string? SelectedCity { get; set; }
         public List<SelectListItem> Governates { get; set; } = new List<SelectListItem>();

@@ -34,6 +34,8 @@
                     <th>Customers</th>
                     <th>Created By</th>
                     <th>Created At</th>
+                    <th>Updated By</th>
+                    <th>Updated At</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -60,6 +62,8 @@
                         </td>
                         <td>@distributor.CreatedBy</td>
                         <td>@distributor.CreatedAt</td>
+                        <td>@distributor.UpdatedBy</td>
+                        <td>@distributor.UpdatedAt</td>
                         <td>
                             <!-- Modal for Showing Selected Customers -->
                             <div class="modal fade" id="customersModal-@distributor.DistributorID" tabindex="-1" aria-labelledby="customersModalLabel-@distributor.DistributorID" aria-hidden="true">
@@ -88,7 +92,7 @@
                                 </div>
                             </div>
 
-                            <a href="@Url.Action("UpdateDistributor", "Distributor", new { id = distributor.Code })" class="btn btn-outline-primary btn-sm me-2">
+                            <a href="@Url.Action("UpdateDistributor", "Distributor", new { id = distributor.DistributorID })" class="btn btn-outline-primary btn-sm me-2">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@distributor.DistributorID')">
