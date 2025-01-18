@@ -106,9 +106,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
 
 
-        public async Task<bool> DeleteAsync(string id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            if (!string.IsNullOrEmpty(id))
+            if (id != 0)
             {
                 return await _technicianRepo.DeleteAsync(id);
             }
@@ -125,6 +125,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             var technicianViewModels = technicians.Select(technician => new TechnicianViewModel
             {
+                TechnicianID = technician.TechnicianID,
                 Code = technician.Code,
                 Name = technician.Name,
                 NickName = technician.NickName,
@@ -164,9 +165,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         }
 
 
-        public async Task<UpdateTechnicianViewModel> GetByIdAsync(string id)
+        public async Task<UpdateTechnicianViewModel> GetByIdAsync(int id)
         {
-            if (!string.IsNullOrEmpty(id))
+            if (id != 0)
             {
                 var technician = await _technicianRepo.GetByIdAsync(id);
 
@@ -194,33 +195,56 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             return null;
         }
 
-        public async Task<bool> UpdateAsync(UpdateTechnicianViewModel TechnicianViewModel)
+        public async Task<bool> UpdateAsync(UpdateTechnicianViewModel technicianViewModel)
         {
-            if (TechnicianViewModel != null)
+            if (technicianViewModel != null)
             {
                 // Fetch the existing technician entity from the database
-                var existingTechnician = await _technicianRepo.GetByIdAsync(TechnicianViewModel.Code);
+                var existingTechnician = await _technicianRepo.GetByIdAsync(technicianViewModel.TechnicianID);
                 if (existingTechnician == null)
                 {
                     return false; // Technician not found
                 }
 
                 // Update the fields
-                existingTechnician.Code = TechnicianViewModel.Code;
-                existingTechnician.Name = TechnicianViewModel.Name;
-                existingTechnician.NickName = TechnicianViewModel.NickName;
-                existingTechnician.NationalID = TechnicianViewModel.NationalID;
-                existingTechnician.PhoneNumber1 = TechnicianViewModel.PhoneNumber1;
-                existingTechnician.PhoneNumber2 = TechnicianViewModel.PhoneNumber2;
-                existingTechnician.PhoneNumber3 = TechnicianViewModel.PhoneNumber3;
-                existingTechnician.Governate = TechnicianViewModel.SelectedGovernate;
-                existingTechnician.City = TechnicianViewModel.SelectedCity;
+                existingTechnician.TechnicianID = technicianViewModel.TechnicianID;
+                existingTechnician.Code = technicianViewModel.Code;
+                existingTechnician.Name = technicianViewModel.Name;
+                existingTechnician.NickName = technicianViewModel.NickName;
+                existingTechnician.NationalID = technicianViewModel.NationalID;
+                existingTechnician.PhoneNumber1 = technicianViewModel.PhoneNumber1;
+                existingTechnician.PhoneNumber2 = technicianViewModel.PhoneNumber2;
+                existingTechnician.PhoneNumber3 = technicianViewModel.PhoneNumber3;
+                existingTechnician.Governate = technicianViewModel.SelectedGovernate;
+                existingTechnician.City = technicianViewModel.SelectedCity;
+
+                ////Handle relationships (Customers and Users)
+                //existingTechnician.Customers.Clear(); // Clear existing customers
+                //foreach (var customerCode in technicianViewModel.SelectedCustomerCodes)
+                //{
+                //    var customer = await _customerRepo.GetCustomerIdsByCodesAsync(customerCode); // Fetch customer by code
+                //    if (customer != null)
+                //    {
+                //        existingTechnician.Customers.Add(customer);
+                //    }
+                //}
+
+                existingTechnician.Users.Clear(); // Clear existing users
+                foreach (var userId in technicianViewModel.SelectedUserCodes)
+                {
+                    var user = await _userManager.FindByIdAsync(userId); // Fetch user by ID
+                    if (user != null)
+                    {
+                        existingTechnician.Users.Add(user);
+                    }
+                }
 
                 // Save the updated entity
                 return await _technicianRepo.UpdateAsync(existingTechnician);
             }
             return false;
         }
+
 
         public async Task<List<SelectListItem>> GetCustomersForDropdownAsync()
         {

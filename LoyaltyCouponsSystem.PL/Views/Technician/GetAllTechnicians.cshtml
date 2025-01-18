@@ -40,6 +40,8 @@
                     <th>Phone Number</th>
                     <th>Created By</th>
                     <th>Created At</th>
+                    <th>Updated By</th>
+                    <th>Updated At</th>
                     <th>Actions</th>
                     <th>Details</th>
                 </tr>
@@ -57,12 +59,14 @@
                         <td>@technician.PhoneNumber1</td>
                         <td>@technician.CreatedBy</td>
                         <td>@technician.CreatedAt</td>
+                        <td>@technician.UpdatedBy</td>
+                        <td>@technician.UpdatedAt</td>
                         <td>
-                            <a href="@Url.Action("UpdateTechnician", "Technician", new { id = technician.Code })" class="btn btn-outline-primary btn-sm me-2">
+                            <a href="@Url.Action("UpdateTechnician", "Technician", new { id = technician.TechnicianID })" class="btn btn-outline-primary btn-sm me-2">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <br /><br />
-                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@technician.Code')">
+                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@technician.TechnicianID')">
                                 <i class="fas fa-trash-alt"></i> Delete
                             </button>
                         </td>

@@ -26,7 +26,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View(result);
         }
 
-        public async Task<IActionResult> GetTechnicianById(string id)
+        public async Task<IActionResult> GetTechnicianById(int id)
         {
             var result = await _technicianService.GetByIdAsync(id);
             return View(result);
@@ -99,13 +99,13 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
         }
 
-        public async Task<IActionResult> DeleteTechnician(string id)
+        public async Task<IActionResult> DeleteTechnician(int id)
         {
             await _technicianService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
         [HttpGet]
-        public async Task<IActionResult> UpdateTechnician(string id)
+        public async Task<IActionResult> UpdateTechnician(int id)
         {
             var technician = await _technicianService.GetByIdAsync(id); 
             if (technician == null)

@@ -71,11 +71,11 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         }
 
         // Delete method
-        public async Task<bool> DeleteAsync(string id)
+        public async Task<bool> DeleteAsync(int id)
         {
             try
             {
-                var technician = await _DBcontext.Technicians.Where(t => t.Code == id).FirstOrDefaultAsync();
+                var technician = await _DBcontext.Technicians.Where(t => t.TechnicianID == id).FirstOrDefaultAsync();
                 if (technician != null)
                 {
                     _DBcontext.Technicians.Remove(technician);
@@ -127,15 +127,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
         }
 
-
-
-
         // Get by ID method
-        public async Task<Technician> GetByIdAsync(string id)
+        public async Task<Technician> GetByIdAsync(int id)
         {
             try
             {
-                return await _DBcontext.Technicians.Where(t => t.Code == id).FirstOrDefaultAsync();
+                return await _DBcontext.Technicians.Where(t => t.TechnicianID == id).FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -153,7 +150,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 technician.UpdatedBy = currentUser?.UserName;
                 technician.UpdatedAt = DateTime.Now;
                 var existingTechnician = await _DBcontext.Technicians
-                    .Where(t => t.Code == technician.Code)
+                    .Where(t => t.TechnicianID == technician.TechnicianID)
                     .FirstOrDefaultAsync();
 
                 if (existingTechnician == null)
@@ -162,6 +159,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 }
 
                 // Update properties
+                existingTechnician.TechnicianID = technician.TechnicianID;
                 existingTechnician.Name = technician.Name;
                 existingTechnician.NickName = technician.NickName;
                 existingTechnician.NationalID = technician.NationalID;

@@ -24,12 +24,13 @@
         <div class="col-md-10">
             <form asp-action="UpdateTechnician" method="post" id="technicianForm">
                 <div asp-validation-summary="All" class="text-danger"></div>
-
+                <!-- Hidden field to pass CustomerID -->
+                <input type="hidden" name="TechnicianID" value="@Model.TechnicianID" />
                 <!-- Code and Name -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label asp-for="Code" class="form-label text-primary"><b>Code <span class="text-danger">*</span></b></label>
-                        <input asp-for="Code" class="form-control" placeholder="Enter technician code" readonly />
+                        <input asp-for="Code" class="form-control" placeholder="Enter technician code" required />
                         <span asp-validation-for="Code" class="text-danger"></span>
                     </div>
                     <div class="col-md-6 mb-3">
