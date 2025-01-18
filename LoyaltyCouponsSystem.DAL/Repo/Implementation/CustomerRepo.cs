@@ -29,13 +29,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             return !await _DBcontext.Customers.AnyAsync(c => c.Code == code);
         }
-        public async Task<List<int>> GetCustomerIdsByCodesAsync(List<string> customerCodes)
-        {
-            return await _DBcontext.Customers
-                .Where(c => customerCodes.Contains(c.Code))
-                .Select(c => c.CustomerID)
-                .ToListAsync();
-        }
+        
 
         // Add a customer
         public async Task<bool> AddAsync(Customer customer)
@@ -59,16 +53,14 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         }
 
         // Soft delete a customer by ID (Code)
-        public async Task<bool> DeleteAsync(string code)
+        public async Task<bool> DeleteAsync(int Id)
         {
             try
             {
-                var customer = await _DBcontext.Customers.FirstOrDefaultAsync(c => c.Code == code);
+                var customer = await _DBcontext.Customers.FirstOrDefaultAsync(c => c.CustomerID == Id);
                 if (customer == null)
                     return false;
-
-                // For soft delete, assume there is an `IsDeleted` property.
-                // Update this property if it exists, otherwise remove the record.
+             
                 _DBcontext.Customers.Remove(customer);
                 await _DBcontext.SaveChangesAsync();
                 return true;
@@ -98,13 +90,13 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         }
 
         // Get customer by Code
-        public async Task<Customer> GetByIdAsync(string code)
+        public async Task<Customer> GetByIdAsync(int Id)
         {
             try
             {
                 return await _DBcontext.Customers
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.Code == code);
+                    .FirstOrDefaultAsync(c => c.CustomerID == Id);
             }
             catch (Exception ex)
             {
@@ -112,20 +104,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 return null;
             }
         }
-        //Get customer by ID
-        public async Task<Customer> GetByCustomerIdAsync(int customerId)
+        public async Task<List<int>> GetCustomerIdsByCodesAsync(List<string> customerCodes)
         {
-            try
-            {
-                return await _DBcontext.Customers
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.CustomerID == customerId);  // Assuming CustomerID is the unique identifier
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error fetching customer by CustomerID: {ex.Message}");
-                return null;
-            }
+            return await _DBcontext.Customers
+                .Where(c => customerCodes.Contains(c.Code))
+                .Select(c => c.CustomerID)
+                .ToListAsync();
         }
 
         public async Task<List<Customer>> GetCustomersByIdsAsync(List<int> customerIds)
@@ -139,9 +123,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             return await _DBcontext.Customers
                 .Where(c => customerIds.Contains(c.CustomerID))
                 .ToListAsync();
-        }
-
-        // Update an existing customer
+        }     
         public async Task<bool> UpdateAsync(Customer customer)
         {
             try
@@ -149,10 +131,8 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 if (customer == null)
                     throw new ArgumentNullException(nameof(customer));
 
-                
-                
                 var existingCustomer = await _DBcontext.Customers
-                    .FirstOrDefaultAsync(c => c.Code == customer.Code);
+                    .FirstOrDefaultAsync(c => c.CustomerID == customer.CustomerID); // Fetch by ID
 
                 if (existingCustomer == null)
                     return false;
@@ -172,8 +152,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             {
                 Console.WriteLine($"Error updating customer: {ex.Message}");
                 return false;
-            }   
+            }
         }
+
 
         // Check if a customer exists by ID (Code)  
         public async Task<bool> ExistsAsync(string code)

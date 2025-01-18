@@ -38,7 +38,7 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label asp-for="Code" class="form-label text-primary"><b>Customer Code</b></label>
-                        <input asp-for="Code" class="form-control" placeholder="Enter customer code" readonly />
+                        <input asp-for="Code" class="form-control" placeholder="Enter customer code"  />
                         <span asp-validation-for="Code" class="text-danger"></span>
                     </div>
                 </div>
@@ -241,14 +241,14 @@
         "New Valley": ["Kharga", "Dakhla", "Farafra"]
     };
 
-        document.getElementById("governate").addEventListener("change", function () {
+            document.getElementById("governate").addEventListener("change", function () {
         const governate = this.value;
         const citySelect = document.getElementById("city");
 
         citySelect.innerHTML = '<option value="" disabled selected>Choose a City</option>';
 
         if (governate && citiesByGovernate[governate]) {
-            citySelect.disabled = false; // Enable the dropdown
+            citySelect.disabled = false;
             citiesByGovernate[governate].forEach(city => {
                 const option = document.createElement("option");
                 option.value = city;
@@ -256,8 +256,13 @@
                 citySelect.appendChild(option);
             });
         } else {
-            citySelect.disabled = true; // Keep it disabled if no governate selected
+            citySelect.disabled = true;
+            const errorMessage = document.createElement("option");
+            errorMessage.value = "";
+            errorMessage.textContent = "No cities available for the selected Governorate";
+            citySelect.appendChild(errorMessage);
         }
     });
+
 
 </script>

@@ -26,31 +26,21 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View(result);
         }
 
-        public async Task<IActionResult> GetCustomerById(string id)
+        public async Task<IActionResult> GetCustomerById(int id)
         {
             var result = await _customerService.GetByIdAsync(id);
             return View(result);
         }
-
-
         [HttpPost]
-        public IActionResult ToggleActivation(string customerCode, [FromBody] bool isActive)
+        public async Task<IActionResult> ToggleActivation(int customerId, [FromBody] bool isActive)
         {
-            // Find customer in the database using the code
-            var customer = _DBcontext.Customers.FirstOrDefault(c => c.Code == customerCode);
-            if (customer == null)
+            var result = await _customerService.ToggleActivationAsync(customerId, isActive);
+            if (!result)
             {
                 return NotFound();
             }
-
-            // Update the customer's active status
-            customer.IsActive = isActive;
-            _DBcontext.SaveChanges();
-
             return Ok();
         }
-
-
         [HttpGet]
         public IActionResult AddCustomer()
         {
@@ -73,14 +63,14 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View(customerViewModel);
         }
 
-        public async Task<IActionResult> DeleteCustomer(string id)
+        public async Task<IActionResult> DeleteCustomer(int id)
         {
             await _customerService.DeleteAsync(id);
             return RedirectToAction(nameof(GetAllCustomers));
         }
 
         [HttpGet]
-        public async Task<IActionResult> UpdateCustomer(string id)
+        public async Task<IActionResult> UpdateCustomer(int id)
         {
             var customer = await _customerService.GetByIdAsync(id);
             if (customer == null)
@@ -90,6 +80,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             var updateCustomerViewModel = new UpdateCustomerViewModel
             {
+                CustomerID = customer.CustomerID,
                 Name = customer.Name,
                 Code = customer.Code,
                 Governate = customer.Governate,

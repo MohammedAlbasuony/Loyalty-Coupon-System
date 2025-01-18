@@ -34,9 +34,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             return false;
         }
 
-        public async Task<bool> DeleteAsync(string id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            if (!string.IsNullOrEmpty(id))
+            if (id != 0)
             {
                 return await _customerRepo.DeleteAsync(id);
             }
@@ -62,10 +62,10 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             return customerViewModels;
         }
-        // Get a customer by code
-        public async Task<CustomerViewModel> GetByIdAsync(string id)
+        // Get a customer by id
+        public async Task<CustomerViewModel> GetByIdAsync(int id)
         {
-            if (!string.IsNullOrEmpty(id))
+            if (id != 0)
             {
                 var customer = await _customerRepo.GetByIdAsync(id);
 
@@ -85,31 +85,39 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             }
             return null;
         }
-        
-
 
         public async Task<bool> UpdateAsync(UpdateCustomerViewModel updateCustomerViewModel)
         {
-            if (updateCustomerViewModel != null && !string.IsNullOrEmpty(updateCustomerViewModel.Code)) 
+            if (updateCustomerViewModel != null && updateCustomerViewModel.CustomerID != 0) 
             {
-                // Fetch the customer using the new identifier (CustomerID)
-                var existingCustomer = await _customerRepo.GetByIdAsync(updateCustomerViewModel.Code);
+                // Fetch the customer by ID
+                var existingCustomer = await _customerRepo.GetByIdAsync(updateCustomerViewModel.CustomerID);
+
                 if (existingCustomer != null)
                 {
+                    // Update properties
                     existingCustomer.Name = updateCustomerViewModel.Name;
-                    existingCustomer.Code = updateCustomerViewModel.Code;  // This is still updated, but it's not the identifier
+                    existingCustomer.Code = updateCustomerViewModel.Code;  
                     existingCustomer.Governate = updateCustomerViewModel.Governate;
                     existingCustomer.City = updateCustomerViewModel.City;
                     existingCustomer.PhoneNumber = updateCustomerViewModel.PhoneNumber;
                     existingCustomer.TechnicianId = updateCustomerViewModel.TechnicianID;
 
-                    return await _customerRepo.UpdateAsync(existingCustomer);
+                    return await _customerRepo.UpdateAsync(existingCustomer); 
                 }
             }
             return false;
         }
-
-
+        public async Task<bool> ToggleActivationAsync(int customerId, bool isActive)
+        {
+            var customer = await _customerRepo.GetByIdAsync(customerId);
+            if (customer == null)
+            {
+                return false;
+            }
+            customer.IsActive = isActive;
+            return await _customerRepo.UpdateAsync(customer);
+        }
 
     }
 }

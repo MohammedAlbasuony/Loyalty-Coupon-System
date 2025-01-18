@@ -11,9 +11,10 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
     public interface ICustomerService
     {
         Task<bool> AddAsync(CustomerViewModel customerViewModel);
-        Task<bool> DeleteAsync(string id);
+        Task<bool> DeleteAsync(int id);
         Task<List<CustomerViewModel>> GetAllAsync();
-        Task<CustomerViewModel> GetByIdAsync(string id);
+        Task<CustomerViewModel> GetByIdAsync(int id);
         Task<bool> UpdateAsync(UpdateCustomerViewModel updateCustomerViewModel);
+        Task<bool> ToggleActivationAsync(int customerId, bool isActive);
     }
 }
