@@ -106,7 +106,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 foreach (var transaction in transactions)
                 {
                     
-                    for (int seqNum = transaction.StartSequenceNumber; seqNum <= transaction.EndSequenceNumber; seqNum++)
+                    for (long seqNum = long.Parse(transaction.StartSequenceNumber); seqNum <= long.Parse(transaction.EndSequenceNumber); seqNum++)
                     {
                         var newTransaction = new Transaction
                         {

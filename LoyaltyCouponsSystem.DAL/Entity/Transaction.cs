@@ -20,10 +20,10 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public Technician Technician { get; set; }
         public string? CouponSort { get; set; } 
         public string? CouponType { get; set; } 
-        public int SequenceNumber { get; set; }
+        public long SequenceNumber { get; set; }
         public string ExchangePermission { get; set; }
         public string? CreatedBy { get; set; }
-        public int SequenceStart { get; set; }
-        public int SequenceEnd { get; set; }
+        public string SequenceStart { get; set; }
+        public string SequenceEnd { get; set; }
     }
 }

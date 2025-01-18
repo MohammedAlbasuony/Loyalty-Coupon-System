@@ -29,12 +29,12 @@ public class AssignmentViewModel
     public string SelectedCity { get; set; }
 
     [Required(ErrorMessage = "Start sequence number is required.")]
-    [Range(1, int.MaxValue, ErrorMessage = "Start sequence number must be a positive number.")]
-    public int StartSequenceNumber { get; set; }
+    //[Range(1, int.MaxValue, ErrorMessage = "Start sequence number must be a positive number.")]
+    public string StartSequenceNumber { get; set; }
 
     [Required(ErrorMessage = "End sequence number is required.")]
-    [Range(1, int.MaxValue, ErrorMessage = "End sequence number must be a positive number.")]
-    public int EndSequenceNumber { get; set; }
+    //[Range(1, int.MaxValue, ErrorMessage = "End sequence number must be a positive number.")]
+    public string EndSequenceNumber { get; set; }
 
     [Required(ErrorMessage = "Exchange permission is required.")]
     [StringLength(50, ErrorMessage = "Exchange permission cannot exceed 50 characters.")]
