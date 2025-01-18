@@ -26,11 +26,12 @@
                     <th>Exchange Permission</th>
                     <th>Customer Name</th>
                     <th>Technician Name</th>
-                    <th>Number of Coupon Types</th>
+                    
                     <th>Governorate</th>
                     <th>City</th>
                     <th>Created By</th>
                     <th>Created At</th>
+                    <th>Details</th>
                 </tr>
             </thead>
             <tbody>
@@ -40,7 +41,7 @@
                         <td>@transaction.ExchangePermission</td>
                         <td>@transaction.Customer.Name</td>
                         <td>@transaction.Technician.Name</td>
-                        <td>
+                      @*   <td>
                             <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#couponModal-@transaction.TransactionID">
                                 Coupons Type
                             </button>
@@ -76,11 +77,18 @@
                                     </div>
                                 </div>
                             </div>
-                        </td>
+                        </td> *@
                         <td>@transaction.Governate</td>
                         <td>@transaction.City</td>
                         <td>@transaction.CreatedBy</td>
                         <td>@transaction.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td>
+                            <form asp-controller="HistoryGenerated" asp-action="GetAllCoupons" method="get" style="display:inline;">
+                                <input type="hidden" name="fromSequence" value="@transaction.SequenceStart" />
+                                <input type="hidden" name="toSequence" value="@transaction.SequenceEnd" />
+                                <button type="submit" class="btn btn-primary">Details</button>
+                            </form>
+                        </td>
                     </tr>
                 }
             </tbody>
