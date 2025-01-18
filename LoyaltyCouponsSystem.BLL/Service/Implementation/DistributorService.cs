@@ -1,4 +1,5 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
@@ -78,19 +79,22 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 IsDeleted = d.IsDeleted,
                 CreatedAt = d.CreatedAt,
                 CreatedBy = d.CreatedBy,
+                UpdatedBy = d.UpdatedBy,
+                UpdatedAt = d.UpdatedAt,
                 SelectedCustomerNames = d.DistributorCustomers.Where(dc => dc.Customer != null)
                 .Select(x => x.Customer.Name)
                 .Distinct().ToList()
             }).ToList();
         }
 
-        public async Task<DistributorViewModel> GetByIdAsync(string id)
+        public async Task<DistributorViewModel> GetByIdAsync(int id)
         {
-            if (id != null)
+            if (id != 0)
             {
-                var distributor = await _distributorRepo.GetByCodeAsync(id);
+                var distributor = await _distributorRepo.GetByIdAsync(id);
                 if (distributor != null)
                 {
+                    var distributorCustomers = distributor.DistributorCustomers ?? new List<DistributorCustomer>();
                     return new DistributorViewModel
                     {
                         DistributorID = distributor.DistributorID,
@@ -99,32 +103,49 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         SelectedGovernate = distributor.Governate,
                         SelectedCity = distributor.City,
                         Code = distributor.Code,
-                        IsDeleted = distributor.IsDeleted
+                        IsDeleted = distributor.IsDeleted,
+                        SelectedCustomerNames = distributorCustomers.Where(dc => dc.Customer != null)
+                        .Select(x => x.Customer.Name)
+                        .Distinct().ToList()
                     };
                 }
             }
             return null;
         }
 
-        public async Task<bool> UpdateAsync(UpdateVM DistributorViewModel)
+
+        public async Task<bool> UpdateAsync(UpdateVM distributorViewModel)
         {
-            if (DistributorViewModel != null)
+            if (distributorViewModel != null)
             {
+                // Fetch the existing distributor by ID to ensure it exists
+                var existingDistributor = await _distributorRepo.GetByIdAsync(distributorViewModel.DistributorID);
+
+                if (existingDistributor == null)
+                {
+                     return false;
+                }
+
+                // Map to Distributor entity for update
                 var distributor = new Distributor
                 {
-                    DistributorID = DistributorViewModel.DistributorID,
-                    Name = DistributorViewModel.Name,
-                    PhoneNumber1 = DistributorViewModel.PhoneNumber1,
-                    Governate = DistributorViewModel.SelectedGovernate,
-                    City = DistributorViewModel.SelectedCity,
-                    Code = DistributorViewModel.Code,
-                    IsDeleted = DistributorViewModel.IsDeleted
+                    DistributorID = distributorViewModel.DistributorID,
+                    Name = distributorViewModel.Name,
+                    PhoneNumber1 = distributorViewModel.PhoneNumber1,
+                    Governate = distributorViewModel.SelectedGovernate,
+                    City = distributorViewModel.SelectedCity,
+                    Code = distributorViewModel.Code,
+                    IsDeleted = distributorViewModel.IsDeleted,
+                    UpdatedBy = distributorViewModel.UpdatedBy,
+                    UpdatedAt = distributorViewModel.UpdatedAt
                 };
 
+                // Call the repository update method
                 return await _distributorRepo.UpdateAsync(distributor);
             }
             return false;
         }
+
 
         // Fetch customers for dropdown
         public async Task<List<SelectListItem>> GetCustomersForDropdownAsync()

@@ -149,6 +149,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         {
             try
             {
+                var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
+                technician.UpdatedBy = currentUser?.UserName;
+                technician.UpdatedAt = DateTime.Now;
                 var existingTechnician = await _DBcontext.Technicians
                     .Where(t => t.Code == technician.Code)
                     .FirstOrDefaultAsync();
@@ -170,6 +173,8 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 existingTechnician.Code = technician.Code;
                 existingTechnician.Users = technician.Users;
                 existingTechnician.Customers = technician.Customers;
+                existingTechnician.UpdatedAt = DateTime.Now;
+                existingTechnician.UpdatedBy = technician.UpdatedBy;
                 await _DBcontext.SaveChangesAsync();
                 return true;
             }

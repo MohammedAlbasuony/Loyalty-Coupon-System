@@ -24,7 +24,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <form asp-action="UpdateDistributor" method="post">
-                <input type="hidden" asp-for="Code" />
+                <input type="hidden" asp-for="DistributorID" />
                 <input hidden type="hidden" asp-for="DistributorID" />
                 <div asp-validation-summary="All" class="text-danger"></div>
 
@@ -37,7 +37,8 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label asp-for="Code" class="form-label text-primary"><b>Distributor Code</b></label>
-                        <input asp-for="Code" class="form-control" readonly />
+                        <input asp-for="Code" class="form-control" placeholder="Enter distributor name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -110,13 +111,14 @@
         };
 
         // Repopulate city list based on the selected governate (if present)
-        function updateCities(governate) {
+        function updateCities(governate, selectedCity = '') {
             const citySelect = $('#city');
             citySelect.empty();
             citySelect.append('<option value="" disabled selected>Choose a City</option>');
             if (governate && citiesByGovernate[governate]) {
                 citiesByGovernate[governate].forEach(function (city) {
-                    citySelect.append('<option value="' + city + '">' + city + '</option>');
+                    const selected = (city === selectedCity) ? 'selected' : '';
+                    citySelect.append('<option value="' + city + '" ' + selected + '>' + city + '</option>');
                 });
                 citySelect.prop('disabled', false);
             } else {
@@ -130,12 +132,14 @@
             updateCities(governate);
         });
 
-        // If governate is already selected, update cities on page load
+        // If governate is already selected, update cities and pre-select city (if present)
         const selectedGovernate = $('#governate').val();
+        const selectedCity = $('#city').data('selected-city');
         if (selectedGovernate) {
-            updateCities(selectedGovernate);
+            updateCities(selectedGovernate, selectedCity);
         }
     </script>
+
 }
 
 <!-- Style Section -->

@@ -130,7 +130,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             {
                 if (customer == null)
                     throw new ArgumentNullException(nameof(customer));
-
+                var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
+                customer.UpdatedBy = currentUser?.UserName;
+                customer.UpdatedAt = DateTime.Now;
                 var existingCustomer = await _DBcontext.Customers
                     .FirstOrDefaultAsync(c => c.CustomerID == customer.CustomerID); // Fetch by ID
 
@@ -144,7 +146,8 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 existingCustomer.City = customer.City;
                 existingCustomer.PhoneNumber = customer.PhoneNumber;
                 existingCustomer.TechnicianId = customer.TechnicianId;
-
+                existingCustomer.UpdatedAt = DateTime.Now;
+                existingCustomer.UpdatedBy = currentUser?.UserName;
                 await _DBcontext.SaveChangesAsync();
                 return true;
             }

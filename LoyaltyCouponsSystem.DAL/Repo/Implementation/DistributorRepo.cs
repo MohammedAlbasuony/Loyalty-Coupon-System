@@ -100,12 +100,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         }
 
         // Get by Code method
-        public async Task<Distributor> GetByCodeAsync(string code)
+        public async Task<Distributor> GetByIdAsync(int Id)
         {
             try
             {
                 return await _DBcontext.Distributors
-                    .Where(d => d.Code == code)
+                    .Where(d => d.DistributorID == Id)
                     .FirstOrDefaultAsync();
             }
             catch (Exception ex)
@@ -122,9 +122,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             try
             {
                 var existingDistributor = await _DBcontext.Distributors
-                .Where(d => d.DistributorID == distributor.DistributorID && d.IsDeleted == false)
-                .FirstOrDefaultAsync();
+                    .Where(d => d.DistributorID == distributor.DistributorID)
+                    .FirstOrDefaultAsync();
 
+                var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
+                distributor.UpdatedBy = currentUser?.UserName;
+                distributor.UpdatedAt = DateTime.Now;
 
                 if (existingDistributor == null)
                 {
@@ -136,7 +139,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 existingDistributor.PhoneNumber1 = distributor.PhoneNumber1;
                 existingDistributor.Governate = distributor.Governate;
                 existingDistributor.City = distributor.City;
-
+                existingDistributor.UpdatedAt = DateTime.Now;
+                existingDistributor.UpdatedBy = distributor.UpdatedBy;
+                existingDistributor.Code = distributor.Code;
                 _DBcontext.Update(existingDistributor);
                 await _DBcontext.SaveChangesAsync();
                 return true;

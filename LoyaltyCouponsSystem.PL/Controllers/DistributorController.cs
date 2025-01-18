@@ -1,7 +1,5 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
-using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
-using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Threading.Tasks;
@@ -12,6 +10,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
     {
         private readonly IDistributorService _distributorService;
         private readonly ICustomerService _customerService;
+
         public DistributorController(IDistributorService distributorService, ICustomerService customerService)
         {
             _distributorService = distributorService;
@@ -23,6 +22,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View();
         }
 
+        // Add Distributor (GET)
         [HttpGet]
         public async Task<IActionResult> AddDistributor()
         {
@@ -35,44 +35,57 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View(viewModel);
         }
 
+        // Add Distributor (POST)
         [HttpPost]
         public async Task<IActionResult> AddDistributor(DistributorViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Logic to handle distributor saving
-                await _distributorService.AddAsync(model);
-                return RedirectToAction("GetAllDistributors", "Distributor");
+                var result = await _distributorService.AddAsync(model);
+                if (result)
+                {
+                    return RedirectToAction("GetAllDistributors", "Distributor");
+                }
+
+                // If Add fails, show error and re-render
+                ModelState.AddModelError("", "Unable to add distributor. Please try again.");
             }
 
-            // In case of error, re-render the form with errors
+            // If validation fails, re-populate dropdowns and return the view
             model.Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync();
             model.Customers = await _distributorService.GetCustomersForDropdownAsync();
             return View(model);
         }
 
+        // Update Distributor (GET)
         [HttpGet]
-        public async Task<IActionResult> UpdateDistributor(string id)
+        public async Task<IActionResult> UpdateDistributor(int id)
         {
-            // Fetch distributor details by ID
-            var distributorViewModel = await _distributorService.GetByIdAsync(id);
-            if (distributorViewModel != null)
+            // Validate the id
+            if (id <= 0)
             {
-                // Fetch the dropdown options for Governates and Customers
-                distributorViewModel.Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync();
-                distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
-                return View(distributorViewModel); // Return the View with the populated ViewModel
+                return NotFound();
             }
 
-            return NotFound();
+            var distributorViewModel = await _distributorService.GetByIdAsync(id);
+            if (distributorViewModel == null)
+            {
+                return NotFound();  
+            }
+
+            distributorViewModel.Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync();
+            distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
+
+            return View(distributorViewModel); // Return populated ViewModel to the view
         }
 
+        // Update Distributor (POST)
         [HttpPost]
-        public async Task<IActionResult> UpdateDistributor(UpdateVM DistributorViewModel)
+        public async Task<IActionResult> UpdateDistributor(UpdateVM distributorViewModel)
         {
             if (ModelState.IsValid)
             {
-                var result = await _distributorService.UpdateAsync(DistributorViewModel);
+                var result = await _distributorService.UpdateAsync(distributorViewModel);
                 if (result)
                 {
                     return RedirectToAction("GetAllDistributors"); // Redirect to list after successful update
@@ -81,19 +94,20 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 ModelState.AddModelError("", "Unable to update distributor. Please try again.");
             }
 
-            // If update fails, re-populate the dropdowns and return the view again
-            DistributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
-            return View(DistributorViewModel);
+            // If update fails, re-populate dropdowns and return the view again
+            distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
+            return View(distributorViewModel);
         }
 
+        // Get All Distributors
         [HttpGet]
         public async Task<IActionResult> GetAllDistributors()
         {
-            
             var distributors = await _distributorService.GetAllAsync();
             return View(distributors);
         }
 
+        // Delete Distributor (POST)
         [HttpPost]
         public async Task<IActionResult> DeleteDistributor(int id)
         {
@@ -102,6 +116,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             {
                 return RedirectToAction("GetAllDistributors");
             }
+
             ModelState.AddModelError("", "Unable to delete distributor. Please try again.");
             return RedirectToAction("GetAllDistributors");
         }
