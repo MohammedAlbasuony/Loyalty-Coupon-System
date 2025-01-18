@@ -137,6 +137,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 SelectedCity = technician.City,
                 CreatedAt = technician.CreatedAt,
                 CreatedBy = technician.CreatedBy,
+                UpdatedBy = technician.UpdatedBy,
+                UpdatedAt = technician.UpdatedAt,
                 SelectedCustomerNames = technician.Customers?.Select(c => c.Name).ToList(),
                 SelectedUserNames = technician.Users?.Select(u => u.UserName).ToList(),
             }).ToList();
@@ -217,28 +219,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 existingTechnician.PhoneNumber3 = technicianViewModel.PhoneNumber3;
                 existingTechnician.Governate = technicianViewModel.SelectedGovernate;
                 existingTechnician.City = technicianViewModel.SelectedCity;
-
-                ////Handle relationships (Customers and Users)
-                //existingTechnician.Customers.Clear(); // Clear existing customers
-                //foreach (var customerCode in technicianViewModel.SelectedCustomerCodes)
-                //{
-                //    var customer = await _customerRepo.GetCustomerIdsByCodesAsync(customerCode); // Fetch customer by code
-                //    if (customer != null)
-                //    {
-                //        existingTechnician.Customers.Add(customer);
-                //    }
-                //}
-
-                existingTechnician.Users.Clear(); // Clear existing users
-                foreach (var userId in technicianViewModel.SelectedUserCodes)
-                {
-                    var user = await _userManager.FindByIdAsync(userId); // Fetch user by ID
-                    if (user != null)
-                    {
-                        existingTechnician.Users.Add(user);
-                    }
-                }
-
+                existingTechnician.UpdatedAt = DateTime.Now;
+                existingTechnician.UpdatedBy = technicianViewModel.UpdatedBy;
                 // Save the updated entity
                 return await _technicianRepo.UpdateAsync(existingTechnician);
             }
