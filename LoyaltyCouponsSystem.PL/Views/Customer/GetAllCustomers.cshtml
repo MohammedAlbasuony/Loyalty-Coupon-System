@@ -55,11 +55,11 @@
                         </td>
                          <td> 
                              <button class="btn toggle-btn btn-sm shadow @(customer.IsActive ? "btn-danger" : "btn-success")" 
-                                     onclick="toggleActivation('@customer.Code', this, @(customer.IsActive))"> 
+                                     onclick="toggleActivation('@customer.CustomerID', this, @(customer.IsActive))"> 
                                  @(customer.IsActive ? "Deactivate" : "Activate") 
                              </button> 
 
-                            <a href="@Url.Action("UpdateCustomer", "Customer", new { id = customer.Code })" class="btn btn-outline-primary btn-sm me-2">
+                            <a href="@Url.Action("UpdateCustomer", "Customer", new { id = customer.CustomerID })" class="btn btn-outline-primary btn-sm me-2">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
                         </td> 
