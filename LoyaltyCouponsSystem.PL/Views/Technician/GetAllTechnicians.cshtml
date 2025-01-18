@@ -38,6 +38,8 @@
                     <th>Governorate</th>
                     <th>City</th>
                     <th>Phone Number</th>
+                    <th>Phone Number 2</th>
+                    <th>Phone Number 3</th>
                     <th>Created By</th>
                     <th>Created At</th>
                     <th>Updated By</th>
@@ -57,6 +59,8 @@
                         <td>@technician.SelectedGovernate</td>
                         <td>@technician.SelectedCity</td>
                         <td>@technician.PhoneNumber1</td>
+                        <td>@technician.PhoneNumber2</td>
+                        <td>@technician.PhoneNumber3</td>
                         <td>@technician.CreatedBy</td>
                         <td>@technician.CreatedAt</td>
                         <td>@technician.UpdatedBy</td>
@@ -72,12 +76,12 @@
                         </td>
                         <td>
                             <!-- Button to trigger Assigned Customers modal -->
-                            <button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#customersModal-@technician.Code">
+                            <button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#customersModal-@technician.TechnicianID">
                                 View  Customers
                             </button>
                             <br /> <br />    
                             <!-- Button to trigger Assigned Users modal -->
-                            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#usersModal-@technician.Code">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#usersModal-@technician.TechnicianID">
                                 View  Representatiives
                             </button>
                         </td>
@@ -87,11 +91,11 @@
                     <tr>
                         <td colspan="10">
                             <!-- Modal for Assigned Customers -->
-                            <div class="modal fade" id="customersModal-@technician.Code" tabindex="-1" aria-labelledby="customersModalLabel-@technician.Code" aria-hidden="true">
+                            <div class="modal fade" id="customersModal-@technician.TechnicianID" tabindex="-1" aria-labelledby="customersModalLabel-@technician.TechnicianID" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="customersModalLabel-@technician.Code">Assigned Customers</h5>
+                                            <h5 class="modal-title" id="customersModalLabel-@technician.TechnicianID">Assigned Customers</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
@@ -110,11 +114,11 @@
                             </div>
 
                             <!-- Modal for Assigned Users -->
-                            <div class="modal fade" id="usersModal-@technician.Code" tabindex="-1" aria-labelledby="usersModalLabel-@technician.Code" aria-hidden="true">
+                            <div class="modal fade" id="usersModal-@technician.TechnicianID" tabindex="-1" aria-labelledby="usersModalLabel-@technician.TechnicianID" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="usersModalLabel-@technician.Code">Assigned Users</h5>
+                                            <h5 class="modal-title" id="usersModalLabel-@technician.TechnicianID">Assigned Users</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">

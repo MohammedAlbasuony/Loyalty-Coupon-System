@@ -1,8 +1,10 @@
 ﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
+using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ZXing;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
 {
@@ -107,24 +109,114 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [HttpGet]
         public async Task<IActionResult> UpdateTechnician(int id)
         {
-            var technician = await _technicianService.GetByIdAsync(id); 
+            var technician = await _technicianService.GetByIdAsync(id);
+
             if (technician == null)
             {
                 return NotFound();
             }
-            return View(technician); 
+
+            var model = new UpdateTechnicianViewModel
+            {
+                TechnicianID = technician.TechnicianID,
+                Code = technician.Code,
+                Name = technician.Name,
+                NickName = technician.NickName,
+                NationalID = technician.NationalID,
+                SelectedGovernate = technician.SelectedGovernate,
+                PhoneNumber1 = technician.PhoneNumber1,
+                PhoneNumber2 = technician.PhoneNumber2,
+                PhoneNumber3 = technician.PhoneNumber3,
+                SelectedCity = technician.SelectedCity,
+                Governates = GetGovernatesList() // Fetch governates dynamically
+            }; return View(model);
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> UpdateTechnician(UpdateTechnicianViewModel updateTechnicianViewModel)
+        public async Task<IActionResult> UpdateTechnician(UpdateTechnicianViewModel model)
         {
             if (ModelState.IsValid)
             {
-                await _technicianService.UpdateAsync(updateTechnicianViewModel);
-                return RedirectToAction("GetAllTechnicians");
+                var result = await _technicianService.UpdateAsync(model);
+                if (result)
+                {
+                    return RedirectToAction("GetAllTechnicians");
+                }
+                ModelState.AddModelError("", "Failed to update customer");
             }
-            return View(updateTechnicianViewModel);
+            return View(model);
+        }
+
+        private List<SelectListItem> GetGovernatesList()
+        {
+            return new List<SelectListItem>
+        {
+            new SelectListItem { Value = "Cairo", Text = "Cairo" },
+            new SelectListItem { Value = "Alexandria", Text = "Alexandria" },
+            new SelectListItem { Value = "Giza", Text = "Giza" },
+            new SelectListItem { Value = "Dakahlia", Text = "Dakahlia" },
+            new SelectListItem { Value = "Red Sea", Text = "Red Sea" },
+            new SelectListItem { Value = "Beheira", Text = "Beheira" },
+            new SelectListItem { Value = "Fayoum", Text = "Fayoum" },
+            new SelectListItem { Value = "Sharqia", Text = "Sharqia" },
+            new SelectListItem { Value = "Aswan", Text = "Aswan" },
+            new SelectListItem { Value = "Assiut", Text = "Assiut" },
+            new SelectListItem { Value = "Beni Suef", Text = "Beni Suef" },
+            new SelectListItem { Value = "Port Said", Text = "Port Said" },
+            new SelectListItem { Value = "Suez", Text = "Suez" },
+            new SelectListItem { Value = "Matruh", Text = "Matruh" },
+            new SelectListItem { Value = "Qalyubia", Text = "Qalyubia" },
+            new SelectListItem { Value = "Gharbia", Text = "Gharbia" },
+            new SelectListItem { Value = "Monufia", Text = "Monufia" },
+            new SelectListItem { Value = "Qena", Text = "Qena" },
+            new SelectListItem { Value = "North Sinai", Text = "North Sinai" },
+            new SelectListItem { Value = "Sohag", Text = "Sohag" },
+            new SelectListItem { Value = "South Sinai", Text = "South Sinai" },
+            new SelectListItem { Value = "Kafr El Sheikh", Text = "Kafr El Sheikh" },
+            new SelectListItem { Value = "Damietta", Text = "Damietta" },
+            new SelectListItem { Value = "Ismailia", Text = "Ismailia" },
+            new SelectListItem { Value = "Luxor", Text = "Luxor" },
+            new SelectListItem { Value = "New Valley", Text = "New Valley" }
+        };
+        }
+
+        // Fetch cities based on the selected governate
+        public IActionResult GetCitiesByGovernorate(string governorateId)
+        {
+            var citiesByGovernate = new Dictionary<string, List<string>>
+        {
+            { "Cairo", new List<string> { "Nasr City", "Heliopolis", "Maadi", "New Cairo" } },
+            { "Alexandria", new List<string> { "Montaza", "Sidi Gaber", "Smouha" } },
+            { "Giza", new List<string> { "Dokki", "Haram", "6th of October" } },
+            { "Dakahlia", new List<string> { "Mansoura", "Mit Ghamr", "Talkha" } },
+            { "Red Sea", new List<string> { "Hurghada", "Safaga", "El Qoseir" } },
+            { "Beheira", new List<string> { "Damanhour", "Rashid", "Kafr El-Dawwar" } },
+            { "Fayoum", new List<string> { "Fayoum City", "Tamiya", "Ibsheway" } },
+            { "Sharqia", new List<string> { "Zagazig", "Belbeis", "10th of Ramadan City" } },
+            { "Aswan", new List<string> { "Aswan City", "Kom Ombo", "Edfu" } },
+            { "Assiut", new List<string> { "Assiut City", "Manfalut", "Dayrout" } },
+            { "Beni Suef", new List<string> { "Beni Suef City", "Nasser", "Ihnasya" } },
+            { "Port Said", new List<string> { "Port Said City" } },
+            { "Suez", new List<string> { "Suez City" } },
+            { "Matruh", new List<string> { "Marsa Matruh", "Siwa", "Alamein" } },
+            { "Qalyubia", new List<string> { "Banha", "Shubra El-Kheima", "Qalyub" } },
+            { "Gharbia", new List<string> { "Tanta", "El-Mahalla", "Kafr El-Zayat" } },
+            { "Monufia", new List<string> { "Shebin El-Kom", "Sadat City", "Menouf" } },
+            { "Qena", new List<string> { "Qena City", "Nag Hammadi", "Qus" } },
+            { "North Sinai", new List<string> { "Arish", "Sheikh Zuweid", "Rafah" } },
+            { "Sohag", new List<string> { "Sohag City", "Tahta", "Akhmim" } },
+            { "South Sinai", new List<string> { "Sharm El-Sheikh", "Dahab", "Taba" } },
+            { "Kafr El Sheikh", new List<string> { "Kafr El Sheikh City", "Desouk", "Balteem" } },
+            { "Damietta", new List<string> { "Damietta City", "Ras El Bar", "New Damietta" } },
+            { "Ismailia", new List<string> { "Ismailia City", "Fayed", "Qantara" } },
+            { "Luxor", new List<string> { "Luxor City", "Armant", "Esna" } },
+            { "New Valley", new List<string> { "Kharga", "Dakhla", "Farafra" } }
+        };
+
+            var cities = citiesByGovernate.ContainsKey(governorateId) ? citiesByGovernate[governorateId] : new List<string>();
+
+            return Json(cities.Select(city => new { cityID = city, cityName = city }));
         }
     }
 }
