@@ -97,39 +97,53 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
         public async Task AssignQRCodeAsync(string selectedCustomerCode, string selectedTechnicianCode, string selectedGovernate, string selectedCity, List<AssignmentViewModel> transactions)
         {
+            if (transactions == null || !transactions.Any())
+                throw new ArgumentException("Transactions cannot be null or empty.");
+
             var customer = await _repository.GetCustomerByCodeOrNameAsync(selectedCustomerCode);
             var technician = await _repository.GetTechnicianByCodeOrNameAsync(selectedTechnicianCode);
 
-            if (customer != null && technician != null && transactions != null)
+            if (customer == null)
+                throw new ArgumentException("Invalid customer code.");
+
+            if (technician == null)
+                throw new ArgumentException("Invalid technician code.");
+
+            string exchangePermissionNum = transactions[0].ExchangePermission;
+
+            foreach (var transaction in transactions)
             {
-                string ExchangePermissionNum = transactions[0].ExchangePermission;
-                foreach (var transaction in transactions)
+                if (transaction.StartSequenceNumber > transaction.EndSequenceNumber)
+                    throw new ArgumentException("Start sequence number cannot be greater than end sequence number.");
+
+                for (long seqNum = transaction.StartSequenceNumber; seqNum <= transaction.EndSequenceNumber; seqNum++)
                 {
-                    
-                    for (long seqNum = long.Parse(transaction.StartSequenceNumber); seqNum <= long.Parse(transaction.EndSequenceNumber); seqNum++)
+                    var exists = await _repository.TransactionExistsAsync(exchangePermissionNum, seqNum);
+                    if (exists)
+                        throw new InvalidOperationException($"Sequence number {seqNum} already exists for Exchange Permission {exchangePermissionNum}.");
+
+                    var newTransaction = new Transaction
                     {
-                        var newTransaction = new Transaction
-                        {
-                            CustomerID = customer.CustomerID,
-                            TechnicianID = technician.TechnicianID,
-                            Governate = selectedGovernate,
-                            City = selectedCity,
-                            Timestamp = System.DateTime.Now,
-                            CouponSort = transaction.SelectedCouponSort,
-                            CouponType = transaction.SelectedCouponType,
-                            SequenceNumber = seqNum,
-                            ExchangePermission = ExchangePermissionNum,
-                            CreatedBy = transaction.CreatedBy,
-                            SequenceStart = transaction.StartSequenceNumber,
-                            SequenceEnd = transaction.EndSequenceNumber,
-                        };
+                        CustomerID = customer.CustomerID,
+                        TechnicianID = technician.TechnicianID,
+                        Governate = selectedGovernate,
+                        City = selectedCity,
+                        Timestamp = DateTime.Now,
+                        CouponSort = transaction.SelectedCouponSort,
+                        CouponType = transaction.SelectedCouponType,
+                        SequenceNumber = seqNum,
+                        ExchangePermission = exchangePermissionNum,
+                        CreatedBy = transaction.CreatedBy,
+                        SequenceStart = transaction.StartSequenceNumber.ToString(),
+                        SequenceEnd = transaction.EndSequenceNumber.ToString(),
+                    };
 
-                        await _repository.AddTransactionAsync(newTransaction);
-                    }
+                    await _repository.AddTransactionAsync(newTransaction);
                 }
-
-                await _repository.SaveChangesAsync();
             }
+
+            await _repository.SaveChangesAsync();
         }
+
     }
 }

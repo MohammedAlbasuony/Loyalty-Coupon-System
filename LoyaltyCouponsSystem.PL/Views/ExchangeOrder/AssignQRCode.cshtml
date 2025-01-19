@@ -6,8 +6,7 @@
 }
 <br />
 <form asp-action="AssignQRCode" method="post" id="assignForm" class="shadow-lg p-4 bg-white rounded">
-    <h2 class="text-center text-primary mb-4">Exchange Permmision </h2>
-
+    <h2 class="text-center text-primary mb-4">Exchange Permission</h2>
 
     <div class="row g-3">
         <!-- Select Customer -->
@@ -20,6 +19,7 @@
                     <option value="@customer.Value">@customer.Text</option>
                 }
             </select>
+            <span class="text-danger" asp-validation-for="SelectedCustomerCode"></span>
         </div>
 
         <!-- Select Technician -->
@@ -32,6 +32,7 @@
                     <option value="@technician.Value">@technician.Text</option>
                 }
             </select>
+            <span class="text-danger" asp-validation-for="SelectedTechnicianCode"></span>
         </div>
 
         <!-- Select Governate -->
@@ -44,6 +45,7 @@
                     <option value="@governate.Value">@governate.Text</option>
                 }
             </select>
+            <span class="text-danger" asp-validation-for="SelectedGovernate"></span>
         </div>
 
         <!-- Select City -->
@@ -52,12 +54,14 @@
             <select asp-for="SelectedCity" class="form-select" id="City" required>
                 <option value="">Select City</option>
             </select>
+            <span class="text-danger" asp-validation-for="SelectedCity"></span>
         </div>
 
         <!-- Exchange Permission -->
         <div class="col-md-6">
             <label for="ExchangePermission" class="form-label fw-bold">Exchange Permission Number</label>
             <input asp-for="ExchangePermission" name="Transactions[0].ExchangePermission" class="form-control" placeholder="Enter exchange permission number" required />
+            <span class="text-danger" asp-validation-for="ExchangePermission"></span>
         </div>
     </div>
 
@@ -73,6 +77,7 @@
                         <option value="@sort.Value">@sort.Text</option>
                     }
                 </select>
+                <span class="text-danger" asp-validation-for="Transactions[0].SelectedCouponSort"></span>
             </div>
             <div class="col-md-3">
                 <label for="CouponType" class="form-label fw-bold">Coupon Type</label>
@@ -83,14 +88,17 @@
                         <option value="@type.Value">@type.Text</option>
                     }
                 </select>
+                <span class="text-danger" asp-validation-for="Transactions[0].SelectedCouponType"></span>
             </div>
             <div class="col-md-3">
                 <label for="StartSequenceNumber" class="form-label fw-bold">Start Sequence Number</label>
-                <input type="number" name="Transactions[0].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
+                <input type="number" name="Transactions[0].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required min="1" />
+                <span class="text-danger" asp-validation-for="Transactions[0].StartSequenceNumber"></span>
             </div>
             <div class="col-md-3">
                 <label for="EndSequenceNumber" class="form-label fw-bold">End Sequence Number</label>
-                <input type="number" name="Transactions[0].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
+                <input type="number" name="Transactions[0].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required min="1" />
+                <span class="text-danger" asp-validation-for="Transactions[0].EndSequenceNumber"></span>
             </div>
             <div class="col-md-1 d-flex align-items-end">
                 <button type="button" class="btn btn-danger removeFieldsButton">Remove</button>
@@ -108,6 +116,7 @@
         <button type="submit" class="btn btn-primary mt-3 px-4 py-2 rounded-pill shadow-sm" style="font-size: 16px;">Assign</button>
     </div>
 </form>
+
 
 <br />
 <br />
@@ -199,10 +208,10 @@
 
             // Define static cities for demonstration
             var cities = {
-                "Cairo": ["City1", "City2"],
+                "Cairo": ["Nasr City", "City2"],
                 "Gharbeia": ["Tanta", "Qotor"],
                 "Sharqeia": ["City5", "City6"],
-                "Alexandria": ["City7", "City8"]
+                "Alexandria": ["Smouha", "City8"]
             };
 
             // Populate city dropdown based on selected governate
@@ -219,6 +228,9 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/additional-methods.min.js"></script>
+
 
     <script>
         // Initialize Select2 on the Customer dropdown
