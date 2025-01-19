@@ -55,6 +55,7 @@
                                 </button>
 
                                 <!-- Modal -->
+                                <!-- Modal -->
                                 <div class="modal fade" id="customersModal-@distributor.DistributorID" tabindex="-1" aria-labelledby="customersModalLabel-@distributor.DistributorID" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered modal-lg">
                                         <div class="modal-content">
@@ -65,17 +66,14 @@
                                             <div class="modal-body">
                                                 <!-- Search Box for Filtering Customers -->
                                                 <div class="mb-3">
-                                                    <input type="text" class="form-control" id="searchCustomers-@distributor.DistributorID" placeholder="Search Customers..." oninput="filterCustomers(@distributor.DistributorID)">
+                                                    <input type="text" class="form-control" placeholder="Search Customers..." id="searchCustomers-@distributor.DistributorID" oninput="filterCustomers(@distributor.DistributorID)">
                                                 </div>
                                                 <!-- Customer List -->
                                                 <ul id="customerList-@distributor.DistributorID" class="list-group">
                                                     @foreach (var customer in distributor.SelectedCustomerNames)
                                                     {
-                                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                            <span>@customer</span>
-                                                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDeleteCustomer('@customer', @distributor.DistributorID)">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
+                                                        <li class="list-group-item">
+                                                            @customer
                                                         </li>
                                                     }
                                                 </ul>
@@ -86,6 +84,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                             }
                             else
                             {
@@ -254,7 +253,7 @@
 </style>
 
 <script>
-    let deleteDistributorId = null;
+        let deleteDistributorId = null;
     let deleteCustomerName = null;
     let deleteCustomerDistributorId = null;
 
@@ -271,15 +270,15 @@
             fetch(`/Distributor/DeleteDistributor/${deleteDistributorId}`, {
                 method: 'DELETE'
             })
-            .then(response => {
-                if (response.ok) {
-                    const row = document.getElementById(`row-${deleteDistributorId}`);
-                    if (row) row.remove();
-                } else {
-                    alert("Failed to delete distributor.");
-                }
-            })
-            .catch(error => console.error('Error deleting distributor:', error));
+                .then(response => {
+                    if (response.ok) {
+                        const row = document.getElementById(`row-${deleteDistributorId}`);
+                        if (row) row.remove();
+                    } else {
+                        alert("Failed to delete distributor.");
+                    }
+                })
+                .catch(error => console.error('Error deleting distributor:', error));
         }
         const deleteModal = bootstrap.Modal.getInstance(document.getElementById("deleteConfirmationModal"));
         deleteModal.hide();
@@ -300,29 +299,19 @@
     // AJAX Delete Functionality for Customer
     document.getElementById("confirmDeleteCustomerButton").addEventListener("click", function () {
         if (deleteCustomerName && deleteCustomerDistributorId) {
-            fetch(`/Customer/DeleteCustomer?name=${deleteCustomerName}`, {
-                method: 'DELETE'
-            })
-            .then(response => {
-                if (response.ok) {
-                    const customerList = document.getElementById(`customerList-${deleteCustomerDistributorId}`);
-                    const customerItems = customerList.getElementsByTagName("li");
+            // Since we're handling this front-end only, no server request is made here.
+            const customerList = document.getElementById(`customerList-${deleteCustomerDistributorId}`);
+            const customerItems = customerList.getElementsByTagName("li");
 
-                    Array.from(customerItems).forEach((customer) => {
-                        if (customer.textContent.trim() === deleteCustomerName) {
-                            customer.remove();
-                        }
-                    });
-
-                    alert("Customer deleted successfully.");
-                } else {
-                    alert("Failed to delete customer.");
+            Array.from(customerItems).forEach((customer) => {
+                if (customer.textContent.trim() === deleteCustomerName) {
+                    customer.remove(); // Remove customer from the list
                 }
-            })
-            .catch(error => console.error('Error deleting customer:', error));
+            });
+
+            const deleteCustomerModal = bootstrap.Modal.getInstance(document.getElementById("deleteCustomerModal"));
+            deleteCustomerModal.hide();
         }
-        const deleteCustomerModal = bootstrap.Modal.getInstance(document.getElementById("deleteCustomerModal"));
-        deleteCustomerModal.hide();
     });
 
     // Search Functionality for Distributors
@@ -345,11 +334,7 @@
 
         Array.from(customers).forEach((customer) => {
             const customerName = customer.textContent.toLowerCase();
-            if (customerName.includes(searchInput)) {
-                customer.style.display = "";
-            } else {
-                customer.style.display = "none";
-            }
+            customer.style.display = customerName.includes(searchInput) ? "" : "none";
         });
     }
 
@@ -391,6 +376,7 @@
         // Initialize pagination
         showPage(1);
     });
+
 </script>
 
 
