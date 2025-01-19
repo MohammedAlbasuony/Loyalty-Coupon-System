@@ -89,11 +89,12 @@
                     <!-- Assign Role -->
                     <div class="form-group">
                         <label for="Role">Select Role</label>
-                        <select asp-for="Role" class="form-control" asp-items="@(new SelectList(Model.AvailableRoles))">
+                        <select asp-for="Role" class="form-control" asp-items="@(new SelectList(Model.AvailableRoles))" id="roleDropdown">
                             <option value="">-- Select a Role --</option>
                         </select>
                         <span asp-validation-for="Role" class="text-danger"></span>
                     </div>
+                    <br />
 
                     <!-- Password -->
                     <div class="col-md-6 mb-3">
@@ -275,6 +276,27 @@
                 .catch(error => console.error('Error fetching cities:', error));
         });
 
+
+            // Get the dropdown element
+        const roleDropdown = document.getElementById("roleDropdown");
+
+        // Add an event listener to disable the first option on focus
+        roleDropdown.addEventListener("focus", function () {
+            const firstOption = this.querySelector('option[value=""]');
+            if (firstOption) {
+                firstOption.disabled = true; // Disable the first option
+            }
+        });
+
+        // Add an event listener to re-enable the first option when no value is selected
+        roleDropdown.addEventListener("blur", function () {
+            if (!this.value) {
+                const firstOption = this.querySelector('option[value=""]');
+                if (firstOption) {
+                    firstOption.disabled = false; // Re-enable the first option if nothing is selected
+                }
+            }
+        });
 
     </script>
 }

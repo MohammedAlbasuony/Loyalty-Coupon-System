@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250119190941_setIsActiveTrueAsDefault")]
+    partial class setIsActiveTrueAsDefault
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -655,7 +658,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TechnicianID"));
 
                     b.Property<string>("City")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Code")
@@ -669,7 +671,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Governate")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -681,6 +682,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NickName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PhoneNumber1")
