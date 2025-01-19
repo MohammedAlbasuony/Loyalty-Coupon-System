@@ -12,13 +12,18 @@
     <div class="container mt-4">
         <h1 class="text-primary text-center"><b>Manage Users</b></h1>
         <br />
+        <!-- Search Filters and Add Button -->
         <div class="row mb-4 justify-content-center">
             <div class="col-md-8">
                 <div class="input-group shadow-sm">
-                    <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, National ID, Phone Number, Governorate, City, Role or Status...">
+                    <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, Code, Governorate, City, or Phone Number...">
+                    <a href="@Url.Action("Register", "Account")" class="btn btn-add-customer input-group-text">
+                        <i class="fas fa-plus"></i> Add User
+                    </a>
                 </div>
             </div>
         </div>
+
         <div class="table-responsive mt-4">
             <table id="usersTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
                 <thead class="thead-dark bg-primary text-white">
@@ -175,6 +180,24 @@ else
         margin-right: auto; /* Ensure it's still centered within the layout */
     }
 
+    .btn-add-customer {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+        border-radius: 0 30px 30px 0; /* Rounded right corners */
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    
+
+
+        .btn-add-customer:hover {
+            background-color: #0056b3;
+            color: white;
+        }
     .table {
         width: 100%; /* Full width table */
         border-radius: 12px;
@@ -304,19 +327,19 @@ else
         font-weight: bold;
     }
 
-    #searchBox {
-        border-radius: 20px;
-        padding: 8px;
+     #searchBox {
+border-radius: 30px 0 0 30px; /* Rounded left corn        padding: 8px;
         font-size: 14px;
         width: 100%;
         border: 2px solid #007bff;
         background-color: #f9f9f9;
+
     }
 
         #searchBox::placeholder {
             font-style: italic;
             color: #aaa;
-        }
+        } 
 
     #paginationContainer .btn {
         font-size: 14px;
