@@ -26,7 +26,6 @@
                     <th>Exchange Permission</th>
                     <th>Customer Name</th>
                     <th>Technician Name</th>
-                    
                     <th>Governorate</th>
                     <th>City</th>
                     <th>Created By</th>
@@ -40,7 +39,7 @@
                     <tr>
                         <td>@transaction.ExchangePermission</td>
                         <td>@transaction.Customer.Name</td>
-                        <td>@transaction.Technician.Name</td>
+                        <td>@transaction.Technician.Name</td>   
                       @*   <td>
                             <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#couponModal-@transaction.TransactionID">
                                 Coupons Type
@@ -94,7 +93,11 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination Container -->
+    <div id="paginationContainer" class="mt-4 text-center"></div>
 </div>
+
 
 <script>
     document.getElementById("searchBox").addEventListener("input", function () {
@@ -165,4 +168,65 @@
         #searchBox::placeholder {
             color: #aaa;
         }
+
+    #paginationContainer .btn {
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin: 2px;
+    }
+
+    #paginationContainer .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+
+    #paginationContainer .btn-outline-primary {
+        border: 1px solid #007bff;
+        color: #007bff;
+        background-color: white;
+    }
+
+    #paginationContainer .btn:hover {
+        opacity: 0.8;
+    }
 </style>
+
+<script>
+    // Pagination functionality
+    document.addEventListener("DOMContentLoaded", function () {
+        const rowsPerPage = 10; // Rows per page
+        const tableBody = document.querySelector("#transactionsTable tbody");
+        const paginationContainer = document.getElementById("paginationContainer");
+
+        // Show specific page
+        function showPage(pageNumber) {
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            rows.forEach((row, index) => {
+                row.style.display = (index >= (pageNumber - 1) * rowsPerPage && index < pageNumber * rowsPerPage) ? "" : "none";
+            });
+
+            updatePaginationControls(pageNumber, totalPages);
+        }
+
+        // Update pagination controls
+        function updatePaginationControls(currentPage, totalPages) {
+            paginationContainer.innerHTML = "";
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement("button");
+                button.textContent = i;
+                button.classList.add("btn", "btn-sm", "mx-1");
+                button.classList.add(i === currentPage ? "btn-primary" : "btn-outline-primary");
+                button.addEventListener("click", () => showPage(i));
+                paginationContainer.appendChild(button);
+            }
+        }
+
+        // Initialize pagination
+        showPage(1);
+    });
+</script>
