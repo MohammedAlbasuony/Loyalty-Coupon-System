@@ -310,7 +310,7 @@
     });
 
 
-                document.addEventListener("DOMContentLoaded", () => {
+                    document.addEventListener("DOMContentLoaded", () => {
         document.addEventListener("submit", function (event) {
             if (event.target.matches("form[asp-action='ToggleActivation']")) {
                 event.preventDefault(); // Prevent default form submission
@@ -339,7 +339,6 @@
                             toggleButton.classList.remove("btn-danger");
                             toggleButton.classList.add("btn-success");
                             row.style.textDecoration = "line-through";
-                            moveRowToBottom(row);
                         } else {
                             // Update to "Active"
                             statusBadge.textContent = "Active";
@@ -349,25 +348,13 @@
                             toggleButton.classList.remove("btn-success");
                             toggleButton.classList.add("btn-danger");
                             row.style.textDecoration = "none";
-                            moveRowToTop(row);
                         }
                     })
                     .catch(error => console.error("Error:", error));
             }
         });
-
-        // Move a row to the bottom of the table
-        function moveRowToBottom(row) {
-            const tbody = row.closest("tbody");
-            tbody.appendChild(row);
-        }
-
-        // Move a row to the top of the table
-        function moveRowToTop(row) {
-            const tbody = row.closest("tbody");
-            tbody.prepend(row);
-        }
     });
+
 
 
 
