@@ -70,7 +70,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var distributorViewModel = await _distributorService.GetByIdAsync(id);
             if (distributorViewModel == null)
             {
-                return NotFound();  
+                return NotFound();
             }
 
             distributorViewModel.Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync();
@@ -120,5 +120,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             ModelState.AddModelError("", "Unable to delete distributor. Please try again.");
             return RedirectToAction("GetAllDistributors");
         }
+
+        
     }
 }
