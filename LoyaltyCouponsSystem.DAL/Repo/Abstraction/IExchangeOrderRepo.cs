@@ -15,5 +15,6 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Abstraction
         Task<List<Technician>> GetAllTechniciansAsync();
         Task AddTransactionAsync(Transaction transaction);
         Task SaveChangesAsync();
+        Task<bool> TransactionExistsAsync(string exchangePermission, long sequenceNumber);
     }
 }
