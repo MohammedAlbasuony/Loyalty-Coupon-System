@@ -26,42 +26,36 @@
         <table id="customerTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
             <thead class="thead-dark bg-primary text-white">
                 <tr>
+                    <th>Code</th>
                     <th>Name</th>
-                    <th>Customer Code</th>
                     <th>Governorate</th>
                     <th>City</th>
                     <th>Phone Number</th>
-                    <th>Created By</th>
-                    <th>Created At</th>
-                    <th>Updated By</th>
-                    <th>Updated At</th>
-                    <th>Current Status</th>
+                    <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var customer in Model)
                 {
-                    <tr id="row-@customer.Code">
-                        <td>@customer.Name</td>
+                    <tr id="row-@customer.CustomerID">
                         <td>@customer.Code</td>
+                        <td>@customer.Name</td>
                         <td>@customer.Governate</td>
                         <td>@customer.City</td>
                         <td>@customer.PhoneNumber</td>
-                        <td>@customer.CreatedBy</td>
-                        <td>@customer.CreatedAt</td>
-                        <td>@customer.UpdatedBy</td>
-                        <td>@customer.UpdatedAt</td>
                         <td>
                             <span class="badge @(customer.IsActive ? "bg-success" : "bg-danger")">
                                 @(customer.IsActive ? "Active" : "Inactive")
                             </span>
                         </td>
                         <td>
-                            <button class="btn toggle-btn btn-sm shadow @(customer.IsActive ? "btn-danger" : "btn-success")"
-                                    onclick="toggleActivation('@customer.CustomerID', this, @(customer.IsActive))">
-                                @(customer.IsActive ? "Deactivate" : "Activate")
-                            </button>
+                            <form asp-controller="Customer" asp-action="ToggleActivation" method="post" style="display:inline;">
+                                <input type="hidden" name="customerId" value="@customer.CustomerID" />
+                                <button type="submit" class="btn btn-sm @(customer.IsActive ? "btn-danger" : "btn-success")">
+                                    @(customer.IsActive ? "Deactivate" : "Activate")
+                                </button>
+                            </form>
                             <a href="@Url.Action("UpdateCustomer", "Customer", new { id = customer.CustomerID })" class="btn btn-outline-primary btn-sm me-2">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
@@ -69,8 +63,11 @@
                     </tr>
                 }
             </tbody>
+
         </table>
+
     </div>
+
 
     <!-- Pagination Controls -->
     <div id="paginationContainer" class="mt-4 text-center"></div>
@@ -122,13 +119,6 @@
         background-color: #e9f5ff;
     }
 
-    .badge {
-        padding: 5px 10px;
-        font-size: 14px;
-        font-weight: bold;
-        border-radius: 6px;
-    }
-
     .btn-add-customer {
         background-color: #007bff;
         color: white;
@@ -139,27 +129,7 @@
 
         .btn-add-customer:hover {
             background-color: #0056b3;
-            color:white;
-        }
-
-    .toggle-btn {
-        font-size: 14px;
-        font-weight: bold;
-        border-radius: 6px;
-    }
-
-        .toggle-btn.btn-danger {
-            background-color: #dc3545;
             color: white;
-        }
-
-        .toggle-btn.btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .toggle-btn:hover {
-            opacity: 0.8;
         }
 
         .btn-add-customer i {
@@ -210,8 +180,52 @@
         opacity: 0.8;
     }
 
+    .badge {
+        padding: 5px 10px;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 6px;
+    }
+
+        .badge.bg-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge.bg-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+    .toggle-btn {
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 6px;
+    }
+
+        .toggle-btn.btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .toggle-btn.btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .toggle-btn:hover {
+            opacity: 0.8;
+        }
+
+
+    /* Add for strikethrough rows */
+    tr[style*="text-decoration: line-through"] {
+        opacity: 0.7; /* Makes the row slightly faded */
+    }
+
 
 </style>
+
 
 <script>
     let deleteCustomerId = null;
@@ -256,43 +270,6 @@
         });
     });
 
-    // Activate/Deactivate Toggle button
-                function toggleActivation(customerCode, button) {
-        fetch(`/Customer/ToggleActivation?customerCode=${customerCode}`, {
-            method: "POST"
-        })
-        .then(response => {
-            if (response.ok) {
-                // Update the UI dynamically
-                const row = button.closest("tr");
-                const badge = row.querySelector(".badge");
-                const isActive = badge.innerText === "Active";
-
-                if (isActive) {
-                    badge.classList.remove("bg-success");
-                    badge.classList.add("bg-danger");
-                    badge.innerText = "Inactive";
-
-                    button.classList.remove("btn-danger");
-                    button.classList.add("btn-success");
-                    button.innerText = "Activate";
-                } else {
-                    badge.classList.remove("bg-danger");
-                    badge.classList.add("bg-success");
-                    badge.innerText = "Active";
-
-                    button.classList.remove("btn-success");
-                    button.classList.add("btn-danger");
-                    button.innerText = "Deactivate";
-                }
-            } else {
-                alert("Failed to update customer status.");
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    }
-
-
     // Pagination functionality
     document.addEventListener("DOMContentLoaded", function () {
         const rowsPerPage = 10; // Set to 10 rows per page
@@ -332,4 +309,68 @@
         showPage(1);
     });
 
+
+                document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("submit", function (event) {
+            if (event.target.matches("form[asp-action='ToggleActivation']")) {
+                event.preventDefault(); // Prevent default form submission
+                const form = event.target;
+                const customerId = form.querySelector("input[name='customerId']").value;
+                const row = document.getElementById(`row-${customerId}`);
+                const statusBadge = row.querySelector(".badge");
+                const toggleButton = form.querySelector("button");
+
+                // Send a POST request to toggle activation
+                fetch(form.action, {
+                    method: "POST",
+                    body: new FormData(form),
+                })
+                    .then(response => response.json()) // Parse JSON response
+                    .then(data => {
+                        const isActive = data.isActive;
+
+                        // Update the UI based on the new status
+                        if (!isActive) {
+                            // Update to "Inactive"
+                            statusBadge.textContent = "Inactive";
+                            statusBadge.classList.remove("bg-success");
+                            statusBadge.classList.add("bg-danger");
+                            toggleButton.textContent = "Activate";
+                            toggleButton.classList.remove("btn-danger");
+                            toggleButton.classList.add("btn-success");
+                            row.style.textDecoration = "line-through";
+                            moveRowToBottom(row);
+                        } else {
+                            // Update to "Active"
+                            statusBadge.textContent = "Active";
+                            statusBadge.classList.remove("bg-danger");
+                            statusBadge.classList.add("bg-success");
+                            toggleButton.textContent = "Deactivate";
+                            toggleButton.classList.remove("btn-success");
+                            toggleButton.classList.add("btn-danger");
+                            row.style.textDecoration = "none";
+                            moveRowToTop(row);
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+            }
+        });
+
+        // Move a row to the bottom of the table
+        function moveRowToBottom(row) {
+            const tbody = row.closest("tbody");
+            tbody.appendChild(row);
+        }
+
+        // Move a row to the top of the table
+        function moveRowToTop(row) {
+            const tbody = row.closest("tbody");
+            tbody.prepend(row);
+        }
+    });
+
+
+
+
 </script>
+

@@ -16,10 +16,12 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _DBcontext = context;
             _customerService = customerService;
         }
+
         public IActionResult Index()
         {
             return View();
         }
+
         public async Task<IActionResult> GetAllCustomers()
         {
             var result = await _customerService.GetAllAsync();
@@ -31,16 +33,25 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var result = await _customerService.GetByIdAsync(id);
             return View(result);
         }
+
         [HttpPost]
-        public async Task<IActionResult> ToggleActivation(int customerId, [FromBody] bool isActive)
+        [Route("Customer/ToggleActivation")]
+        public async Task<IActionResult> ToggleActivation(int customerId)
         {
-            var result = await _customerService.ToggleActivationAsync(customerId, isActive);
-            if (!result)
+            var customer = await _DBcontext.Customers.FindAsync(customerId);
+            if (customer == null)
             {
                 return NotFound();
             }
-            return Ok();
+
+            customer.IsActive = !customer.IsActive;
+            await _DBcontext.SaveChangesAsync();
+
+            return RedirectToAction("GetAllCustomers");
         }
+
+
+
         [HttpGet]
         public IActionResult AddCustomer()
         {
@@ -86,7 +97,9 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 Governate = customer.Governate,
                 City = customer.City,
                 PhoneNumber = customer.PhoneNumber,
-                TechnicianID = customer.TechnicianID
+                TechnicianID = customer.TechnicianID,
+                IsActive = customer.IsActive // Assuming IsActive is part of the ApplicationUser class
+
             };
 
             return View(updateCustomerViewModel);
