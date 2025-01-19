@@ -21,7 +21,7 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public string? Imagepath { get; set; }
         public virtual Admin Admin { get; set; }
         public virtual Representative Representative { get; set; }
-        public bool IsActive { get; set; } = false; // Default to active
+        public bool IsActive { get; set; } = true; // Default to active
         public int? TechnicianId { get; set; }
         public virtual Technician Technician { get; set; }
 
