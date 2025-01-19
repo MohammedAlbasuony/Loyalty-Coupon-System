@@ -57,21 +57,23 @@
                                 @(customer.IsActive ? "Active" : "Inactive")
                             </span>
                         </td>
-                         <td> 
-                             <button class="btn toggle-btn btn-sm shadow @(customer.IsActive ? "btn-danger" : "btn-success")" 
-                                     onclick="toggleActivation('@customer.CustomerID', this, @(customer.IsActive))"> 
-                                 @(customer.IsActive ? "Deactivate" : "Activate") 
-                             </button> 
-
+                        <td>
+                            <button class="btn toggle-btn btn-sm shadow @(customer.IsActive ? "btn-danger" : "btn-success")"
+                                    onclick="toggleActivation('@customer.CustomerID', this, @(customer.IsActive))">
+                                @(customer.IsActive ? "Deactivate" : "Activate")
+                            </button>
                             <a href="@Url.Action("UpdateCustomer", "Customer", new { id = customer.CustomerID })" class="btn btn-outline-primary btn-sm me-2">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                        </td> 
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination Controls -->
+    <div id="paginationContainer" class="mt-4 text-center"></div>
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -92,6 +94,7 @@
         </div>
     </div>
 </div>
+
 
 <style>
     /* Table Styling */
@@ -183,6 +186,31 @@
         font-weight: bold;
         letter-spacing: 1px;
     }
+
+    #paginationContainer .btn {
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    #paginationContainer .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+
+    #paginationContainer .btn-outline-primary {
+        border: 1px solid #007bff;
+        color: #007bff;
+        background-color: white;
+    }
+
+    #paginationContainer .btn:hover {
+        opacity: 0.8;
+    }
+
+
 </style>
 
 <script>
@@ -265,5 +293,43 @@
     }
 
 
+    // Pagination functionality
+    document.addEventListener("DOMContentLoaded", function () {
+        const rowsPerPage = 10; // Set to 10 rows per page
+        const tableBody = document.querySelector("#customerTable tbody");
+        const paginationContainer = document.getElementById("paginationContainer");
+
+        // Function to show a specific page
+        function showPage(pageNumber) {
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            // Hide all rows and show only the rows for the current page
+            rows.forEach((row, index) => {
+                row.style.display = (index >= (pageNumber - 1) * rowsPerPage && index < pageNumber * rowsPerPage) ? "" : "none";
+            });
+
+            // Update pagination controls
+            updatePaginationControls(pageNumber, totalPages);
+        }
+
+        // Function to update pagination controls
+        function updatePaginationControls(currentPage, totalPages) {
+            paginationContainer.innerHTML = ""; // Clear existing pagination controls
+
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement("button");
+                button.textContent = i;
+                button.classList.add("btn", "btn-sm", "mx-1");
+                button.classList.add(i === currentPage ? "btn-primary" : "btn-outline-primary");
+                button.addEventListener("click", () => showPage(i));
+                paginationContainer.appendChild(button);
+            }
+        }
+
+        // Initialize pagination
+        showPage(1);
+    });
 
 </script>
