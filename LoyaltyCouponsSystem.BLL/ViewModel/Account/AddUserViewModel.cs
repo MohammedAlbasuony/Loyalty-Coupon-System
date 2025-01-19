@@ -1,8 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.BLL.ViewModel.Account
 {
-    public class RegisterViewModel
+    public class AddUserViewModel
     {
         [Required(ErrorMessage = "Name is required.")]
         [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "Name must contain only letters, numbers, and spaces.")]
@@ -41,8 +46,6 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Account
         [DataType(DataType.Password)]
         [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; }
-        public List<string>? AvailableRoles { get; set; } 
-
-
+        public List<string>? AvailableRoles { get; set; }
     }
 }

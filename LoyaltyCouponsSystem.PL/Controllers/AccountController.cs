@@ -149,6 +149,9 @@
                 ViewBag.RegistrationSuccess = false;
                 return View(model);
             }
+            
+
+
 
             [HttpGet]
             [Route("api/get-cities")]
