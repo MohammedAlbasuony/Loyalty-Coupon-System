@@ -1,9 +1,12 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using DocumentFormat.OpenXml.InkML;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
+using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using ZXing;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
@@ -11,9 +14,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
     public class TechnicianController : Controller
     {
         private readonly ITechnicianService _technicianService;
+        private readonly ApplicationDbContext _DBcontext;
 
-        public TechnicianController(ITechnicianService technicianService)
+        public TechnicianController(ApplicationDbContext context, ITechnicianService technicianService)
         {
+            _DBcontext = context;
             _technicianService = technicianService;
         }
 
@@ -218,6 +223,25 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             return Json(cities.Select(city => new { cityID = city, cityName = city }));
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleActivation(int technicianId, bool isActive)
+        {
+            var technician = await _DBcontext.Technicians.FindAsync(technicianId);
+            if (technician == null)
+            {
+                return NotFound(new { success = false, message = "Technician not found" });
+            }
+
+            technician.IsActive = isActive;
+            _DBcontext.Technicians.Update(technician);
+            await _DBcontext.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+
+
     }
 }
 
