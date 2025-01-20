@@ -42,7 +42,7 @@
             <tbody>
                 @foreach (var distributor in Model)
                 {
-                    <tr id="row-@distributor.Code">
+                    <tr id="row-@distributor.DistributorID">
                         <td>@distributor.Code</td>
                         <td>@distributor.Name</td>
                         <td>@distributor.PhoneNumber1</td>
@@ -51,6 +51,7 @@
                         <td>
                             @if (distributor.SelectedCustomerNames != null && distributor.SelectedCustomerNames.Any())
                             {
+                                <!-- View Customers Button -->
                                 <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#customersModal-@distributor.DistributorID">
                                     View Customers
                                 </button>
@@ -84,14 +85,12 @@
                                         </div>
                                     </div>
                                 </div>
-
                             }
                             else
                             {
                                 <span>No Customers</span>
                             }
                         </td>
-
                         <td>@distributor.CreatedBy</td>
                         <td>@distributor.CreatedAt</td>
                         <td>@distributor.UpdatedBy</td>
@@ -103,15 +102,15 @@
                         </td>
                         <td>
                             <button class="btn btn-sm @(distributor.IsActive ? "btn-danger" : "btn-success") toggle-activation"
-                                    data-customer-id="@distributor.DistributorID"
+                                    data-distributor-id="@distributor.DistributorID"
                                     data-is-active="@distributor.IsActive">
                                 @(distributor.IsActive ? "Deactivate" : "Activate")
                             </button>
+                            <span style="display: none;">DistributorID: @distributor.DistributorID</span>
                             <a href="@Url.Action("UpdateDistributor", "Distributor", new { id = distributor.DistributorID })" class="btn btn-outline-primary btn-sm me-2">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                         </td>
-
                     </tr>
                 }
             </tbody>
@@ -138,6 +137,7 @@
     <!-- Pagination Controls -->
     <div id="paginationContainer" class="mt-4 text-center"></div>
 </div>
+
 
 <style>
     /* Table Styling */
@@ -261,72 +261,58 @@
 
 <script>
     // Toggle Activation Functionality for Distributor
-    document.addEventListener("DOMContentLoaded", function () {
+            document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".toggle-activation").forEach(button => {
             button.addEventListener("click", function () {
-                const distributorId = this.getAttribute("data-customer-id");
+                const distributorId = this.getAttribute("data-distributor-id");
                 const isActive = this.getAttribute("data-is-active") === "True";
 
-                // Set the confirmation message dynamically
-                const toggleActionText = isActive ? "deactivate" : "activate";
-                const actionColor = isActive ? "danger" : "success";
+            // Call API to toggle activation status
+                fetch('/Distributor/ToggleActivation?distributorId=' + distributorId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
 
-                // Set modal content
-                document.getElementById("toggleAction").textContent = toggleActionText;
-                const confirmButton = document.getElementById("confirmToggleButton");
-                confirmButton.className = `btn btn-${actionColor}`;
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const row = document.getElementById(`row-${distributorId}`);
+                        const statusBadge = row.querySelector(".badge");
+                        const toggleButton = row.querySelector(".toggle-activation");
 
-                // Open the modal
-                $('#toggleConfirmationModal').modal('show');
+                        // Update UI dynamically
+                        if (data.isActive) {
+                            statusBadge.textContent = "Active";
+                            statusBadge.classList.remove("bg-danger");
+                            statusBadge.classList.add("bg-success");
 
-                // Add click event to confirm toggle
-                confirmButton.onclick = function () {
-                    toggleActivation(distributorId, !isActive);
-                    $('#toggleConfirmationModal').modal('hide'); // Close the modal after confirming
-                };
+                            toggleButton.textContent = "Deactivate";
+                            toggleButton.classList.remove("btn-success");
+                            toggleButton.classList.add("btn-danger");
+                        } else {
+                            statusBadge.textContent = "Inactive";
+                            statusBadge.classList.remove("bg-success");
+                            statusBadge.classList.add("bg-danger");
+
+                            toggleButton.textContent = "Activate";
+                            toggleButton.classList.remove("btn-danger");
+                            toggleButton.classList.add("btn-success");
+                        }
+
+                        toggleButton.setAttribute("data-is-active", data.isActive.toString());
+                    } else {
+                        alert(data.message || "Failed to toggle activation.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error toggling activation:", error);
+                    alert("An error occurred. Please try again.");
+                });
             });
         });
     });
 
-    function toggleActivation(distributorId, newIsActive) {
-        fetch(`/Distributor/ToggleActivation?distributorId=${distributorId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({ isActive: newIsActive }) // Sending the updated activation status
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const row = document.getElementById(`row-${distributorId}`);
-                const statusBadge = row?.querySelector(".badge");
-                const toggleButton = row?.querySelector(".toggle-activation");
 
-                if (statusBadge && toggleButton) {
-                    if (newIsActive) {
-                        statusBadge.textContent = "Active";
-                        statusBadge.classList.remove("bg-danger");
-                        statusBadge.classList.add("bg-success");
-                        toggleButton.textContent = "Deactivate";
-                        toggleButton.classList.remove("btn-success");
-                        toggleButton.classList.add("btn-danger");
-                    } else {
-                        statusBadge.textContent = "Inactive";
-                        statusBadge.classList.remove("bg-success");
-                        statusBadge.classList.add("bg-danger");
-                        toggleButton.textContent = "Activate";
-                        toggleButton.classList.remove("btn-danger");
-                        toggleButton.classList.add("btn-success");
-                    }
-                }
-
-                toggleButton?.setAttribute("data-is-active", newIsActive.toString());
-            } else {
-                alert(data.message || "Failed to toggle activation.");
-            }
-        })
-        .catch(error => alert("An error occurred while toggling activation. Please try again."));
-    }
 </script>

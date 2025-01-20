@@ -161,7 +161,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [HttpPost]
         public async Task<IActionResult> ToggleActivation(int distributorId)
         {
-            var distributor = await _DBcontext.Distributors.FindAsync(distributorId);
+            var distributor = await _DBcontext.Distributors.FirstOrDefaultAsync(d => d.DistributorID == distributorId);
             if (distributor == null)
             {
                 return Json(new { success = false, message = "Distributor not found." });
@@ -169,10 +169,12 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             distributor.IsActive = !distributor.IsActive;
             distributor.UpdatedAt = DateTime.Now;
-            distributor.UpdatedBy = User.Identity.Name;
+            distributor.UpdatedBy = User.Identity.Name ?? "Unknown"; // Assuming authentication is enabled
+
             await _DBcontext.SaveChangesAsync();
 
             return Json(new { success = true, isActive = distributor.IsActive });
         }
+
     }
 }
