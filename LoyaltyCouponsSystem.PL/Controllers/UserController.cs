@@ -52,14 +52,14 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         {
             // Repopulate the roles list for the view in case of validation errors
             addUserViewModel.AvailableRoles = new List<string>
-                    {
-                        "Admin",
-                        "HR",
-                        "Representative",
-                        "Storekeeper",
-                        "Accountant",
-                        "SuperAdmin"
-                    };
+    {
+        "Admin",
+        "HR",
+        "Representative",
+        "Storekeeper",
+        "Accountant",
+        "SuperAdmin"
+    };
 
             if (ModelState.IsValid)
             {
@@ -106,7 +106,9 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                         City = addUserViewModel.City,
                         NationalID = addUserViewModel.NationalID,
                         UserName = addUserViewModel.Name,
-                        OptionalPhoneNumber = addUserViewModel.OptionalPhoneNumber
+                        OptionalPhoneNumber = addUserViewModel.OptionalPhoneNumber,
+                        Role = addUserViewModel.Role,
+                        EmailConfirmed = true,
                     };
 
                     var result = await userManager.CreateAsync(user, addUserViewModel.Password);
@@ -140,5 +142,6 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             // Return to the same view with validation errors
             return View(addUserViewModel);
         }
+
     }
 }
