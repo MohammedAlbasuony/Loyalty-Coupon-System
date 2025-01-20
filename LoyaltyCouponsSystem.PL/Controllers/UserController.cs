@@ -36,8 +36,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     "HR",
                     "Representative",
                     "Storekeeper",
-                    "Accountant",
-                    "SuperAdmin"
+                    "Accountant"
                 };
             var addUserViewModel = new AddUserViewModel
             {
@@ -57,9 +56,9 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         "HR",
         "Representative",
         "Storekeeper",
-        "Accountant",
-        "SuperAdmin"
-    };
+        "Accountant"
+            
+        };
 
             if (ModelState.IsValid)
             {
