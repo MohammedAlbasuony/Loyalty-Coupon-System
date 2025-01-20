@@ -1,7 +1,10 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using DocumentFormat.OpenXml.InkML;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
+using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
@@ -10,9 +13,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
     {
         private readonly IDistributorService _distributorService;
         private readonly ICustomerService _customerService;
+        private readonly ApplicationDbContext _DBcontext;
 
-        public DistributorController(IDistributorService distributorService, ICustomerService customerService)
+        public DistributorController(ApplicationDbContext context, IDistributorService distributorService, ICustomerService customerService)
         {
+            _DBcontext = context;
             _distributorService = distributorService;
             _customerService = customerService;
         }
@@ -121,6 +126,22 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return RedirectToAction("GetAllDistributors");
         }
 
-        
+        [HttpPost]
+        public async Task<IActionResult> ToggleActivation(int distributorId)
+        {
+            var distributor = await _DBcontext.Distributors.FindAsync(distributorId);
+            if (distributor == null)
+            {
+                return Json(new { success = false, message = "Distributor not found." });
+            }
+
+            distributor.IsActive = !distributor.IsActive;
+            distributor.UpdatedAt = DateTime.Now;
+            distributor.UpdatedBy = User.Identity.Name;
+            await _DBcontext.SaveChangesAsync();
+
+            return Json(new { success = true, isActive = distributor.IsActive });
+        }
+
     }
 }

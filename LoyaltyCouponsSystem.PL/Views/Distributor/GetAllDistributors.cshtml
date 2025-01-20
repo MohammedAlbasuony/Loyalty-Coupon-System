@@ -35,6 +35,7 @@
                     <th>Created At</th>
                     <th>Updated By</th>
                     <th>Updated At</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -96,41 +97,49 @@
                         <td>@distributor.UpdatedBy</td>
                         <td>@distributor.UpdatedAt</td>
                         <td>
+                            <span class="badge @(distributor.IsActive ? "bg-success" : "bg-danger")">
+                                @(distributor.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm @(distributor.IsActive ? "btn-danger" : "btn-success") toggle-activation"
+                                    data-customer-id="@distributor.DistributorID"
+                                    data-is-active="@distributor.IsActive">
+                                @(distributor.IsActive ? "Deactivate" : "Activate")
+                            </button>
                             <a href="@Url.Action("UpdateDistributor", "Distributor", new { id = distributor.DistributorID })" class="btn btn-outline-primary btn-sm me-2">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
-                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@distributor.DistributorID')">
-                                <i class="fas fa-trash-alt"></i> Delete
-                            </button>
                         </td>
+
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-
+    <!-- Confirmation Modal for Toggle Activation (moved outside the loop) -->
+    <div class="modal fade" id="toggleConfirmationModal" tabindex="-1" aria-labelledby="toggleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="toggleModalLabel">Confirm Toggle Activation</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to <span id="toggleAction">activate</span> this customer?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmToggleButton" class="btn btn-warning">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Pagination Controls -->
     <div id="paginationContainer" class="mt-4 text-center"></div>
 </div>
 
-<!-- Delete Customer Confirmation Modal -->
-<div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteCustomerModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete <span id="customerToDelete"></span>?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteCustomerButton">Delete</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 
 <style>
@@ -189,7 +198,7 @@
 
         .btn-add-customer:hover {
             background-color: #0056b3 !important;
-            color: white!important ;
+            color: white !important;
         }
 
     h1 {
@@ -250,68 +259,109 @@
     }
 
 </style>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JS (includes Popper.js for modal handling) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-        let deleteDistributorId = null;
-    let deleteCustomerName = null;
-    let deleteCustomerDistributorId = null;
+     // Toggle Activation Functionality for Distributor
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".toggle-activation").forEach(button => {
+            button.addEventListener("click", function () {
+                debugger;
+                const distributorId = this.getAttribute("data-customer-id");
+                const isActive = this.getAttribute("data-is-active") === "True";
 
-    // Confirmation Modal for Distributor
-    function confirmDelete(distributorCode) {
-        deleteDistributorId = distributorCode;
-        const deleteModal = new bootstrap.Modal(document.getElementById("deleteConfirmationModal"));
-        deleteModal.show();
-    }
+                // Log the initial state for debugging
+                console.log("Initial State - Distributor ID:", distributorId, "Is Active:", isActive);
 
-    // AJAX Delete Functionality for Distributor
-    function deleteDistributor() {
-        if (deleteDistributorId) {
-            fetch(`/Distributor/DeleteDistributor/${deleteDistributorId}`, {
-                method: 'DELETE'
-            })
-                .then(response => {
-                    if (response.ok) {
-                        const row = document.getElementById(`row-${deleteDistributorId}`);
-                        if (row) row.remove();
-                    } else {
-                        alert("Failed to delete distributor.");
-                    }
-                })
-                .catch(error => console.error('Error deleting distributor:', error));
-        }
-        const deleteModal = bootstrap.Modal.getInstance(document.getElementById("deleteConfirmationModal"));
-        deleteModal.hide();
-    }
+                // Set the confirmation message dynamically
+                const toggleActionText = isActive ? "deactivate" : "activate";
+                const actionColor = isActive ? "danger" : "success";
 
-    // Confirmation Modal for Customer Deletion
-    function confirmDeleteCustomer(customerName, distributorID) {
-        deleteCustomerName = customerName;
-        deleteCustomerDistributorId = distributorID;
+                // Set modal content
+                document.getElementById("toggleAction").textContent = toggleActionText;
+                const confirmButton = document.getElementById("confirmToggleButton");
+                confirmButton.className = `btn btn-${actionColor}`;
 
-        const customerNameElement = document.getElementById("customerToDelete");
-        customerNameElement.textContent = customerName;
+                // Open the modal
+                $('#toggleConfirmationModal').modal('show');
 
-        const deleteCustomerModal = new bootstrap.Modal(document.getElementById("deleteCustomerModal"));
-        deleteCustomerModal.show();
-    }
-
-    // AJAX Delete Functionality for Customer
-    document.getElementById("confirmDeleteCustomerButton").addEventListener("click", function () {
-        if (deleteCustomerName && deleteCustomerDistributorId) {
-            // Since we're handling this front-end only, no server request is made here.
-            const customerList = document.getElementById(`customerList-${deleteCustomerDistributorId}`);
-            const customerItems = customerList.getElementsByTagName("li");
-
-            Array.from(customerItems).forEach((customer) => {
-                if (customer.textContent.trim() === deleteCustomerName) {
-                    customer.remove(); // Remove customer from the list
-                }
+                // Add click event to confirm toggle
+                confirmButton.onclick = function () {
+                    toggleActivation(distributorId, !isActive);
+                    $('#toggleConfirmationModal').modal('hide'); // Close the modal after confirming
+                };
             });
-
-            const deleteCustomerModal = bootstrap.Modal.getInstance(document.getElementById("deleteCustomerModal"));
-            deleteCustomerModal.hide();
-        }
+        });
     });
+
+    function toggleActivation(distributorId, newIsActive) {
+        // Log what we're sending to the server
+        console.log("Toggling activation - Distributor ID:", distributorId, "New Active Status:", newIsActive);
+
+        fetch(`/Distributor/ToggleActivation?distributorId=${distributorId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ isActive: newIsActive }) // Sending the updated activation status
+        })
+        .then(response => {
+            if (!response.ok) {
+                // Log the error response if it's not ok
+                console.error('Response Error:', response);
+                throw new Error('Failed to toggle activation.');
+            }
+            return response.json(); // Parse the JSON response
+        })
+        .then(data => {
+            console.log("Server Response:", data); // Log the server's response
+
+            if (data.success) {
+                // Get the row and button for this distributor
+                const row = document.getElementById(`row-${distributorId}`);
+                const statusBadge = row?.querySelector(".badge");
+                const toggleButton = row?.querySelector(".toggle-activation");
+
+                // Check the new status and update the UI accordingly
+                if(statusBadge && toggleButton){
+                if (newIsActive ) {
+                    statusBadge.textContent = "Active";
+                    statusBadge.classList.remove("bg-danger");
+                    statusBadge.classList.add("bg-success");
+                    toggleButton.textContent = "Deactivate";
+                    toggleButton.classList.remove("btn-success");
+                    toggleButton.classList.add("btn-danger");
+                } else {
+                    statusBadge.textContent = "Inactive";
+                    statusBadge.classList.remove("bg-success");
+                    statusBadge.classList.add("bg-danger");
+                    toggleButton.textContent = "Activate";
+                    toggleButton.classList.remove("btn-danger");
+                    toggleButton.classList.add("btn-success");
+                }
+                }
+
+                // Update the data-is-active attribute of the button
+                toggleButton?.setAttribute("data-is-active", newIsActive.toString());
+
+                // Log the updated button state
+                console.log("Updated button state - data-is-active:", newIsActive);
+            } else {
+                alert(data.message || "Failed to toggle activation.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred while toggling activation. Please try again.");
+        });
+    }
+
+
 
     // Search Functionality for Distributors
     document.getElementById("searchBox").addEventListener("input", function () {
@@ -379,7 +429,3 @@
 </script>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">

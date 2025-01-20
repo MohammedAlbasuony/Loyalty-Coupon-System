@@ -37,6 +37,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 IsDeleted = distributorViewModel.IsDeleted,
                 CreatedBy = distributorViewModel.CreatedBy,
                 CreatedAt = distributorViewModel.CreatedAt,
+                IsActive = distributorViewModel.IsActive,
                 DistributorCustomers = new List<DistributorCustomer>()
             };
 
@@ -81,6 +82,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 CreatedBy = d.CreatedBy,
                 UpdatedBy = d.UpdatedBy,
                 UpdatedAt = d.UpdatedAt,
+                IsActive = d.IsActive,
                 SelectedCustomerNames = d.DistributorCustomers.Where(dc => dc.Customer != null)
                 .Select(x => x.Customer.Name)
                 .Distinct().ToList()
@@ -104,6 +106,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         SelectedCity = distributor.City,
                         Code = distributor.Code,
                         IsDeleted = distributor.IsDeleted,
+                        IsActive = distributor.IsActive,
                         SelectedCustomerNames = distributorCustomers.Where(dc => dc.Customer != null)
                         .Select(x => x.Customer.Name)
                         .Distinct().ToList()
@@ -137,7 +140,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     Code = distributorViewModel.Code,
                     IsDeleted = distributorViewModel.IsDeleted,
                     UpdatedBy = distributorViewModel.UpdatedBy,
-                    UpdatedAt = distributorViewModel.UpdatedAt
+                    UpdatedAt = distributorViewModel.UpdatedAt,
+                    IsActive = distributorViewModel.IsActive,
                 };
 
                 // Call the repository update method
@@ -190,6 +194,20 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         new SelectListItem { Text = "New Valley", Value = "New Valley" },
         new SelectListItem { Text = "Sharkia", Value = "Sharkia" }
     };
+        }
+        public async Task<bool> ToggleActivationAsync(int distributorId)
+        {
+            var distributor = await _distributorRepo.GetByIdAsync(distributorId);
+            if (distributor == null)
+            {
+                return false;
+            }
+
+            // Toggle the IsActive status
+            distributor.IsActive = !distributor.IsActive;
+
+            // Save the updated distributor
+            return await _distributorRepo.UpdateAsync(distributor);
         }
 
     }
