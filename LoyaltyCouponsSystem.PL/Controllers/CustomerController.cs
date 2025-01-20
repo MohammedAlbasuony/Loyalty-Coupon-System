@@ -127,5 +127,40 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             return View(updateCustomerViewModel);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Please select a valid Excel file.";
+                return RedirectToAction("GetAllCustomers");
+            }
+
+            try
+            {
+                using var stream = new MemoryStream();
+                await file.CopyToAsync(stream);
+
+                // Process the file in the service
+                var result = await _customerService.ImportCustomersFromExcelAsync(stream);
+
+                if (result)
+                {
+                    TempData["SuccessMessage"] = "Customers imported successfully!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to import customers. Please check the file format.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+            }
+
+            return RedirectToAction("GetAllCustomers");
+        }
+
     }
 }
