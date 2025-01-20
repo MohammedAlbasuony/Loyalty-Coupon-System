@@ -47,5 +47,6 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Account
         [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; }
         public List<string>? AvailableRoles { get; set; }
+        public bool EmailConfirmed { get; set; } = true; 
     }
 }
