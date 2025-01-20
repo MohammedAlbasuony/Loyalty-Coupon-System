@@ -32,13 +32,8 @@
                     <th>National ID</th>
                     <th>Governorate</th>
                     <th>City</th>
-                    <th>Phone Number</th>
-                    <th>Phone Number 2</th>
-                    <th>Phone Number 3</th>
-                    <th>Created By</th>
-                    <th>Created At</th>
-                    <th>Updated By</th>
-                    <th>Updated At</th>
+                    <th>Phone Numbers</th>
+                    <th>Created By/At - Updated By/At</th>
                     <th>Status</th>
                     <th>Actions</th>
                     <th>Details</th>
@@ -54,13 +49,16 @@
                         <td>@technician.NationalID</td>
                         <td>@technician.SelectedGovernate</td>
                         <td>@technician.SelectedCity</td>
-                        <td>@technician.PhoneNumber1</td>
-                        <td>@technician.PhoneNumber2</td>
-                        <td>@technician.PhoneNumber3</td>
-                        <td>@technician.CreatedBy</td>
-                        <td>@technician.CreatedAt</td>
-                        <td>@technician.UpdatedBy</td>
-                        <td>@technician.UpdatedAt</td>
+                        <td>
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#phoneNumbersModal-@technician.TechnicianID">
+                                View Phone Numbers
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createdUpdatedModal-@technician.TechnicianID">
+                                View Created/Updated Info
+                            </button>
+                        </td>
                         <td>
                             <span class="badge @(technician.IsActive ? "bg-success" : "bg-danger")">
                                 @(technician.IsActive ? "Active" : "Inactive")
@@ -125,6 +123,49 @@
                                             <li>@user</li>
                                         }
                                     </ul>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal for Phone Numbers -->
+                    <div class="modal fade" id="phoneNumbersModal-@technician.TechnicianID" tabindex="-1" aria-labelledby="phoneNumbersModalLabel-@technician.TechnicianID" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="phoneNumbersModalLabel-@technician.TechnicianID">Phone Numbers</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <ul>
+                                        <li>Phone Number 1: @technician.PhoneNumber1</li>
+                                        <li>Phone Number 2: @technician.PhoneNumber2</li>
+                                        <li>Phone Number 3: @technician.PhoneNumber3</li>
+                                    </ul>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal for Created/Updated Info -->
+                    <div class="modal fade" id="createdUpdatedModal-@technician.TechnicianID" tabindex="-1" aria-labelledby="createdUpdatedModalLabel-@technician.TechnicianID" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="createdUpdatedModalLabel-@technician.TechnicianID">Created & Updated Information</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Created By:</strong> @technician.CreatedBy</p>
+                                    <p><strong>Created At:</strong> @technician.CreatedAt</p>
+                                    <p><strong>Updated By:</strong> @technician.UpdatedBy</p>
+                                    <p><strong>Updated At:</strong> @technician.UpdatedAt</p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
