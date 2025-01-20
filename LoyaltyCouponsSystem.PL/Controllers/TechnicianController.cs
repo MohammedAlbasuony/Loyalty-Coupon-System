@@ -29,9 +29,27 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
         public async Task<IActionResult> GetAllTechnicians()
         {
-            var result = await _technicianService.GetAllAsync();
-            return View(result);
+            // Fetch all technicians along with associated users and customers
+            var technicians = await _technicianService.GetAllAsync();
+
+            // Iterate through each technician and apply distinct logic to their users and customers
+            foreach (var technician in technicians)
+            {
+                // Get distinct users for the current technician
+                technician.SelectedUserNames = technician.SelectedUserNames
+                    .Distinct()
+                    .ToList();
+
+                // Get distinct customers for the current technician
+                technician.SelectedCustomerNames = technician.SelectedCustomerNames
+                    .Distinct()
+                    .ToList();
+            }
+
+            // Return the distincted list of technicians with their users and customers
+            return View(technicians);
         }
+
 
         public async Task<IActionResult> GetTechnicianById(int id)
         {

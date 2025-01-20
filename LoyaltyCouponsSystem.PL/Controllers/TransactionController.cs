@@ -36,7 +36,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View(distinctTransactions);
 
 
-
+            
         }
 
     }
