@@ -117,7 +117,7 @@
             </tbody>
         </table>
     </div>
-    <!-- Confirmation Modal for Toggle Activation (moved outside the loop) -->
+    <!-- Confirmation Modal for Toggle Activation -->
     <div class="modal fade" id="toggleConfirmationModal" tabindex="-1" aria-labelledby="toggleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -126,7 +126,7 @@
                     <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to <span id="toggleAction">activate</span> this customer?
+                    Are you sure you want to <span id="toggleAction">activate</span> this distributor?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -138,9 +138,6 @@
     <!-- Pagination Controls -->
     <div id="paginationContainer" class="mt-4 text-center"></div>
 </div>
-
-
-
 
 <style>
     /* Table Styling */
@@ -180,7 +177,7 @@
         font-size: 16px;
         border: 2px solid #007bff;
         background-color: #f9f9f9;
-        width: 75%; /* Adjust width as needed */
+        width: 75%;
     }
 
         #searchBox::placeholder {
@@ -257,25 +254,18 @@
         font-weight: bold;
         text-transform: uppercase;
     }
-
 </style>
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Bootstrap JS (includes Popper.js for modal handling) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-     // Toggle Activation Functionality for Distributor
+    // Toggle Activation Functionality for Distributor
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".toggle-activation").forEach(button => {
             button.addEventListener("click", function () {
-                debugger;
                 const distributorId = this.getAttribute("data-customer-id");
                 const isActive = this.getAttribute("data-is-active") === "True";
-
-                // Log the initial state for debugging
-                console.log("Initial State - Distributor ID:", distributorId, "Is Active:", isActive);
 
                 // Set the confirmation message dynamically
                 const toggleActionText = isActive ? "deactivate" : "activate";
@@ -299,9 +289,6 @@
     });
 
     function toggleActivation(distributorId, newIsActive) {
-        // Log what we're sending to the server
-        console.log("Toggling activation - Distributor ID:", distributorId, "New Active Status:", newIsActive);
-
         fetch(`/Distributor/ToggleActivation?distributorId=${distributorId}`, {
             method: 'POST',
             headers: {
@@ -310,122 +297,36 @@
             },
             body: JSON.stringify({ isActive: newIsActive }) // Sending the updated activation status
         })
-        .then(response => {
-            if (!response.ok) {
-                // Log the error response if it's not ok
-                console.error('Response Error:', response);
-                throw new Error('Failed to toggle activation.');
-            }
-            return response.json(); // Parse the JSON response
-        })
+        .then(response => response.json())
         .then(data => {
-            console.log("Server Response:", data); // Log the server's response
-
             if (data.success) {
-                // Get the row and button for this distributor
                 const row = document.getElementById(`row-${distributorId}`);
                 const statusBadge = row?.querySelector(".badge");
                 const toggleButton = row?.querySelector(".toggle-activation");
 
-                // Check the new status and update the UI accordingly
-                if(statusBadge && toggleButton){
-                if (newIsActive ) {
-                    statusBadge.textContent = "Active";
-                    statusBadge.classList.remove("bg-danger");
-                    statusBadge.classList.add("bg-success");
-                    toggleButton.textContent = "Deactivate";
-                    toggleButton.classList.remove("btn-success");
-                    toggleButton.classList.add("btn-danger");
-                } else {
-                    statusBadge.textContent = "Inactive";
-                    statusBadge.classList.remove("bg-success");
-                    statusBadge.classList.add("bg-danger");
-                    toggleButton.textContent = "Activate";
-                    toggleButton.classList.remove("btn-danger");
-                    toggleButton.classList.add("btn-success");
-                }
+                if (statusBadge && toggleButton) {
+                    if (newIsActive) {
+                        statusBadge.textContent = "Active";
+                        statusBadge.classList.remove("bg-danger");
+                        statusBadge.classList.add("bg-success");
+                        toggleButton.textContent = "Deactivate";
+                        toggleButton.classList.remove("btn-success");
+                        toggleButton.classList.add("btn-danger");
+                    } else {
+                        statusBadge.textContent = "Inactive";
+                        statusBadge.classList.remove("bg-success");
+                        statusBadge.classList.add("bg-danger");
+                        toggleButton.textContent = "Activate";
+                        toggleButton.classList.remove("btn-danger");
+                        toggleButton.classList.add("btn-success");
+                    }
                 }
 
-                // Update the data-is-active attribute of the button
                 toggleButton?.setAttribute("data-is-active", newIsActive.toString());
-
-                // Log the updated button state
-                console.log("Updated button state - data-is-active:", newIsActive);
             } else {
                 alert(data.message || "Failed to toggle activation.");
             }
         })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("An error occurred while toggling activation. Please try again.");
-        });
+        .catch(error => alert("An error occurred while toggling activation. Please try again."));
     }
-
-
-
-    // Search Functionality for Distributors
-    document.getElementById("searchBox").addEventListener("input", function () {
-        const searchValue = this.value.toLowerCase();
-        const rows = document.querySelectorAll("#distributorTable tbody tr");
-
-        rows.forEach(row => {
-            const cells = Array.from(row.children);
-            const isVisible = cells.some(cell => cell.textContent.toLowerCase().includes(searchValue));
-            row.style.display = isVisible ? "" : "none";
-        });
-    });
-
-    // Filter Customers in Modal
-    function filterCustomers(distributorID) {
-        const searchInput = document.getElementById(`searchCustomers-${distributorID}`).value.toLowerCase();
-        const customerList = document.getElementById(`customerList-${distributorID}`);
-        const customers = customerList.getElementsByTagName("li");
-
-        Array.from(customers).forEach((customer) => {
-            const customerName = customer.textContent.toLowerCase();
-            customer.style.display = customerName.includes(searchInput) ? "" : "none";
-        });
-    }
-
-    // Pagination functionality
-    document.addEventListener("DOMContentLoaded", function () {
-        const rowsPerPage = 10; // Number of rows per page
-        const tableBody = document.querySelector("#distributorTable tbody");
-        const paginationContainer = document.getElementById("paginationContainer");
-
-        // Function to show a specific page
-        function showPage(pageNumber) {
-            const rows = Array.from(tableBody.querySelectorAll("tr"));
-            const totalRows = rows.length;
-            const totalPages = Math.ceil(totalRows / rowsPerPage);
-
-            // Hide all rows and show only the rows for the current page
-            rows.forEach((row, index) => {
-                row.style.display = (index >= (pageNumber - 1) * rowsPerPage && index < pageNumber * rowsPerPage) ? "" : "none";
-            });
-
-            // Update pagination controls
-            updatePaginationControls(pageNumber, totalPages);
-        }
-
-        // Function to update pagination controls
-        function updatePaginationControls(currentPage, totalPages) {
-            paginationContainer.innerHTML = ""; // Clear existing pagination controls
-
-            for (let i = 1; i <= totalPages; i++) {
-                const button = document.createElement("button");
-                button.textContent = i;
-                button.classList.add("btn", "btn-sm", "mx-1");
-                button.classList.add(i === currentPage ? "btn-primary" : "btn-outline-primary");
-                button.addEventListener("click", () => showPage(i));
-                paginationContainer.appendChild(button);
-            }
-        }
-
-        // Initialize pagination
-        showPage(1);
-    });
-
 </script>
-
-

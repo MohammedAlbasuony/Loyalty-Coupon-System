@@ -1,4 +1,5 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using LoyaltyCouponsSystem.DAL.DB;
@@ -40,6 +41,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     City = technicianViewModel.SelectedCity,
                     CreatedAt = technicianViewModel?.CreatedAt,
                     CreatedBy = technicianViewModel?.CreatedBy,
+                    IsActive = technicianViewModel.IsActive,
                 };
 
                 // Fetch customer IDs by selected codes
@@ -139,6 +141,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 CreatedBy = technician.CreatedBy,
                 UpdatedBy = technician.UpdatedBy,
                 UpdatedAt = technician.UpdatedAt,
+                IsActive = technician.IsActive,
                 SelectedCustomerNames = technician.Customers?.Select(c => c.Name).ToList(),
                 SelectedUserNames = technician.Users?.Select(u => u.UserName).ToList(),
             }).ToList();
@@ -187,6 +190,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         PhoneNumber3 = technician.PhoneNumber3,
                         SelectedGovernate = technician.Governate,
                         SelectedCity = technician.City,
+                        IsActive = technician.IsActive,
                         Customers = await GetCustomersForDropdownAsync(),
                         Users = await GetUsersForDropdownAsync(),
                     };
@@ -221,6 +225,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 existingTechnician.City = technicianViewModel.SelectedCity;
                 existingTechnician.UpdatedAt = DateTime.Now;
                 existingTechnician.UpdatedBy = technicianViewModel.UpdatedBy;
+                existingTechnician.IsActive = technicianViewModel.IsActive;
                 // Save the updated entity
                 return await _technicianRepo.UpdateAsync(existingTechnician);
             }
@@ -283,5 +288,19 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             viewModel.Governates = governates;
             viewModel.Cities = cities;
         }
+        public async Task<bool> ToggleActivationAsync(int technicianId)
+        {
+            var technician = await _technicianRepo.GetByIdAsync(technicianId);
+            if (technician == null)
+            {
+                return false;
+            }
+
+            technician.IsActive = !technician.IsActive;
+            technician.UpdatedAt = DateTime.Now;
+
+            return await _technicianRepo.UpdateAsync(technician);
+        }
+
     }
 }

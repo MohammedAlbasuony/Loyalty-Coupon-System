@@ -27,5 +27,6 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         }
         public ICollection<Customer> Customers { get; set; }
         public ICollection<ApplicationUser> Users { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 }
