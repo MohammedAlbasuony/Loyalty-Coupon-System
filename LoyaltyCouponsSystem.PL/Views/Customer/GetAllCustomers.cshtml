@@ -50,12 +50,11 @@
                             </span>
                         </td>
                         <td>
-                            <form asp-controller="Customer" asp-action="ToggleActivation" method="post" style="display:inline;">
-                                <input type="hidden" name="customerId" value="@customer.CustomerID" />
-                                <button type="submit" class="btn btn-sm @(customer.IsActive ? "btn-danger" : "btn-success")">
-                                    @(customer.IsActive ? "Deactivate" : "Activate")
-                                </button>
-                            </form>
+                            <button class="btn btn-sm @(customer.IsActive ? "btn-danger" : "btn-success") toggle-activation"
+                                    data-customer-id="@customer.CustomerID"
+                                    data-is-active="@customer.IsActive">
+                                @(customer.IsActive ? "Deactivate" : "Activate")
+                            </button>
                             <a href="@Url.Action("UpdateCustomer", "Customer", new { id = customer.CustomerID })" class="btn btn-outline-primary btn-sm me-2">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
@@ -63,57 +62,40 @@
                     </tr>
                 }
             </tbody>
-
         </table>
-
     </div>
 
+    <!-- Confirmation Modal for Toggle Activation (moved outside the loop) -->
+    <div class="modal fade" id="toggleConfirmationModal" tabindex="-1" aria-labelledby="toggleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="toggleModalLabel">Confirm Toggle Activation</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to <span id="toggleAction">activate</span> this customer?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmToggleButton" class="btn btn-warning">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Pagination Controls -->
     <div id="paginationContainer" class="mt-4 text-center"></div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete this customer?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="confirmDeleteButton" class="btn btn-danger" onclick="deleteCustomer()">Delete</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 <style>
     /* Table Styling */
-    .table {
-        border-radius: 12px;
-        overflow: hidden;
-        text-align: center;
+    .table th {
+        background-color: #007bff !important;
+        color: #ffffff !important;
+        font-weight: bold;
+        text-transform: uppercase;
     }
-
-        .table th {
-            background-color: #007bff !important;
-            color: #ffffff !important;
-            font-weight: bold;
-            font-size: 16px;
-            padding: 12px;
-            text-transform: uppercase;
-        }
-
-        .table td {
-            font-size: 14px;
-            font-weight: 500;
-        }
 
     .table-hover tbody tr:hover {
         background-color: #e9f5ff;
@@ -124,240 +106,126 @@
         color: white;
         font-weight: bold;
         border-radius: 30px;
-        padding: 10px 20px;
     }
 
-        .btn-add-customer:hover {
-            background-color: #0056b3;
-            color: white;
-        }
-
-        .btn-add-customer i {
-            margin-right: 8px;
-        }
-
-    /* Search Box Styling */
-    #searchBox {
-        border-radius: 20px;
-        padding: 10px;
-        font-size: 16px;
-        border: 2px solid #007bff;
-        background-color: #f9f9f9;
-        width: 75%; /* Adjust width as needed */
+    .badge.bg-success {
+        background-color: #28a745;
     }
 
-        #searchBox::placeholder {
-            font-style: italic;
-            color: #aaa;
-        }
-
-    h1 {
-        font-family: 'Verdana', sans-serif;
-        font-weight: bold;
-        letter-spacing: 1px;
+    .badge.bg-danger {
+        background-color: #dc3545;
     }
-
-    #paginationContainer .btn {
-        font-size: 14px;
-        padding: 8px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    #paginationContainer .btn-primary {
-        background-color: #007bff;
-        color: white;
-        border: none;
-    }
-
-    #paginationContainer .btn-outline-primary {
-        border: 1px solid #007bff;
-        color: #007bff;
-        background-color: white;
-    }
-
-    #paginationContainer .btn:hover {
-        opacity: 0.8;
-    }
-
-    .badge {
-        padding: 5px 10px;
-        font-size: 14px;
-        font-weight: bold;
-        border-radius: 6px;
-    }
-
-        .badge.bg-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .badge.bg-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-    .toggle-btn {
-        font-size: 14px;
-        font-weight: bold;
-        border-radius: 6px;
-    }
-
-        .toggle-btn.btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .toggle-btn.btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .toggle-btn:hover {
-            opacity: 0.8;
-        }
-
-
-    /* Add for strikethrough rows */
-    tr[style*="text-decoration: line-through"] {
-        opacity: 0.7; /* Makes the row slightly faded */
-    }
-
-
 </style>
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JS (includes Popper.js for modal handling) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    let deleteCustomerId = null;
+    document.addEventListener("DOMContentLoaded", function () {
+        // Find all toggle buttons
+        document.querySelectorAll(".toggle-activation").forEach(button => {
+            button.addEventListener("click", function () {
+                const customerId = this.getAttribute("data-customer-id");
+                const isActive = this.getAttribute("data-is-active") === "True";
 
-    // Confirmation Modal
-    function confirmDelete(customerCode) {
-        deleteCustomerId = customerCode;
-        const deleteModal = new bootstrap.Modal(document.getElementById("deleteConfirmationModal"));
-        deleteModal.show();
-    }
+                // Set the confirmation message dynamically
+                const toggleActionText = isActive ? "deactivate" : "activate";
+                const actionColor = isActive ? "danger" : "success";
 
-    // AJAX Delete Functionality
-    function deleteCustomer() {
-        if (deleteCustomerId) {
-            fetch(`/Customer/DeleteCustomer/${deleteCustomerId}`, {
-                method: 'DELETE'
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Remove row from the table
-                    const row = document.getElementById(`row-${deleteCustomerId}`);
-                    if (row) row.remove();
+                // Set modal content
+                document.getElementById("toggleAction").textContent = toggleActionText;
+                const confirmButton = document.getElementById("confirmToggleButton");
+                confirmButton.className = `btn btn-${actionColor}`;
+
+                // Open the modal
+                $('#toggleConfirmationModal').modal('show');
+
+                // Add click event to confirm toggle
+                confirmButton.onclick = function () {
+                    toggleActivation(customerId, !isActive);
+                    $('#toggleConfirmationModal').modal('hide'); // Close the modal after confirming
+                };
+            });
+        });
+
+            // Function to toggle activation
+    function toggleActivation(customerId, isActive) {
+        fetch(`/Customer/ToggleActivation?customerId=${customerId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const row = document.getElementById(`row-${customerId}`);
+                const statusBadge = row.querySelector(".badge");
+                const toggleButton = row.querySelector(".toggle-activation");
+
+                // Ensure the UI reflects the updated status correctly
+                if (data.isActive) {
+                    statusBadge.textContent = "Active";
+                    statusBadge.classList.remove("bg-danger");
+                    statusBadge.classList.add("bg-success");
+                    toggleButton.textContent = "Deactivate";
+                    toggleButton.classList.remove("btn-success");
+                    toggleButton.classList.add("btn-danger");
                 } else {
-                    alert("Failed to delete customer.");
+                    statusBadge.textContent = "Inactive";
+                    statusBadge.classList.remove("bg-success");
+                    statusBadge.classList.add("bg-danger");
+                    toggleButton.textContent = "Activate";
+                    toggleButton.classList.remove("btn-danger");
+                    toggleButton.classList.add("btn-success");
                 }
-            })
-            .catch(error => console.error('Error deleting customer:', error));
-        }
-        const deleteModal = bootstrap.Modal.getInstance(document.getElementById("deleteConfirmationModal"));
-        deleteModal.hide();
+            } else {
+                alert(data.message || "Failed to toggle activation.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred while toggling activation. Please try again.");
+        });
     }
 
-    // Search Functionality
+    });
+
+    // Search functionality
     document.getElementById("searchBox").addEventListener("input", function () {
         const searchValue = this.value.toLowerCase();
-        const rows = document.querySelectorAll("#customerTable tbody tr");
-
-        rows.forEach(row => {
-            const cells = Array.from(row.children);
-            const isVisible = cells.some(cell => cell.textContent.toLowerCase().includes(searchValue));
+        document.querySelectorAll("#customerTable tbody tr").forEach(row => {
+            const isVisible = Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(searchValue));
             row.style.display = isVisible ? "" : "none";
         });
     });
 
     // Pagination functionality
-    document.addEventListener("DOMContentLoaded", function () {
-        const rowsPerPage = 10; // Set to 10 rows per page
-        const tableBody = document.querySelector("#customerTable tbody");
-        const paginationContainer = document.getElementById("paginationContainer");
+    const rowsPerPage = 10;
+    const tableBody = document.querySelector("#customerTable tbody");
+    const paginationContainer = document.getElementById("paginationContainer");
 
-        // Function to show a specific page
-        function showPage(pageNumber) {
-            const rows = Array.from(tableBody.querySelectorAll("tr"));
-            const totalRows = rows.length;
-            const totalPages = Math.ceil(totalRows / rowsPerPage);
-
-            // Hide all rows and show only the rows for the current page
-            rows.forEach((row, index) => {
-                row.style.display = (index >= (pageNumber - 1) * rowsPerPage && index < pageNumber * rowsPerPage) ? "" : "none";
-            });
-
-            // Update pagination controls
-            updatePaginationControls(pageNumber, totalPages);
-        }
-
-        // Function to update pagination controls
-        function updatePaginationControls(currentPage, totalPages) {
-            paginationContainer.innerHTML = ""; // Clear existing pagination controls
-
-            for (let i = 1; i <= totalPages; i++) {
-                const button = document.createElement("button");
-                button.textContent = i;
-                button.classList.add("btn", "btn-sm", "mx-1");
-                button.classList.add(i === currentPage ? "btn-primary" : "btn-outline-primary");
-                button.addEventListener("click", () => showPage(i));
-                paginationContainer.appendChild(button);
-            }
-        }
-
-        // Initialize pagination
-        showPage(1);
-    });
-
-
-                    document.addEventListener("DOMContentLoaded", () => {
-        document.addEventListener("submit", function (event) {
-            if (event.target.matches("form[asp-action='ToggleActivation']")) {
-                event.preventDefault(); // Prevent default form submission
-                const form = event.target;
-                const customerId = form.querySelector("input[name='customerId']").value;
-                const row = document.getElementById(`row-${customerId}`);
-                const statusBadge = row.querySelector(".badge");
-                const toggleButton = form.querySelector("button");
-
-                // Send a POST request to toggle activation
-                fetch(form.action, {
-                    method: "POST",
-                    body: new FormData(form),
-                })
-                    .then(response => response.json()) // Parse JSON response
-                    .then(data => {
-                        const isActive = data.isActive;
-
-                        // Update the UI based on the new status
-                        if (!isActive) {
-                            // Update to "Inactive"
-                            statusBadge.textContent = "Inactive";
-                            statusBadge.classList.remove("bg-success");
-                            statusBadge.classList.add("bg-danger");
-                            toggleButton.textContent = "Activate";
-                            toggleButton.classList.remove("btn-danger");
-                            toggleButton.classList.add("btn-success");
-                            row.style.textDecoration = "line-through";
-                        } else {
-                            // Update to "Active"
-                            statusBadge.textContent = "Active";
-                            statusBadge.classList.remove("bg-danger");
-                            statusBadge.classList.add("bg-success");
-                            toggleButton.textContent = "Deactivate";
-                            toggleButton.classList.remove("btn-success");
-                            toggleButton.classList.add("btn-danger");
-                            row.style.textDecoration = "none";
-                        }
-                    })
-                    .catch(error => console.error("Error:", error));
-            }
+    function showPage(pageNumber) {
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        rows.forEach((row, index) => {
+            row.style.display = (index >= (pageNumber - 1) * rowsPerPage && index < pageNumber * rowsPerPage) ? "" : "none";
         });
-    });
+        updatePagination(pageNumber, Math.ceil(rows.length / rowsPerPage));
+    }
 
+    function updatePagination(currentPage, totalPages) {
+        paginationContainer.innerHTML = "";
+        for (let i = 1; i <= totalPages; i++) {
+            const button = document.createElement("button");
+            button.textContent = i;
+            button.className = `btn btn-sm mx-1 ${i === currentPage ? "btn-primary" : "btn-outline-primary"}`;
+            button.addEventListener("click", () => showPage(i));
+            paginationContainer.appendChild(button);
+        }
+    }
 
-
-
-
+    showPage(1);
 </script>
-

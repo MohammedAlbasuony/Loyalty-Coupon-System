@@ -27,7 +27,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     Governate = customerViewModel.Governate,
                     City = customerViewModel.City,
                     PhoneNumber = customerViewModel.PhoneNumber,
-                    TechnicianId = customerViewModel.TechnicianID
+                    TechnicianId = customerViewModel.TechnicianID,
+                    IsActive = customerViewModel.IsActive
                 };
                 return await _customerRepo.AddAsync(customer);
             }
@@ -60,6 +61,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 CreatedAt = customer.CreatedAt,
                 UpdatedBy = customer.UpdatedBy,
                 UpdatedAt = customer.UpdatedAt,
+                IsActive = customer.IsActive,
             }).ToList();
 
             return customerViewModels;
@@ -81,7 +83,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         Governate = customer.Governate,
                         City = customer.City,
                         PhoneNumber = customer.PhoneNumber,
-                        TechnicianID = customer.TechnicianId
+                        TechnicianID = customer.TechnicianId,
+                        IsActive = customer.IsActive
                     };
                 }
             }
@@ -106,7 +109,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     existingCustomer.TechnicianId = updateCustomerViewModel.TechnicianID;
                     existingCustomer.UpdatedAt = DateTime.Now;
                     existingCustomer.UpdatedBy = updateCustomerViewModel.UpdatedBy;
-                    
+                    existingCustomer.IsActive = updateCustomerViewModel.IsActive;
 
                     return await _customerRepo.UpdateAsync(existingCustomer); 
                 }
