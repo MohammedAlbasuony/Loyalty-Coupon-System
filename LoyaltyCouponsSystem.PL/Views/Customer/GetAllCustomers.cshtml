@@ -38,7 +38,7 @@
             <tbody>
                 @foreach (var customer in Model)
                 {
-                    <tr id="row-@customer.CustomerID">
+                    <tr id="row-@customer.CustomerID" class="@(customer.IsActive ? "" : "inactive-row")">
                         <td>@customer.Code</td>
                         <td>@customer.Name</td>
                         <td>@customer.Governate</td>
@@ -109,6 +109,11 @@
         border-radius: 30px;
     }
 
+    .btn-add-customer:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
     .badge.bg-success {
         background-color: #28a745;
     }
@@ -116,6 +121,25 @@
     .badge.bg-danger {
         background-color: #dc3545;
     }
+
+    /* Styling for inactive rows */
+    .inactive-row {
+        background-color: #f5f5f5; /* Light gray background */
+        color: #6c757d; /* Muted text color */
+    }
+
+        .inactive-row td {
+            text-decoration: line-through; /* Strikethrough text */
+        }
+
+            /* Exclude Action column from line-through */
+            .inactive-row td:last-child, /* Ensure no line-through on Action column */
+            .inactive-row td:last-child * {
+                text-decoration: none !important;
+                 /* Keep text color muted but no line-through */
+            }
+
+
 </style>
 
 <!-- jQuery -->
@@ -125,9 +149,10 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-        document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
         const tableBody = document.querySelector("#customerTable tbody");
 
+        // Rearrange rows based on status
         function rearrangeRows() {
             const rows = Array.from(tableBody.querySelectorAll("tr"));
             const activeRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Active");
@@ -139,10 +164,24 @@
             inactiveRows.forEach(row => tableBody.appendChild(row));
         }
 
-        // Rearrange rows on page load
-        rearrangeRows();
+        // Style rows dynamically based on active/inactive status
+        function styleRows() {
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
+            rows.forEach(row => {
+                const badge = row.querySelector(".badge");
+                if (badge && badge.textContent.trim() === "Inactive") {
+                    row.classList.add("inactive-row");
+                } else {
+                    row.classList.remove("inactive-row");
+                }
+            });
+        }
 
-        // Toggle activation and rearrange rows dynamically
+        // Rearrange and style rows on page load
+        rearrangeRows();
+        styleRows();
+
+        // Toggle activation and update rows dynamically
         document.querySelectorAll(".toggle-activation").forEach(button => {
             button.addEventListener("click", function () {
                 const customerId = this.getAttribute("data-customer-id");
@@ -181,8 +220,9 @@
 
                             toggleButton.setAttribute("data-is-active", data.isActive.toString());
 
-                            // Rearrange rows after the change
+                            // Rearrange and style rows after the change
                             rearrangeRows();
+                            styleRows();
                         } else {
                             alert(data.message || "Failed to toggle activation.");
                         }
@@ -193,41 +233,39 @@
                     });
             });
         });
-    });
 
-
-    // Search functionality
-    document.getElementById("searchBox").addEventListener("input", function () {
-        const searchValue = this.value.toLowerCase();
-        document.querySelectorAll("#customerTable tbody tr").forEach(row => {
-            const isVisible = Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(searchValue));
-            row.style.display = isVisible ? "" : "none";
+        // Search functionality
+        document.getElementById("searchBox").addEventListener("input", function () {
+            const searchValue = this.value.toLowerCase();
+            document.querySelectorAll("#customerTable tbody tr").forEach(row => {
+                const isVisible = Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(searchValue));
+                row.style.display = isVisible ? "" : "none";
+            });
         });
-    });
 
-    // Pagination functionality
-    const rowsPerPage = 10;
-    const tableBody = document.querySelector("#customerTable tbody");
-    const paginationContainer = document.getElementById("paginationContainer");
+        // Pagination functionality
+        const rowsPerPage = 10;
+        const paginationContainer = document.getElementById("paginationContainer");
 
-    function showPage(pageNumber) {
-        const rows = Array.from(tableBody.querySelectorAll("tr"));
-        rows.forEach((row, index) => {
-            row.style.display = (index >= (pageNumber - 1) * rowsPerPage && index < pageNumber * rowsPerPage) ? "" : "none";
-        });
-        updatePagination(pageNumber, Math.ceil(rows.length / rowsPerPage));
-    }
-
-    function updatePagination(currentPage, totalPages) {
-        paginationContainer.innerHTML = "";
-        for (let i = 1; i <= totalPages; i++) {
-            const button = document.createElement("button");
-            button.textContent = i;
-            button.className = `btn btn-sm mx-1 ${i === currentPage ? "btn-primary" : "btn-outline-primary"}`;
-            button.addEventListener("click", () => showPage(i));
-            paginationContainer.appendChild(button);
+        function showPage(pageNumber) {
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
+            rows.forEach((row, index) => {
+                row.style.display = (index >= (pageNumber - 1) * rowsPerPage && index < pageNumber * rowsPerPage) ? "" : "none";
+            });
+            updatePagination(pageNumber, Math.ceil(rows.length / rowsPerPage));
         }
-    }
 
-    showPage(1);
+        function updatePagination(currentPage, totalPages) {
+            paginationContainer.innerHTML = "";
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement("button");
+                button.textContent = i;
+                button.className = `btn btn-sm mx-1 ${i === currentPage ? "btn-primary" : "btn-outline-primary"}`;
+                button.addEventListener("click", () => showPage(i));
+                paginationContainer.appendChild(button);
+            }
+        }
+
+        showPage(1);
+    });
 </script>
