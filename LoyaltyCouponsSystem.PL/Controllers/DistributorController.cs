@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.InkML;
 using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
 using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.AspNetCore.Mvc;
@@ -176,5 +177,41 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return Json(new { success = true, isActive = distributor.IsActive });
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> UploadExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Please select a valid Excel file.";
+                return RedirectToAction("GetAllCustomers");
+            }
+
+            try
+            {
+                using var stream = new MemoryStream();
+                await file.CopyToAsync(stream);
+
+                // Process the file in the service
+                var result = await _distributorService.ImportDistributorsFromExcelAsync(stream);
+
+                if (result)
+                {
+                    TempData["SuccessMessage"] = "Distibutor imported successfully!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to import Distibutor. Please check the file format.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+            }
+
+            return RedirectToAction("GetAllDistributors");
+        }
+
     }
 }
+
