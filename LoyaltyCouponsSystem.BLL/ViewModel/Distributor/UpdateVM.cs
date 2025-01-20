@@ -37,5 +37,6 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Distributor
         public List<string>? SelectedCustomerNames { get; set; }
         public List<CustomerViewModel>? AvailableCustomers { get; set; }
         public List<SelectListItem> Customers { get; set; } = new List<SelectListItem>();
+        public bool IsActive { get; set; }
     }
 }
