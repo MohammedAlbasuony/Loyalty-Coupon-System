@@ -8,7 +8,21 @@
 }
 
 <div class="container mt-5">
-
+    <!-- Excel Upload Form -->
+    <div class="mb-4">
+        <form asp-controller="Customer" asp-action="UploadExcel" enctype="multipart/form-data" method="post">
+            <div class="row align-items-center">
+                <div class="col-md-9">
+                    <input type="file" name="file" accept=".xlsx, .xls" class="form-control" required />
+                </div>
+                <div class="col-md-3 text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload Excel
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
     <!-- Backward Button -->
     <div class="mb-4">
         <a href="@Url.Action("GetAllCustomers", "Customer")" class="btn btn-outline-primary" style="border-radius: 30px;">

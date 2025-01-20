@@ -16,5 +16,6 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
         Task<CustomerViewModel> GetByIdAsync(int id);
         Task<bool> UpdateAsync(UpdateCustomerViewModel updateCustomerViewModel);
         Task<bool> ToggleActivationAsync(int customerId, bool isActive);
+        Task<bool> ImportCustomersFromExcelAsync(Stream stream);
     }
 }
