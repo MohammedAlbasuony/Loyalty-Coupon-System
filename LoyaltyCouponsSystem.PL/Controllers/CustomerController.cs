@@ -34,6 +34,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View(result);
         }
 
+
         [HttpPost]
         [Route("Customer/ToggleActivation")]
         public async Task<IActionResult> ToggleActivation(int customerId)
@@ -41,14 +42,20 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var customer = await _DBcontext.Customers.FindAsync(customerId);
             if (customer == null)
             {
-                return NotFound();
+                return Json(new { success = false, message = "Customer not found" });
             }
 
+            // Toggle the IsActive status
             customer.IsActive = !customer.IsActive;
             await _DBcontext.SaveChangesAsync();
 
-            return RedirectToAction("GetAllCustomers");
+            // Return the updated status
+            return Json(new { success = true, isActive = customer.IsActive });
         }
+
+
+
+
 
 
 

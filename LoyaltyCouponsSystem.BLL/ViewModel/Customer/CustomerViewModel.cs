@@ -31,6 +31,6 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Customer
         public DateTime? CreatedAt { get; set; }
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; } 
     }
 }
