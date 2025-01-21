@@ -1,4 +1,5 @@
 ﻿using LoyaltyCouponsSystem.DAL.Entity;
+using LoyaltyCouponsSystem.DAL.Entity.Permission;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,8 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public DbSet<Area> Areas { get; set; }
 
         public DbSet<QRScanLog> QRScanLogs { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
 
         public DbSet<QRCodeTransactionGenerated> qRCodeTransactionGenerateds { get; set; }
 
@@ -198,6 +201,35 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.HasKey(e => e.AuditLogID);
                 entity.Property(e => e.Action).IsRequired().HasMaxLength(200);
             });
+         
+            
+            // Define a composite key for RolePermission (RoleId + PermissionId)
+            modelBuilder.Entity<RolePermission>()
+                .HasKey(rp => new { rp.RoleId, rp.PermissionId });
+
+            // Configure the relationships
+            modelBuilder.Entity<RolePermission>()
+                .HasOne(rp => rp.Role)
+                .WithMany()  // IdentityRole has no RolePermissions collection, so we use WithMany() without a navigation property
+                .HasForeignKey(rp => rp.RoleId)
+                .OnDelete(DeleteBehavior.Cascade); // Optional: cascade delete to remove associated RolePermissions if role is deleted
+
+            modelBuilder.Entity<RolePermission>()
+                .HasOne(rp => rp.Permission)
+                .WithMany(p => p.RolePermissions) // This assumes you add the RolePermissions navigation property in Permission
+                .HasForeignKey(rp => rp.PermissionId)
+                .OnDelete(DeleteBehavior.Cascade); // Optional: cascade delete to remove associated RolePermissions if permission is deleted
+
+
+            modelBuilder.Entity<Permission>().HasData(
+           new Permission { Id = 1, Name = "Manage Customers" },
+           new Permission { Id = 2, Name = "Manage Distributors" },
+           new Permission { Id = 3, Name = "Manage Technicias" },
+           new Permission { Id = 4, Name = "Manage Users" },
+           new Permission { Id = 5, Name = "Generate QR Codes" },
+           new Permission { Id = 6, Name = "Exchange Permissions" }
+       );
+
         }
 
         public override int SaveChanges()

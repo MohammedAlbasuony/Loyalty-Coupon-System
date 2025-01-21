@@ -1,9 +1,12 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using DocumentFormat.OpenXml.InkML;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Admin;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
+using LoyaltyCouponsSystem.DAL.Entity.Permission;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SkiaSharp;
 
 namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 {
@@ -12,10 +15,11 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         private readonly ApplicationDbContext dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _DBcontext;
 
         public AdminService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            this.dbContext = dbContext;
+            _DBcontext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
         }
@@ -144,5 +148,74 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             return true;
         }
+
+
+
+        // Permission
+
+        // Get all permissions for a role
+        public async Task<List<string>> GetPermissionsForRoleAsync(string roleName)
+        {
+            var role = await _roleManager.FindByNameAsync(roleName);
+            if (role == null)
+                return new List<string>();
+
+            var rolePermissions = await _DBcontext.RolePermissions
+                .Where(rp => rp.RoleId == role.Id)
+                .Include(rp => rp.Permission)
+                .ToListAsync();
+
+            return rolePermissions.Select(rp => rp.Permission.Name).ToList();
+        }
+
+        // Assign permission to a role
+        public async Task<bool> AssignPermissionToRoleAsync(string roleName, string permissionName)
+        {
+            var role = await _roleManager.FindByNameAsync(roleName);
+            if (role == null)
+                return false;
+
+            var permission = await _DBcontext.Permissions
+                .FirstOrDefaultAsync(p => p.Name == permissionName);
+
+            if (permission == null)
+                return false;
+
+            var rolePermission = new RolePermission
+            {
+                RoleId = role.Id,
+                PermissionId = permission.Id
+            };
+
+            await _DBcontext.RolePermissions.AddAsync(rolePermission);
+            await _DBcontext.SaveChangesAsync();
+
+            return true;
+        }
+
+        // Remove permission from a role
+        public async Task<bool> RemovePermissionFromRoleAsync(string roleName, string permissionName)
+        {
+            var role = await _roleManager.FindByNameAsync(roleName);
+            if (role == null)
+                return false;
+
+            var permission = await _DBcontext.Permissions
+                .FirstOrDefaultAsync(p => p.Name == permissionName);
+            if (permission == null)
+                return false;
+
+            var rolePermission = await _DBcontext.RolePermissions
+                .FirstOrDefaultAsync(rp => rp.RoleId == role.Id && rp.PermissionId == permission.Id);
+
+            if (rolePermission != null)
+            {
+                _DBcontext.RolePermissions.Remove(rolePermission);
+                await _DBcontext.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
     }
 }
