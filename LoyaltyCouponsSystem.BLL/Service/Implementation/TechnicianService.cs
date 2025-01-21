@@ -322,7 +322,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     var code = worksheet.Cells[row, 2].Text; // Column 2: Technician Code
                     var nickName = worksheet.Cells[row, 3].Text; // Column 3: Nickname
                     var nationalID = worksheet.Cells[row, 4].Text; // Column 4: National ID
-                    var phoneNumberText = worksheet.Cells[row, 5].Text; // Column 5: Phone Number
+                    var phoneNumberText = worksheet.Cells[row, 5].Text; // Column 5: Phone Numbers (comma-separated)
                     var governate = worksheet.Cells[row, 6].Text; // Column 6: Governate
                     var city = worksheet.Cells[row, 7].Text; // Column 7: City
                     var selectedCustomerCodes = worksheet.Cells[row, 8].Text; // Column 8: Customer Codes (comma-separated)
@@ -330,12 +330,25 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
                     if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(code) && !string.IsNullOrWhiteSpace(phoneNumberText))
                     {
-                        // Parse the phone number as an integer
-                        if (!int.TryParse(phoneNumberText, out var phoneNumber))
-                        {
-                            // If phone number is invalid, skip this row or handle the error as needed
-                            continue;
-                        }
+                        // Split the phone numbers
+                        var phoneNumbers = phoneNumberText.Split(',')
+                                                           .Select(p => p.Trim())
+                                                           .ToList();
+
+                        // Initialize phone number variables with default values
+                        int phoneNumber1 = 0;
+                        int? phoneNumber2 = null;
+                        int? phoneNumber3 = null;
+
+                        // Try parsing phone numbers to integers
+                        if (phoneNumbers.Count > 0 && int.TryParse(phoneNumbers[0], out var parsedPhone1))
+                            phoneNumber1 = parsedPhone1;
+
+                        if (phoneNumbers.Count > 1 && int.TryParse(phoneNumbers[1], out var parsedPhone2))
+                            phoneNumber2 = parsedPhone2;
+
+                        if (phoneNumbers.Count > 2 && int.TryParse(phoneNumbers[2], out var parsedPhone3))
+                            phoneNumber3 = parsedPhone3;
 
                         var technician = new Technician
                         {
@@ -343,7 +356,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                             Code = code,
                             NickName = nickName,
                             NationalID = nationalID,
-                            PhoneNumber1 = phoneNumber,
+                            PhoneNumber1 = phoneNumber1, // Assign first phone number
+                            PhoneNumber2 = phoneNumber2, // Assign second phone number if available
+                            PhoneNumber3 = phoneNumber3, // Assign third phone number if available
                             Governate = governate,
                             City = city,
                             IsActive = true,
@@ -385,6 +400,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 return false;
             }
         }
+
+
 
 
     }
