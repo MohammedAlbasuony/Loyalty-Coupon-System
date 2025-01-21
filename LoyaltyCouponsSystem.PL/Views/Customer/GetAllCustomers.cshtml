@@ -148,6 +148,11 @@
 <!-- Bootstrap JS (includes Popper.js for modal handling) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- SweetAlert2 -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const tableBody = document.querySelector("#customerTable tbody");
@@ -181,65 +186,119 @@
         rearrangeRows();
         styleRows();
 
-        // Toggle activation and update rows dynamically
-        document.querySelectorAll(".toggle-activation").forEach(button => {
-            button.addEventListener("click", function () {
-                const customerId = this.getAttribute("data-customer-id");
-                const isActive = this.getAttribute("data-is-active") === "True";
+        // Toggle activation with SweetAlert confirmation
+    document.querySelectorAll(".toggle-activation").forEach(button => {
+        button.addEventListener("click", function () {
+            const customerId = this.getAttribute("data-customer-id");
+            const isActive = this.getAttribute("data-is-active") === "True";
+            const action = isActive ? "Deactivate" : "Activate";
+            const actionText = isActive ? "deactivated" : "activated";
 
-                // Call API to toggle activation
-                fetch(`/Customer/ToggleActivation?customerId=${customerId}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const row = document.getElementById(`row-${customerId}`);
-                            const statusBadge = row.querySelector(".badge");
-                            const toggleButton = row.querySelector(".toggle-activation");
-
-                            // Update status and button dynamically
-                            if (data.isActive) {
-                                statusBadge.textContent = "Active";
-                                statusBadge.classList.remove("bg-danger");
-                                statusBadge.classList.add("bg-success");
-                                toggleButton.textContent = "Deactivate";
-                                toggleButton.classList.remove("btn-success");
-                                toggleButton.classList.add("btn-danger");
-                            } else {
-                                statusBadge.textContent = "Inactive";
-                                statusBadge.classList.remove("bg-success");
-                                statusBadge.classList.add("bg-danger");
-                                toggleButton.textContent = "Activate";
-                                toggleButton.classList.remove("btn-danger");
-                                toggleButton.classList.add("btn-success");
-                            }
-
-                            toggleButton.setAttribute("data-is-active", data.isActive.toString());
-
-                            // Rearrange and style rows after the change
-                            rearrangeRows();
-                            styleRows();
-                        } else {
-                            alert(data.message || "Failed to toggle activation.");
-                        }
+            // Show SweetAlert confirmation
+            Swal.fire({
+                title: `Are you sure?`,
+                text: `You are about to ${action} this customer.`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: isActive ? "#d33" : "#28a745",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: `Yes, ${action}!`,
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Call API to toggle activation
+                    fetch(`/Customer/ToggleActivation?customerId=${customerId}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
                     })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        alert("An error occurred while toggling activation. Please try again.");
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const row = document.getElementById(`row-${customerId}`);
+                                const statusBadge = row.querySelector(".badge");
+                                const toggleButton = row.querySelector(".toggle-activation");
+
+                                // Update status and button dynamically
+                                if (data.isActive) {
+                                    statusBadge.textContent = "Active";
+                                    statusBadge.classList.remove("bg-danger");
+                                    statusBadge.classList.add("bg-success");
+                                    toggleButton.textContent = "Deactivate";
+                                    toggleButton.classList.remove("btn-success");
+                                    toggleButton.classList.add("btn-danger");
+                                    toggleButton.setAttribute("data-is-active", "True");
+                                } else {
+                                    statusBadge.textContent = "Inactive";
+                                    statusBadge.classList.remove("bg-success");
+                                    statusBadge.classList.add("bg-danger");
+                                    toggleButton.textContent = "Activate";
+                                    toggleButton.classList.remove("btn-danger");
+                                    toggleButton.classList.add("btn-success");
+                                    toggleButton.setAttribute("data-is-active", "False");
+                                }
+
+                                // Rearrange and style rows after the change
+                                rearrangeRows();
+                                styleRows();
+
+                                Swal.fire(
+                                    "Success!",
+                                    `Customer has been ${actionText} successfully.`,
+                                    "success"
+                                );
+                            } else {
+                                Swal.fire(
+                                    "Error!",
+                                    data.message || `Failed to ${actionText} the customer.`,
+                                    "error"
+                                );
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            Swal.fire(
+                                "Error!",
+                                "An error occurred while processing the request. Please try again.",
+                                "error"
+                            );
+                        });
+                }
             });
         });
+    });
 
         // Search functionality
         document.getElementById("searchBox").addEventListener("input", function () {
-            const searchValue = this.value.toLowerCase();
-            document.querySelectorAll("#customerTable tbody tr").forEach(row => {
-                const isVisible = Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(searchValue));
-                row.style.display = isVisible ? "" : "none";
+            const searchValue = this.value.toLowerCase().trim(); // Get the search value
+            const rows = document.querySelectorAll("#customerTable tbody tr");
+
+            rows.forEach((row) => {
+                // Extract values from relevant columns
+                const code = row.children[0]?.textContent.toLowerCase(); // Code (1st column)
+                const name = row.children[1]?.textContent.toLowerCase(); // Name (2nd column)
+                const governorate = row.children[2]?.textContent.toLowerCase(); // Governorate (3rd column)
+                const city = row.children[3]?.textContent.toLowerCase(); // City (4th column)
+                const phoneNumber = row.children[4]?.textContent.toLowerCase(); // Phone Number (5th column)
+                const status = row.children[5]?.textContent.toLowerCase().trim(); // Status (6th column)
+
+                // Handle exact match for "active" or "inactive" in the Status column
+                const isStatusMatch =
+                    searchValue === "active" ? status === "active" :
+                    searchValue === "inactive" ? status === "inactive" :
+                    status.includes(searchValue); // General match for other cases
+
+                // Check if the search matches any of the other columns
+                const isOtherMatch =
+                    code.includes(searchValue) ||
+                    name.includes(searchValue) ||
+                    governorate.includes(searchValue) ||
+                    city.includes(searchValue) ||
+                    phoneNumber.includes(searchValue);
+
+                // Show/hide the row based on the match
+                row.style.display = isStatusMatch || isOtherMatch ? "" : "none";
             });
         });
 

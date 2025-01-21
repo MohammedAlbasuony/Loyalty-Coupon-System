@@ -61,20 +61,27 @@
                                 </span>
                             </td>
                             <td>
-                                <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
-                                    <input type="hidden" name="userId" value="@user.Id" />
-                                    <select name="roleName" class="form-select action-dropdown">
-                                        <option disabled selected>Select Role</option>
-                                        @foreach (var role in Model.AllRoles)
-                                        {
-                                            <option value="@role">@role</option>
-                                        }
-                                    </select>
-                                    <br />
-                                    <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
-                                        Assign Role
-                                    </button>
-                                </form>
+                                @if (user.IsActive)
+                                {
+                                    <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <select name="roleName" class="form-select action-dropdown">
+                                            <option disabled selected>Select Role</option>
+                                            @foreach (var role in Model.AllRoles)
+                                            {
+                                                <option value="@role">@role</option>
+                                            }
+                                        </select>
+                                        <br />
+                                        <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
+                                            Assign Role
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not Available</span>
+                                }
                             </td>
                             <td>
                                 <form asp-action="ToggleActivation" asp-controller="Admin" method="post" class="action-form">
@@ -87,7 +94,6 @@
                                     </button>
                                 </form>
                             </td>
-
                         </tr>
                     }
 
@@ -133,6 +139,8 @@
         </div>
         <div id="paginationContainer" class="mt-4 text-center"></div>
     </div>
+}
+
 
 
     <!-- Confirmation Modals -->
@@ -158,13 +166,13 @@
         </div>
     </div>
 
-}
-else
-{
-    <div class="alert alert-danger" role="alert">
-        You do not have permission to view this page.
-    </div>
-}
+@* } *@
+@* else *@
+@* { *@
+@*     <div class="alert alert-danger" role="alert"> *@
+@*         You do not have permission to view this page. *@
+@*     </div> *@
+@* } *@
 
 
 <style>
@@ -281,7 +289,7 @@ else
         .assign-btn:hover,
         .confirm-btn:hover {
             background-color: #0056b3;
-            color: white;
+            color: white !important;
         }
 
     .toggle-btn {
@@ -368,172 +376,149 @@ border-radius: 30px 0 0 30px; /* Rounded left corn        padding: 8px;
 </style>
 
 
-
+<!-- SweetAlert2 -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
     let currentForm = null;
 
+    // Confirm Assign Role Functionality
     function confirmAssignRole(userName, form) {
-        currentForm = form;
-        const selectedRole = form.querySelector("select[name='roleName']").value;
-        const modalBody = document.getElementById("confirmationModalBody");
-        modalBody.innerHTML = `Are you sure you want to assign <strong>${userName}</strong> to <strong>${selectedRole}</strong> Role ?`;
+        currentForm = form; // Set the form to be submitted later
+        const selectedRole = form.querySelector("select[name='roleName']").value; // Get the selected role
 
-        const confirmButton = document.getElementById("confirmActionButton");
-        confirmButton.onclick = () => currentForm.submit();
-
-        const modal = new bootstrap.Modal(document.getElementById("confirmationModal"));
-        modal.show();
-    }
-
-    function confirmAccount(userName, form) {
-        currentForm = form;
-        const modalBody = document.getElementById("confirmationModalBody");
-        modalBody.innerHTML = `Are you sure you want to confirm the account for <strong>${userName}</strong>?`;
-
-        const confirmButton = document.getElementById("confirmActionButton");
-        confirmButton.onclick = () => currentForm.submit();
-
-        const modal = new bootstrap.Modal(document.getElementById("confirmationModal"));
-        modal.show();
-    }
-
-        document.getElementById("searchBox").addEventListener("input", function () {
-        const searchValue = this.value.toLowerCase(); // Get the search value
-        const rows = document.querySelectorAll("#usersTable tbody tr");
-
-        rows.forEach((row) => {
-            // Get all the relevant cell values in the row
-            const username = row.children[0]?.textContent.toLowerCase(); // Username (1st column)
-            const nationalId = row.children[1]?.textContent.toLowerCase(); // National ID (2nd column)
-            const phoneNumber = row.children[2]?.textContent.toLowerCase(); // Phone Number (3rd column)
-            const optionalPhone = row.children[3]?.textContent.toLowerCase(); // Optional Phone (4th column)
-            const governorate = row.children[4]?.textContent.toLowerCase(); // Governorate (5th column)
-            const city = row.children[5]?.textContent.toLowerCase(); // City (6th column)
-            const role = row.children[6]?.textContent.toLowerCase(); // Current Role (7th column)
-            const status = row.children[7]?.textContent.toLowerCase().trim(); // Current Status (8th column)
-
-            // Handle exact match for "active", "inactive", or "pending" in Current Status
-            const isStatusMatch =
-                searchValue === "active" ? status === "active" :
-                searchValue === "inactive" ? status === "inactive" :
-                searchValue === "pending" ? status === "pending" :
-                status.includes(searchValue); // General match for other cases
-
-            // Check if the search matches any of the other columns
-            const isOtherMatch =
-                username.includes(searchValue) ||
-                nationalId.includes(searchValue) ||
-                phoneNumber.includes(searchValue) ||
-                optionalPhone.includes(searchValue) ||
-                governorate.includes(searchValue) ||
-                city.includes(searchValue) ||
-                role.includes(searchValue);
-
-            // Show/hide the row based on the match
-            row.style.display = isStatusMatch || isOtherMatch ? "" : "none";
-        });
-    });
-
-
-
-            function toggleActivation(button, userName, form) {
-        const isActive = button.getAttribute("data-status") === "True";
-        const action = isActive ? "deactivate" : "activate";
-        const modalBody = document.getElementById("confirmationModalBody");
-
-        modalBody.innerHTML = `Are you sure you want to ${action} the account for <strong>${userName}</strong>?`;
-
-        const confirmButton = document.getElementById("confirmActionButton");
-        confirmButton.onclick = () => {
-            form.submit();
-            const row = button.closest("tr");
-
-            if (isActive) {
-                // Deactivate row
-                row.classList.remove("active-row");
-                row.classList.add("inactive-row");
-                button.setAttribute("data-status", "False");
-                button.innerHTML = "Activate";
-                button.classList.remove("deactivate");
-                button.classList.add("activate");
-            } else {
-                // Activate row
-                row.classList.remove("inactive-row");
-                row.classList.add("active-row");
-                button.setAttribute("data-status", "True");
-                button.innerHTML = "Deactivate";
-                button.classList.remove("activate");
-                button.classList.add("deactivate");
-            }
-        };
-
-        const modal = new bootstrap.Modal(document.getElementById("confirmationModal"));
-        modal.show();
-    }
-
-            document.addEventListener("DOMContentLoaded", function () {
-        const tableBody = document.querySelector("#usersTable tbody");
-
-        function moveInactiveRowsToBottom() {
-            const rows = Array.from(tableBody.querySelectorAll("tr"));
-            const activeRows = [];
-            const inactiveRows = [];
-
-            rows.forEach((row) => {
-                const status = row.querySelector("td:nth-child(8) span")?.textContent.toLowerCase().trim();
-                if (status === "inactive") {
-                    row.classList.add("inactive-row"); // Add class to inactive rows
-                    inactiveRows.push(row);
-                } else {
-                    row.classList.remove("inactive-row"); // Remove the class if not inactive
-                    activeRows.push(row);
-                }
-            });
-
-            // Clear the table body and append rows in the desired order
-            tableBody.innerHTML = "";
-            activeRows.forEach((row) => tableBody.appendChild(row));
-            inactiveRows.forEach((row) => tableBody.appendChild(row));
+        // Validate the role selection
+        if (!selectedRole || selectedRole === "Select Role") {
+            Swal.fire("Warning!", "Please select a role before assigning.", "warning");
+            return;
         }
 
-        // Call the function initially to reorder the rows
-        moveInactiveRowsToBottom();
+        // Display confirmation modal with SweetAlert2
+        Swal.fire({
+            title: "Are you sure?",
+            text: `You are about to assign the role "${selectedRole}" to ${userName}.`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#007bff",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Yes, Assign!",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                currentForm.submit(); // Submit the form if the user confirms
+            }
+        });
+    }
 
-        // Update the function to trigger after toggling activation
-        document.querySelectorAll(".toggle-btn").forEach((button) => {
-            button.addEventListener("click", function () {
-                setTimeout(() => moveInactiveRowsToBottom(), 100); // Slight delay to allow DOM update
+    // Attach event listeners to Assign Role buttons
+    document.querySelectorAll(".assign-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const form = this.closest("form"); // Get the form element
+            const userName = this.closest("tr").querySelector("td").textContent.trim(); // Get the username
+            confirmAssignRole(userName, form); // Call the function
+        });
+    });
+
+        // Confirm Account for Unconfirmed Users
+    document.querySelectorAll(".confirm-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const form = this.closest("form"); // Get the form element
+            const userName = this.closest("tr").querySelector("td").textContent.trim(); // Get the username
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: `You are about to confirm the account for ${userName}.`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#007bff",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Yes, Confirm!",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit(); // Submit the form if the user confirms
+                }
             });
         });
     });
 
+        // Toggle Activation
+        document.querySelectorAll(".toggle-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const userName = this.closest("tr").querySelector("td").textContent.trim();
+                const form = this.closest("form");
+                const isActive = this.getAttribute("data-status") === "True";
+                const action = isActive ? "Deactivate" : "Activate";
 
-    // Pagination functionality
-        document.addEventListener("DOMContentLoaded", function () {
-        const rowsPerPage = 10; // Number of rows per page
-        const tableBody = document.querySelector("#usersTable tbody");
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: `You are about to ${action} the account for ${userName}.`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: isActive ? "#d33" : "#28a745",
+                    cancelButtonColor: "#6c757d",
+                    confirmButtonText: `Yes, ${action}!`,
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); // Submit the form after confirmation
+                    }
+                });
+            });
+        });
+
+        // Rearrange Rows
+        function rearrangeRows() {
+            const tableBody = document.querySelector("#usersTable tbody");
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
+            const activeRows = rows.filter(row => row.querySelector(".badge")?.textContent.trim() === "Active");
+            const unconfirmedRows = rows.filter(row => row.querySelector(".badge")?.textContent.trim() === "Pending");
+            const inactiveRows = rows.filter(row => row.querySelector(".badge")?.textContent.trim() === "Inactive");
+
+            tableBody.innerHTML = ""; // Clear the table
+            activeRows.forEach(row => tableBody.appendChild(row)); // Add active rows
+            unconfirmedRows.forEach(row => tableBody.appendChild(row)); // Add unconfirmed rows
+            inactiveRows.forEach(row => tableBody.appendChild(row)); // Add inactive rows
+        }
+
+        // Style Rows
+        function styleRows() {
+            const rows = Array.from(document.querySelectorAll("#usersTable tbody tr"));
+            rows.forEach(row => {
+                const badge = row.querySelector(".badge");
+                if (badge) {
+                    if (badge.textContent.trim() === "Inactive") {
+                        row.classList.add("inactive-row");
+                    } else if (badge.textContent.trim() === "Pending") {
+                        row.classList.add("pending-row");
+                    } else {
+                        row.classList.remove("inactive-row");
+                        row.classList.remove("pending-row");
+                    }
+                }
+            });
+        }
+
+        // Rearrange and style rows on page load
+        rearrangeRows();
+        styleRows();
+
+        // Pagination
+        const rowsPerPage = 10;
         const paginationContainer = document.getElementById("paginationContainer");
 
-        // Function to show a specific page
         function showPage(pageNumber) {
-            const rows = Array.from(tableBody.querySelectorAll("tr"));
-            const totalRows = rows.length;
-            const totalPages = Math.ceil(totalRows / rowsPerPage);
-
-            // Hide all rows and show only the rows for the current page
+            const rows = Array.from(document.querySelector("#usersTable tbody").querySelectorAll("tr"));
             rows.forEach((row, index) => {
                 row.style.display = (index >= (pageNumber - 1) * rowsPerPage && index < pageNumber * rowsPerPage) ? "" : "none";
             });
-
-            // Update pagination controls
-            updatePaginationControls(pageNumber, totalPages);
+            updatePagination(pageNumber, Math.ceil(rows.length / rowsPerPage));
         }
 
-        // Function to update pagination controls
-        function updatePaginationControls(currentPage, totalPages) {
-            paginationContainer.innerHTML = ""; // Clear existing pagination controls
-
+        function updatePagination(currentPage, totalPages) {
+            paginationContainer.innerHTML = "";
             for (let i = 1; i <= totalPages; i++) {
                 const button = document.createElement("button");
                 button.textContent = i;
@@ -546,7 +531,36 @@ border-radius: 30px 0 0 30px; /* Rounded left corn        padding: 8px;
 
         // Initialize pagination
         showPage(1);
+
+        // Search Functionality
+        document.getElementById("searchBox").addEventListener("input", function () {
+            const searchValue = this.value.toLowerCase().trim();
+            const rows = document.querySelectorAll("#usersTable tbody tr");
+
+            rows.forEach(row => {
+                const username = row.children[0]?.textContent.toLowerCase();
+                const nationalId = row.children[1]?.textContent.toLowerCase();
+                const phoneNumber = row.children[2]?.textContent.toLowerCase();
+                const optionalPhone = row.children[3]?.textContent.toLowerCase();
+                const governorate = row.children[4]?.textContent.toLowerCase();
+                const city = row.children[5]?.textContent.toLowerCase();
+                const role = row.children[6]?.textContent.toLowerCase();
+                const status = row.children[7]?.textContent.toLowerCase().trim();
+
+                const isMatch =
+                    username.includes(searchValue) ||
+                    nationalId.includes(searchValue) ||
+                    phoneNumber.includes(searchValue) ||
+                    optionalPhone.includes(searchValue) ||
+                    governorate.includes(searchValue) ||
+                    city.includes(searchValue) ||
+                    role.includes(searchValue) ||
+                    status.includes(searchValue);
+
+                row.style.display = isMatch ? "" : "none";
+            });
+        });
     });
-
-
 </script>
+
+
