@@ -92,6 +92,13 @@
                                             data-status="@user.IsActive">
                                         @(user.IsActive ? "Deactivate" : "Activate")
                                     </button>
+                                   @*  <!-- Permission Button -->
+                                    <button type="button" class="btn btn-info btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#permissionsModal"
+                                            onclick="setUserPermissions('@user.UserName')">
+                                        Manage Permissions
+                                    </button> *@
                                 </form>
                             </td>
                         </tr>
@@ -122,6 +129,7 @@
                                     <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
                                         Assign Role
                                     </button>
+                                    
                                 </form>
                             </td>
                             <td>
@@ -130,6 +138,7 @@
                                     <button type="button" class="btn btn-warning btn-sm shadow confirm-btn" onclick="confirmAccount('@user.UserName', this.form)">
                                         Confirm Account
                                     </button>
+
                                 </form>
                             </td>
                         </tr>
@@ -141,7 +150,36 @@
     </div>
 }
 
+<!-- Permissions Modal -->
+<div class="modal fade" id="permissionsModal" tabindex="-1" aria-labelledby="permissionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title" id="permissionsModalLabel">Manage Permissions</h5>
+                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="permissionsForm">
+                    <div class="mb-3">
+                        <label for="roleName" class="form-label">Role</label>
+                        <input type="text" class="form-control" id="roleName" disabled>
+                    </div>
 
+                    <div class="mb-3">
+                        <label for="permissions" class="form-label">Permissions</label>
+                        <div id="permissionsContainer">
+                            <!-- Permission checkboxes will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">Save Permissions</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Confirmation Modals -->
     <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
@@ -561,6 +599,44 @@ border-radius: 30px 0 0 30px; /* Rounded left corn        padding: 8px;
             });
         });
     });
+
+
+    <script>
+            //permmissions
+          function setUserPermissions(userName) {
+        // Assuming you're sending the userName to the server to get permissions.
+        $.ajax({
+            url: '@Url.Action("GetPermissionsForUser", "Admin")', // Replace with correct action if different
+            method: 'GET',
+            data: { userName: userName },
+            success: function (data) {
+                // Set role field
+                $('#roleName').val(data.roleName); // Assuming roleName is returned
+
+                // Clear current permissions
+                $('#permissionsContainer').empty();
+
+                // Add checkboxes for each permission
+                data.permissions.forEach(function(permission) {
+                    var checkboxHtml = `
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="${permission}" id="permission-${permission}" checked>
+                            <label class="form-check-label" for="permission-${permission}">
+                                ${permission}
+                            </label>
+                        </div>`;
+                    $('#permissionsContainer').append(checkboxHtml);
+                });
+            },
+            error: function () {
+                alert('Error loading permissions');
+            }
+        });
+    }
+
+
+</script>
+
 </script>
 
 
