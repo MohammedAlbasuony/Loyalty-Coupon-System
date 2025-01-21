@@ -17,22 +17,6 @@
 }
 
 <div class="container mt-5">
-
-    <!-- Excel Upload Form -->
-    <div class="mb-4">
-        <form asp-controller="Technician" asp-action="UploadExcel" enctype="multipart/form-data" method="post">
-            <div class="row align-items-center">
-                <div class="col-md-9">
-                    <input type="file" name="file" accept=".xlsx, .xls" class="form-control" required />
-                </div>
-                <div class="col-md-3 text-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-upload"></i> Upload Excel
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
     <!-- Backward Button -->
     <div class="mb-4">
         <a href="@Url.Action("GetAllTechnicians", "Technician")" class="btn btn-outline-primary" style="border-radius: 30px;">
@@ -44,6 +28,21 @@
     <div class="text-center mb-4">
         <h1 class="display-5 text-primary"><b>Add Technician</b></h1>
         <p class="lead text-secondary">Register new technicians with ease and flexibility.</p>
+    </div>
+
+    <!-- Excel Upload Form -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-10">
+            <form asp-controller="Technician" asp-action="UploadExcel" enctype="multipart/form-data" method="post">
+                <label class="form-label text-primary"><b>Upload Excel File to Auto-fill Technician Data</b></label>
+                <div class="input-group">
+                    <input type="file" name="file" accept=".xlsx, .xls" class="form-control" required />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload Excel
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Form Section -->
@@ -66,7 +65,7 @@
                     </div>
                 </div>
 
-                <!-- Nickname and National ID -->
+                <!-- Additional Fields -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label asp-for="NickName" class="form-label text-primary"><b>Nick Name</b></label>
@@ -75,7 +74,7 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label asp-for="NationalID" class="form-label text-primary"><b>National ID <span class="text-danger">*</span></b></label>
-                        <input asp-for="NationalID" class="form-control" type="text" placeholder="Enter national ID" />
+                        <input asp-for="NationalID" class="form-control" type="text" placeholder="Enter national ID" required />
                         <span asp-validation-for="NationalID" class="text-danger"></span>
                     </div>
                 </div>
@@ -84,19 +83,19 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label asp-for="PhoneNumber1" class="form-label text-primary"><b>Phone Number 1 <span class="text-danger">*</span></b></label>
-                        <input asp-for="PhoneNumber1" class="form-control" type="text" placeholder="Enter phone number 1" />
+                        <input asp-for="PhoneNumber1" class="form-control" placeholder="Enter phone number 1" required />
                         <span asp-validation-for="PhoneNumber1" class="text-danger"></span>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label asp-for="PhoneNumber2" class="form-label text-primary"><b>Phone Number 2</b></label>
-                        <input asp-for="PhoneNumber2" class="form-control" type="text" placeholder="Enter phone number 2" />
+                        <input asp-for="PhoneNumber2" class="form-control" placeholder="Enter phone number 2" />
                         <span asp-validation-for="PhoneNumber2" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label asp-for="PhoneNumber3" class="form-label text-primary"><b>Phone Number 3</b></label>
-                        <input asp-for="PhoneNumber3" class="form-control" type="text" placeholder="Enter phone number 3" />
+                        <input asp-for="PhoneNumber3" class="form-control" placeholder="Enter phone number 3" />
                         <span asp-validation-for="PhoneNumber3" class="text-danger"></span>
                     </div>
                 </div>
@@ -121,16 +120,14 @@
                     </div>
                 </div>
 
+                <!-- Customers and Representatives -->
                 <div class="row">
-                    <!-- Select Customers -->
                     <div class="col-md-6 mb-3">
-                        <label asp-for="SelectedCustomerCodes" class="form-label text-primary"><b>Select Customers </b></label>
+                        <label asp-for="SelectedCustomerCodes" class="form-label text-primary"><b>Select Customers</b></label>
                         <select asp-for="SelectedCustomerCodes" asp-items="Model.Customers" class="form-control select2" multiple>
                             <option></option>
                         </select>
                     </div>
-
-                    <!-- Select Representatives -->
                     <div class="col-md-6 mb-3">
                         <label asp-for="SelectedUserCodes" class="form-label text-primary"><b>Select Representatives</b></label>
                         <select asp-for="SelectedUserCodes" asp-items="Model.Users" class="form-control select2" multiple>
@@ -138,7 +135,6 @@
                         </select>
                     </div>
                 </div>
-
                 <br />
 
                 <!-- Submit Button -->
@@ -151,6 +147,7 @@
         </div>
     </div>
 </div>
+
 
 
 @section Scripts {
