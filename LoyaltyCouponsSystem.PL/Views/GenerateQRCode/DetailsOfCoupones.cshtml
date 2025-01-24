@@ -1,4 +1,4 @@
-﻿@using LoyaltyCouponsSystem.BLL.ViewModel.QRCode
+﻿ @using LoyaltyCouponsSystem.BLL.ViewModel.QRCode
 @model QRCodeDetailsViewModel
 @{
     ViewData["Title"] = "QR Code Generator";
@@ -17,8 +17,8 @@
                 <!-- نوع الكوبون -->
                 <div class="col-md-6">
                     <label for="typeOfCoupon" class="form-label">اختر نوع الكوبون:</label>
-                    <select asp-for="TypeOfCoupon" class="form-select" aria-label="Default select example">
-                        <option disabled selected>اختر نوع الكوبون</option>
+                    <select asp-for="TypeOfCoupon" class="form-select" aria-label="Default select example" required>
+                        <option disabled selected value="">اختر نوع الكوبون</option>
                         <option value="راك ثيرم">راك ثيرم</option>
                         <option value="صرف جي تكس">صرف جي تكس</option>
                         <option value="اقطار كبيرة وهودذا">اقطار كبيرة وهودذا</option>
@@ -26,12 +26,14 @@
                         <option value="كعب صرف جي تكس">كعب صرف جي تكس</option>
                         <option value="كعب اقطار كبيرة وهودذا">كعب اقطار كبيرة وهودذا</option>
                     </select>
+                    <span asp-validation-for="TypeOfCoupon" class="text-danger"></span>
                 </div>
+
 
                 <!-- القيمة -->
                 <div class="col-md-6">
                     <label for="value" class="form-label">القيمة:</label>
-                    <input type="number" class="form-control" id="value" name="Value" value="50" min="1" />
+                    <input type="number" class="form-control" id="value" name="Value" value="50" min="1" required />
                 </div>
 
                 <!-- المحافظة -->
@@ -132,41 +134,6 @@
             });
                        // Script to set the current year in the input group
             document.getElementById('currentYear').innerText = new Date().getFullYear();
-
-            //  document.getElementById('submitButton').addEventListener('click', async function () {
-            //   // عطل الزر بعد الضغط
-            //   const button = this;
-            //   button.disabled = true;
-            //   button.innerText = 'جاري الإرسال...';
-
-            //   try {
-            //     // إرسال الطلب إلى الـ Action في الـ Controller
-            //     const response = await fetch('@Url.Action("DetailsOfCoupones", "GenerateQRCode")', {
-            //       method: 'POST',
-            //       headers: {
-            //         'Content-Type': 'application/json',
-            //         'RequestVerificationToken': '@Html.AntiForgeryToken()' // لحماية الـ CSRF
-            //       },
-            //       body: JSON.stringify({
-            //         // البيانات المرسلة (أضف البيانات هنا إذا لزم الأمر)
-            //         data: 'yourDataHere'
-            //       })
-            //     });
-
-            //     if (response.ok) {
-            //       // الطلب نجح
-            //       button.innerText = 'تم الإرسال بنجاح';
-            //     } else {
-            //       // الطلب فشل
-            //       button.innerText = 'فشل الإرسال';
-            //       button.disabled = false; // إعادة تفعيل الزر
-            //     }
-            //   } catch (error) {
-            //     // خطأ أثناء الطلب
-            //     button.innerText = 'حدث خطأ أثناء الإرسال';
-            //     button.disabled = false; // إعادة تفعيل الزر
-            //   }
-            // });
 
 
         </script>

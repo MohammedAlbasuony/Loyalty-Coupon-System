@@ -10,6 +10,7 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.QRCode
 {
     public class QRCodeDetailsViewModel
     {
+        [Required(ErrorMessage = "يجب اختيار نوع الكوبون.")]
         public string TypeOfCoupon { get; set; }
 
         public int Value { get; set; }
