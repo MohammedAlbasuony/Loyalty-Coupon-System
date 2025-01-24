@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using LoyaltyCouponsSystem.BLL.ViewModel.Permission;
-using LoyaltyCouponsSystem.DAL.Entity.Permission;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
 {
@@ -23,7 +21,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _adminService = adminService;
         }
 
-       
+
 
         [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> ManageUsers()
@@ -191,51 +189,5 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             return RedirectToAction("ManageUsers");
         }
-
-        // Permission 
-       
-
-        // Get permissions for a role (via AJAX)
-        [HttpGet]
-        public async Task<IActionResult> GetPermissionsForRoleAsync(string roleName)
-        {
-            var permissions = await _adminService.GetPermissionsForRoleAsync(roleName);
-            return Json(permissions);  // Return the permissions as JSON
-        }
-
-        public async Task<IActionResult> GetPermissionsForUser(string userName)
-        {
-            var user = await _userManager.FindByNameAsync(userName);
-            if (user == null)
-            {
-                return Json(new { success = false });
-            }
-
-            var roleName = await _userManager.GetRolesAsync(user);
-            var permissions = await _adminService.GetPermissionsForRoleAsync(roleName.FirstOrDefault());
-
-            return Json(new { roleName = roleName.FirstOrDefault(), permissions = permissions });
-        }
-
-        // Assign or remove permissions (via POST)
-        [HttpPost]
-        public async Task<IActionResult> AssignPermissions([FromBody] RolePermission model)
-        {
-            foreach (var permission in model.Permissions)
-            {
-                var result = await _adminService.AssignPermissionToRoleAsync(model.RoleName, permission);
-                if (!result)
-                {
-                    return Json(new { success = false });
-                }
-            }
-
-            return Json(new { success = true });
-        }
-
-
-
-
-
     }
 }
