@@ -97,18 +97,15 @@
                                 <div class="modal-body">
                                     <input type="text" class="form-control mb-3 modal-search-box" placeholder="Search Customers...">
                                     <ul class="list-group">
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <span>Nanci</span>
-                                            <button class="btn btn-sm btn-outline-danger delete-customer" data-customer="Nanci">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <span>Michael</span>
-                                            <button class="btn btn-sm btn-outline-danger delete-customer" data-customer="Michael">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </li>
+                                        @foreach (var customer in technician.SelectedCustomerNames)
+                                        {
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>@customer</span>
+                                                <button class="btn btn-sm btn-outline-danger delete-customer" data-customer="@customer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </li>
+                                        }
                                     </ul>
                                 </div>
                                 <div class="modal-footer">
@@ -734,34 +731,15 @@
     });
 
 
-                            $(document).on('input', '.modal-search-box', function () {
-        const query = $(this).val().toLowerCase().trim(); // Get the search query
-        const listGroup = $(this).closest('.modal-body').find('.list-group'); // Find the closest list-group container
+            $(document).on('input', '.modal-search-box', function () {
+        const query = $(this).val().toLowerCase();
+        const listItems = $(this).closest('.modal-body').find('.list-group-item');
 
-        // Iterate through list items and filter based on the search query
-        listGroup.find('.list-group-item').each(function () {
-            const itemText = $(this).find('span').text().toLowerCase().trim(); // Get the text of the name inside the span
-            if (itemText.includes(query)) {
-                $(this).show(); // Show matching items
-            } else {
-                $(this).hide(); // Hide non-matching items
-            }
+        listItems.each(function () {
+            const itemText = $(this).text().toLowerCase();
+            $(this).toggle(itemText.includes(query));
         });
-
-        // Handle "No results found" case
-        const visibleItems = listGroup.find('.list-group-item:visible').length;
-        if (visibleItems === 0) {
-            if (!listGroup.find('.no-results').length) {
-                listGroup.append('<li class="list-group-item no-results text-muted">No matching results found.</li>');
-            }
-        } else {
-            listGroup.find('.no-results').remove();
-        }
     });
-
-
-
-
 
         // Handle delete action for customers
     $(document).on('click', '.delete-customer', function () {
@@ -819,7 +797,7 @@
         });
     });
 
-    
+
 </script>
 
 
