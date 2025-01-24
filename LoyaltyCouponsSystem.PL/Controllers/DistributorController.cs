@@ -40,7 +40,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     .Where(c => c.IsActive) // Only include active customers
                     .Select(c => new SelectListItem
                     {
-                        Value = c.CustomerID.ToString(),
+                        Value = c.Code.ToString(),
                         Text = $"{c.Name} - {c.Code}"
                     })
                     .ToList()
