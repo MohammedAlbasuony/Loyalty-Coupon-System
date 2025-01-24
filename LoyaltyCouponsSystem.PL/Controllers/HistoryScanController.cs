@@ -1,8 +1,12 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateQR;
+﻿using QRCoder;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.IO;
+
+using System.Drawing;
+using ZXing; // للتعامل مع تدفقات البيانات
+
 
 namespace LoyaltyCouponsSystem.PL.Controllers
 {
@@ -50,7 +54,59 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View(logs);
         }
 
+        // GET: Home
+        [HttpGet("Index")]
+        public ActionResult Index()
+         {
+             return View();
+         }
 
+        [HttpGet("DataOfScaning")]
+        public ActionResult DataOfScaning(string Key)
+        {
+            ViewBag.Data = Key;
+            return View();
+        }
+        [HttpPost]
+        public IActionResult UploadQRCode(IFormFile postedFile)
+        {
+            string DataOfQR="";
+            if (postedFile != null && postedFile.Length > 0)
+            {
+                try
+                {
+                    using (var stream = postedFile.OpenReadStream())
+                    {
+                        using (var bitmap = new Bitmap(stream))
+                        {
+                            var reader = new BarcodeReader();
+                            var result = reader.Decode(bitmap);
+                            Console.WriteLine(result);
 
+                            if (result != null)
+                            {
+                                DataOfQR = result.Text;
+                                ViewBag.QRText = result.Text; // عرض النص المستخرج من QR Code
+                            }
+                            else
+                            {
+                                ViewBag.QRText = "Unable to read QR Code. Please try again.";
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.QRText = "An error occurred: " + ex.Message;
+                }
+            }
+            else
+            {
+                ViewBag.QRText = "Please upload a valid image file.";
+            }
+
+            //return View("Index");
+            return RedirectToAction("DataOfScaning", new { Key = DataOfQR });
+        }
     }
 }

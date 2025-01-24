@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Aspose.Words" Version="25.1.0" />
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="FastExcel" Version="3.0.13" />
     <PackageReference Include="Grid.Mvc" Version="3.0.0" />
     <PackageReference Include="IronWord" Version="2025.1.2" />
     <PackageReference Include="iTextSharp" Version="5.5.13.4" />
@@ -24,8 +25,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="NPOI" Version="2.7.2" />
+    <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
-    <PackageReference Include="ZXing.Net" Version="0.16.9" />
+    <PackageReference Include="ZXing.Net" Version="0.16.6" />
   </ItemGroup>
 
 </Project>

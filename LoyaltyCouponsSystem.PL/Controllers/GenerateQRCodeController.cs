@@ -8,6 +8,7 @@ using LoyaltyCouponsSystem.BLL.ViewModel.QRCode;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.PL.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -107,9 +108,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GenerateCouponsExcel(
-    List<Coupon> coupons,
-    string baseURL,
-    float qrCodeSizeCm)
+    List<Coupon> coupons)
         {
             if (coupons == null || !coupons.Any())
             {
@@ -120,7 +119,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             {
                 var generateExcelWithCoupons = new clsGenerateExcelWithCoupons();
                 byte[] excelData = await generateExcelWithCoupons.GenerateExcelWithCouponsAsync(
-                    coupons, baseURL, qrCodeSizeCm);
+                    coupons);
 
                 return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Coupons.xlsx");
             }
@@ -165,9 +164,9 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             
 
             // إنشاء QR Codes
-            var generateListOfCoupons = new GenerateListOfCoupons();
-            string baseUrl = $"{Request.Scheme}://{Request.Host}";
-            var qrCodesAsBytes = generateListOfCoupons.GenerateQRCodesAsync(qrCodesList, baseUrl);
+            //var generateListOfCoupons = new GenerateListOfCoupons();
+            //string baseUrl = $"{Request.Scheme}://{Request.Host}";
+            //var qrCodesAsBytes = generateListOfCoupons.GenerateQRCodesAsync(qrCodesList, baseUrl);
 
             // إنشاء ملف PDF من QR Codes
             // return await GenerateCouponsPDF(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
@@ -175,7 +174,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             // إنشاء ملف Word من QR Codes
             // return await GenerateCouponsWord(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
             // إنشاء ملف Excel من QR Codes
-            return await GenerateCouponsExcel(qrCodesList, baseUrl,  Size);
+            return await GenerateCouponsExcel(qrCodesList);
 
 
 
@@ -203,8 +202,14 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 int currentYear = DateTime.Now.Year;
                 var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
                 ServiceToSetSerialNumber serialNumber = new ServiceToSetSerialNumber();
-
-
+                var numInYear = await serviceToMangeCounters.GetNextNumInYearAsync();
+                var SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber, 0);
+                var SerialNumberAsLong=long.Parse(SerialNumber);
+                var CreatedBy = currentUser?.UserName;
+                var TypeOfCoupone = detailsVM.TypeOfCoupon;
+                var Value = detailsVM.Value;
+                var GovernorateId = detailsVM.GovernorateId;
+                var AreaId = detailsVM.AreaId;
 
                   // إنشاء الكوبونات
                for (int i = 0; i < detailsVM.Count; i++)
@@ -212,22 +217,22 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                        var couponDetails = new Coupon
                        {
 
-                           TypeOfCoupone = detailsVM.TypeOfCoupon,
-                           Value = detailsVM.Value,
-                           GovernorateId = detailsVM.GovernorateId,
-                           AreaId = detailsVM.AreaId,
-                           NumInYear = await serviceToMangeCounters.GetNextNumInYearAsync(),
-                           SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber, i),
-                           CreatedBy = currentUser?.UserName
+                           TypeOfCoupone = TypeOfCoupone,
+                           Value = Value,
+                           GovernorateId = GovernorateId,
+                           AreaId = AreaId,
+                           NumInYear = numInYear+i,
+                           SerialNumber = (SerialNumberAsLong+ i).ToString(),
+                           CreatedBy = CreatedBy
 
                        };
 
-                       await _context.Coupons.AddAsync(couponDetails);
-                       await _context.SaveChangesAsync();
                        qrCodesList.Add(couponDetails);
                }
-            
-               QRCodeTransactionGenerated qRCodeTransactionGenerated =new()
+            await _context.Coupons.AddRangeAsync(qrCodesList);
+            await _context.SaveChangesAsync();
+
+            QRCodeTransactionGenerated qRCodeTransactionGenerated =new()
                {
                 NumberOfCoupones = qrCodesList.Count,
                 FromSerialNumber= serialNumber.GetSerialNumber(detailsVM.SerialNumber, 0),
@@ -248,10 +253,10 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             await serviceToMangeCounters.UpdateMaxSerialNumAsync(detailsVM.SerialNumber, detailsVM.Count);
 
-                // إنشاء QR Codes
-                var generateListOfCoupons = new GenerateListOfCoupons();
-                string baseUrl = $"{Request.Scheme}://{Request.Host}";
-                var qrCodesAsBytes = generateListOfCoupons.GenerateQRCodesAsync(qrCodesList, baseUrl);
+                //// إنشاء QR Codes
+                //var generateListOfCoupons = new GenerateListOfCoupons();
+                //string baseUrl = $"{Request.Scheme}://{Request.Host}";
+                //var qrCodesAsBytes = generateListOfCoupons.GenerateQRCodesAsync(qrCodesList, baseUrl);
 
                 // إنشاء ملف PDF من QR Codes
                 // return await GenerateCouponsPDF(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
@@ -259,7 +264,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 // إنشاء ملف Word من QR Codes
                 // return await GenerateCouponsWord(await qrCodesAsBytes.ConfigureAwait(false), detailsVM.CouponsPerRow, detailsVM.HorizontalSpacing, detailsVM.VerticalSpacing, detailsVM.CouponSize);
                 // إنشاء ملف Excel من QR Codes
-                return await GenerateCouponsExcel(qrCodesList, baseUrl, detailsVM.CouponSize);
+                return await GenerateCouponsExcel(qrCodesList);
            
 
 
