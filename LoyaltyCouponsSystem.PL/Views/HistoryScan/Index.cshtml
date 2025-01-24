@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Code Scanner</title>
+    <style>
+        /* Styling for the video */
+        #preview {
+            width: 100%;
+            height: auto;
+            position: relative;
+            background-color: black; /* Add a background color for better visibility */
+        }
+
+        /* Styling for the scanning overlay */
+        #scannerOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px; /* Adjust the height of the scanning bar */
+            background-color: rgba(0, 255, 0, 0.5); /* Green color with transparency */
+        }
+
+        /* Hide elements initially */
+        .hidden {
+            display: none;
+        }
+
+        /* Button styling */
+        #scanButton {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+            #scanButton:hover {
+                background-color: #45a049;
+            }
+    </style>
+</head>
+<body>
+    <h1>Upload or Scan QR Code</h1>
+
+    <!-- Form to upload QR Code image -->
+    @using (Html.BeginForm("UploadQRCode", "HistoryScan", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div>
+            <label for="postedFile">Select an image with QR Code:</label>
+            <input type="file" name="postedFile" accept="image/*" />
+        </div>
+        <br />
+        <input type="submit" value="Upload and Decode QR Code" />
+    }
+
+    <h2>OR</h2>
+
+    <!-- QR Code scanner using the camera -->
+    <div>
+        <button id="scanButton">Start Scanning with Camera</button>
+        <br />
+        <video id="preview" class="hidden"></video> <!-- Hide initially -->
+        <div id="scannerOverlay" class="hidden"></div> <!-- Hide overlay initially -->
+    </div>
+
+    <br />
+    @if (ViewBag.QRText != null)
+    {
+        <h2>Decoded QR Code:</h2>
+        <p>@ViewBag.QRText</p>
+    }
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.min.js"></script>
+    <script>
+        const video = document.getElementById('preview');
+        const scanButton = document.getElementById('scanButton');
+        const scannerOverlay = document.getElementById('scannerOverlay');
+
+        let position = 0; // Initial position of the overlay
+        const overlaySpeed = 2; // Speed of movement
+        const maxPosition = 40; // Maximum position (percentage)
+        const minPosition = 0; // Minimum position (percentage)
+
+        scanButton.onclick = async () => {
+            // Show the video and scanning overlay
+            video.classList.remove('hidden');
+            scannerOverlay.classList.remove('hidden');
+
+            // Request camera access
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            video.srcObject = stream;
+            video.play();
+
+            video.addEventListener('play', () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                function scanFrame() {
+                    if (video.paused || video.ended) return;
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+                    if (code) {
+                        alert('QR Code scanned: ' + code.data);
+                        // Here you can send the result to the server or use it directly
+                    } else {
+                        requestAnimationFrame(scanFrame);
+                    }
+
+                    // Move the scanning overlay up and down using JavaScript
+                    position += overlaySpeed;
+                    if (position >= maxPosition || position <= minPosition) {
+                        overlaySpeed *= -1; // Reverse direction when reaching the limits
+                    }
+
+                    // Update the position of the overlay
+                    scannerOverlay.style.top = `${position}%`;
+                }
+
+                scanFrame();
+            });
+        };
+    </script>
+</body>
+</html>

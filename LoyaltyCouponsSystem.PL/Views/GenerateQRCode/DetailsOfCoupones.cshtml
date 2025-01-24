@@ -7,166 +7,80 @@
 }
 
 <div class="container mt-5">
-    <div class="text-center mb-4">
-        <h1 class="display-5 text-primary"><b>إنشاء باركود</b></h1>
-        <p class="lead text-secondary">إدارة وإنشاء الباركود بسهولة وبواجهة حديثة</p>
+    <div style="direction: rtl; text-align: right;">
+        <h2>انشاء باركود</h2>
     </div>
 
-    <form asp-controller="GenerateQRCode" asp-action="DetailsOfCoupones" method="post" class="shadow-lg p-4 bg-white rounded">
-        <div class="row g-3" style="direction: rtl; text-align: right;">
-
-            <!-- نوع الكوبون -->
-            <div class="col-md-6">
-                <label for="typeOfCoupon" class="form-label text-primary"><b>اختر نوع الكوبون</b></label>
-                <select asp-for="TypeOfCoupon" class="form-select">
-                    <option disabled selected>اختر نوع الكوبون</option>
-                    <option value="راك ثيرم">راك ثيرم</option>
-                    <option value="صرف جي تكس">صرف جي تكس</option>
-                    <option value="اقطار كبيرة وهودذا">اقطار كبيرة وهودذا</option>
-                    <option value="كعب راك ثيرم">كعب راك ثيرم</option>
-                    <option value="كعب صرف جي تكس">كعب صرف جي تكس</option>
-                    <option value="كعب اقطار كبيرة وهودذا">كعب اقطار كبيرة وهودذا</option>
-                </select>
-            </div>
-
-            <!-- القيمة -->
-            <div class="col-md-6">
-                <label for="value" class="form-label text-primary"><b>القيمة</b></label>
-                <input type="number" class="form-control" id="value" name="Value" value="50" min="1" />
-            </div>
-
-            <!-- المحافظة -->
-            <div class="col-md-6">
-                <label asp-for="GovernorateId" class="form-label text-primary"><b>اختر المحافظة (اختياري)</b></label>
-                <select class="form-select" asp-for="GovernorateId" asp-items="@(new SelectList(Model.governorates,"Id","Name"))">
-                    <option disabled selected>اختر المحافظة</option>
-                </select>
-            </div>
-
-            <!-- المنطقة -->
-            <div class="col-md-6">
-                <label asp-for="AreaId" class="form-label text-primary"><b>اختر المنطقة (اختياري)</b></label>
-                <select class="form-select" asp-for="AreaId" asp-items="@(new SelectList(Model.Areas,"Id","Name"))">
-                    <option disabled selected>اختر المنطقة</option>
-                </select>
-            </div>
-
-            <!-- العدد -->
-            <div class="col-md-6">
-                <label for="Count" class="form-label text-primary"><b>اختر العدد</b></label>
-                <input type="number" class="form-control" id="Count" name="Count" required>
-            </div>
-
-            <!-- مسلسل الكوبون -->
-            <div class="col-md-6">
-                <label for="SerialNumber" class="form-label text-primary"><b>مسلسل الكوبون</b></label>
-                <div class="input-group">
-                    <span class="input-group-text bg-primary text-white" id="currentYear">2025</span>
-                    <input type="text" class="form-control" id="SerialNumber" name="Serialnumber" required>
+    <form asp-controller="GenerateQRCode" asp-action="DetailsOfCoupones" method="post">
+        <div class="container">
+            <div class="row g-3" style="direction: rtl; text-align: right;">
+                <!-- نوع الكوبون -->
+                <div class="col-md-6">
+                    <label for="typeOfCoupon" class="form-label">اختر نوع الكوبون:</label>
+                    <select asp-for="TypeOfCoupon" class="form-select" aria-label="Default select example">
+                        <option disabled selected>اختر نوع الكوبون</option>
+                        <option value="راك ثيرم">راك ثيرم</option>
+                        <option value="صرف جي تكس">صرف جي تكس</option>
+                        <option value="اقطار كبيرة وهودذا">اقطار كبيرة وهودذا</option>
+                        <option value="كعب راك ثيرم">كعب راك ثيرم</option>
+                        <option value="كعب صرف جي تكس">كعب صرف جي تكس</option>
+                        <option value="كعب اقطار كبيرة وهودذا">كعب اقطار كبيرة وهودذا</option>
+                    </select>
                 </div>
-            </div>
 
-            <!-- حجم الكوبون -->
-            <div class="col-md-6">
-                <label for="couponWidth" class="form-label text-primary"><b>حجم الكوبون (cm)</b></label>
-                <input type="number" step="0.1" class="form-control" id="couponWidth" name="CouponSize" value="2.5" />
-            </div>
+                <!-- القيمة -->
+                <div class="col-md-6">
+                    <label for="value" class="form-label">القيمة:</label>
+                    <input type="number" class="form-control" id="value" name="Value" value="50" min="1" />
+                </div>
 
-            <!-- زر الإرسال -->
-            <div class="col-12 text-center">
-                <button type="submit" id="submitButton" class="btn btn-custom w-100">
-                    <i class="fas fa-check-circle"></i> إنشاء الكوبونات
-                </button>
+                <!-- المحافظة -->
+                <div class="col-md-6">
+                    <label asp-for="GovernorateId" class="form-label">اختر المحافظة (اختياري):</label>
+                    <select class="form-select" asp-for="GovernorateId" asp-items="@(new SelectList(Model.governorates,"Id","Name"))">
+                        <option disabled selected>اختر المحافظة</option>
+                    </select>
+                </div>
+
+                <!-- المنطقة -->
+                <div class="col-md-6">
+                    <label asp-for="AreaId" class="form-label">اختر المنطقة (اختياري):</label>
+                    <select class="form-select" asp-for="AreaId" asp-items="@(new SelectList(Model.Areas,"Id","Name"))">
+                        <option disabled selected>اختر المنطقة</option>
+                    </select>
+                </div>
+
+                <!-- العدد -->
+                <div class="col-md-6">
+                    <label for="Count" class="form-label">اختر العدد:</label>
+                    <input type="number" class="form-control" id="Count" name="Count" required>
+                </div>
+
+                <!-- مسلسل الكوبون -->
+                <div class="col-md-6">
+                    <label for="SerialNumber" class="form-label">مسلسل الكوبون:</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="currentYear"></span>
+                        <input type="text" class="form-control" id="SerialNumber" name="Serialnumber" required>
+                    </div>
+                </div>
+
+
+              @*   <!-- حجم الكوبون -->
+                <div class="col-md-6">
+                    <label for="couponWidth" class="form-label">حجم الكوبون (cm):</label>
+                    <input type="number" step="0.1" class="form-control" id="couponWidth" name="CouponSize" value="2.5" />
+                </div> *@
+
+                <!-- زر الإرسال -->
+                <div class="col-12">
+                    <button type="submit" id="submitButton" class="btn btn-primary w-100">إنشاء الكوبونات</button>
+                </div>
             </div>
         </div>
     </form>
+
 </div>
-
-
-<style>
-    .form-label {
-        color: #0056b3;
-        font-weight: bold;
-    }
-
-    .form-control, .form-select {
-        border-radius: 20px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        font-size: 16px;
-        padding: 10px 15px;
-    }
-
-        .form-control:focus, .form-select:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-        }
-
-    .btn-custom {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 10px 25px;
-        background-color: #007bff;
-        color: white;
-        font-weight: bold;
-        font-size: 16px;
-        border: none;
-        border-radius: 30px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-
-        .btn-custom:hover {
-            background-color: #0056b3;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        }
-
-    .input-group-text {
-        border-radius: 0 20px 20px 0;
-        border: 2px solid #007bff;
-        background-color: #0056b3;
-        color: white;
-        font-weight: bold;
-    }
-
-    /* Update Serial Number Field Styling */
-    .input-group .form-control {
-        border-radius: 20px 0 0 20px !important; /* Rounded left side */
-        border: 1px solid #ced4da; /* Default border */
-        box-shadow: none; /* Remove custom shadow */
-        font-size: 16px; /* Default font size */
-        padding: 10px 15px; /* Default padding */
-    }
-
-        .input-group .form-control:focus {
-            border-color: #0056b3;
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-        }
-
-    /* Adjust Dropdown Arrow Spacing */
-    .form-select {
-        position: relative;
-        padding-right: 30px; /* Adjust space between arrow and content */
-    }
-
-        .form-select::after {
-            content: '';
-            position: absolute;
-            right: 10px; /* Adjust arrow positioning */
-            top: 50%;
-            transform: translateY(-50%);
-            width: 12px;
-            height: 12px;
-            background: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns%3d%22http://www.w3.org/2000/svg%22 viewBox%3d%220 0 4 5%22 fill%3d%22%23000%22%3e%3cpath d%3d%22M2 4.5L0 1h4L2 4.5z%22/%3e%3c/svg%3e') no-repeat center;
-            pointer-events: none;
-        }
-</style>
-
-
-
-
     @section Scripts {
         <script>
             $(document).ready(function () {
