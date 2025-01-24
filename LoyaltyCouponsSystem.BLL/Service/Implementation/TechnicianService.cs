@@ -246,20 +246,21 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         }
         public async Task<List<SelectListItem>> GetUsersForDropdownAsync()
         {
-            // Fetch all active users from the database
-            var activeUsers = await _userManager.Users
-                                                .Where(user => user.IsActive) 
-                                                .ToListAsync();
+            // Fetch all active and confirmed users
+            var activeConfirmedUsers = await _userManager.Users
+                .Where(user => user.IsActive && user.EmailConfirmed)
+                .ToListAsync();
 
-            // Filter the active users by role asynchronously
+            // Filter the users by the "Representative" role
             var representatives = new List<ApplicationUser>();
-            foreach (var user in activeUsers)
+            foreach (var user in activeConfirmedUsers)
             {
                 if (await _userManager.IsInRoleAsync(user, "Representative"))
                 {
                     representatives.Add(user);
                 }
             }
+
 
             // Return the list of SelectListItem
             return representatives.Select(u => new SelectListItem
