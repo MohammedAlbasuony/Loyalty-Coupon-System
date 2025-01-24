@@ -13,7 +13,7 @@
     <div class="row mb-4 justify-content-center">
         <div class="col-md-8">
             <div class="input-group shadow-sm">
-                <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, Code, Governorate, City, or Phone Number...">
+                <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, Code, Governorate, City, Phone Number or Status...">
                 <a href="@Url.Action("AddCustomer", "Customer")" class="btn btn-add-customer ms-2">
                     <i class="fas fa-plus"></i> Add New Customer
                 </a>
@@ -109,10 +109,10 @@
         border-radius: 30px;
     }
 
-    .btn-add-customer:hover {
-        background-color: #007bff;
-        color: white;
-    }
+        .btn-add-customer:hover {
+            background-color: #007bff;
+            color: white;
+        }
 
     .badge.bg-success {
         background-color: #28a745;
@@ -136,9 +136,8 @@
             .inactive-row td:last-child, /* Ensure no line-through on Action column */
             .inactive-row td:last-child * {
                 text-decoration: none !important;
-                 /* Keep text color muted but no line-through */
+                /* Keep text color muted but no line-through */
             }
-
 
 </style>
 

@@ -41,7 +41,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     .Select(c => new SelectListItem
                     {
                         Value = c.CustomerID.ToString(),
-                        Text = $"{c.Name} ({c.Code})"
+                        Text = $"{c.Name} - {c.Code}"
                     })
                     .ToList()
             };
@@ -72,7 +72,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 .Select(c => new SelectListItem
                 {
                     Value = c.CustomerID.ToString(),
-                    Text = $"{c.Name} ({c.Code})"
+                    Text = $"{c.Name} - {c.Code}"
                 })
                 .ToList();
 
