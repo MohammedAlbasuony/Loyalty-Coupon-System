@@ -67,7 +67,7 @@
                         <td>
                             <button class="btn btn-sm @(technician.IsActive ? "btn-danger" : "btn-success") toggle-activation"
                                     data-technician-id="@technician.TechnicianID"
-                                    data-is-active="@technician.IsActive">
+                                    data-is-active="@technician.IsActive.ToString().ToLower()">
                                 @(technician.IsActive ? "Deactivate" : "Activate")
                             </button>
 
