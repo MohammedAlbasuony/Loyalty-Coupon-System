@@ -25,7 +25,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
       
        
 
-        public async Task< IActionResult> Index(
+        public async Task< IActionResult> TransactionHistory(
           
     string fromSequence = "",
     string toSequence = "",
