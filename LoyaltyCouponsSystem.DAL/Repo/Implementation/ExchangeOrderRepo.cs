@@ -55,6 +55,13 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             {
                 await _context.SaveChangesAsync();
             }
+            public async Task<bool> TransactionExistsAsync(string exchangePermission, long sequenceNumber)
+            {
+                return await _context.Transactions.AnyAsync(t =>
+                    t.ExchangePermission == exchangePermission &&
+                    t.SequenceNumber == sequenceNumber);
+            }
+
         }
     }
 

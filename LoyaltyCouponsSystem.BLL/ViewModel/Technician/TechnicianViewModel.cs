@@ -12,7 +12,7 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
         public string Code { get; set; }
         [Required(ErrorMessage = "Name is required.")]
         public string Name { get; set; }
-        public string NickName { get; set; }
+        public string? NickName { get; set; }
         [Required(ErrorMessage = "National ID is required.")]
         [RegularExpression(@"^\d{14}$", ErrorMessage = "National ID must be exactly 14 digits long.")]
         [Display(Name = "National ID")]
@@ -45,5 +45,6 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
         public DateTime? CreatedAt { get; set; }
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public bool IsActive { get; set; }
     }
 }

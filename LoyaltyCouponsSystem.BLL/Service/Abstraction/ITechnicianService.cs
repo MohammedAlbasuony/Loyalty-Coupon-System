@@ -12,5 +12,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
         Task<bool> UpdateAsync(UpdateTechnicianViewModel TechnicianViewModel);
         Task<List<SelectListItem>> GetCustomersForDropdownAsync();
         Task<List<SelectListItem>> GetUsersForDropdownAsync();
+        Task<bool> ToggleActivationAsync(int distributorId);
+        Task<bool> ImportTechniciansFromExcelAsync(Stream stream);
     }
 }

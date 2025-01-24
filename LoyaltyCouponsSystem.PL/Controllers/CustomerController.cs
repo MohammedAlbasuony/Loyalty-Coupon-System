@@ -16,10 +16,12 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _DBcontext = context;
             _customerService = customerService;
         }
+
         public IActionResult Index()
         {
             return View();
         }
+
         public async Task<IActionResult> GetAllCustomers()
         {
             var result = await _customerService.GetAllAsync();
@@ -31,16 +33,32 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var result = await _customerService.GetByIdAsync(id);
             return View(result);
         }
+
+
         [HttpPost]
-        public async Task<IActionResult> ToggleActivation(int customerId, [FromBody] bool isActive)
+        [Route("Customer/ToggleActivation")]
+        public async Task<IActionResult> ToggleActivation(int customerId)
         {
-            var result = await _customerService.ToggleActivationAsync(customerId, isActive);
-            if (!result)
+            var customer = await _DBcontext.Customers.FindAsync(customerId);
+            if (customer == null)
             {
-                return NotFound();
+                return Json(new { success = false, message = "Customer not found" });
             }
-            return Ok();
+
+            // Toggle the IsActive status
+            customer.IsActive = !customer.IsActive;
+            await _DBcontext.SaveChangesAsync();
+
+            // Return the updated status
+            return Json(new { success = true, isActive = customer.IsActive });
         }
+
+
+
+
+
+
+
         [HttpGet]
         public IActionResult AddCustomer()
         {
@@ -86,7 +104,9 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 Governate = customer.Governate,
                 City = customer.City,
                 PhoneNumber = customer.PhoneNumber,
-                TechnicianID = customer.TechnicianID
+                TechnicianID = customer.TechnicianID,
+                IsActive = customer.IsActive // Assuming IsActive is part of the ApplicationUser class
+
             };
 
             return View(updateCustomerViewModel);
@@ -107,5 +127,40 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             return View(updateCustomerViewModel);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Please select a valid Excel file.";
+                return RedirectToAction("GetAllCustomers");
+            }
+
+            try
+            {
+                using var stream = new MemoryStream();
+                await file.CopyToAsync(stream);
+
+                // Process the file in the service
+                var result = await _customerService.ImportCustomersFromExcelAsync(stream);
+
+                if (result)
+                {
+                    TempData["SuccessMessage"] = "Customers imported successfully!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to import customers. Please check the file format.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+            }
+
+            return RedirectToAction("GetAllCustomers");
+        }
+
     }
 }

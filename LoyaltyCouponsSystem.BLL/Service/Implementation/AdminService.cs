@@ -144,5 +144,10 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             return true;
         }
+
+        public Task<bool> AssignPermissionToRoleAsync(string roleName, string permission)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

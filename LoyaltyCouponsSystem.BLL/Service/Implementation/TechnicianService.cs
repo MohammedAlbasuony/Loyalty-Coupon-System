@@ -1,4 +1,5 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using LoyaltyCouponsSystem.DAL.DB;
@@ -8,6 +9,7 @@ using LoyaltyCouponsSystem.DAL.Repo.Implementation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 
 namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 {
@@ -40,6 +42,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     City = technicianViewModel.SelectedCity,
                     CreatedAt = technicianViewModel?.CreatedAt,
                     CreatedBy = technicianViewModel?.CreatedBy,
+                    IsActive = technicianViewModel.IsActive,
                 };
 
                 // Fetch customer IDs by selected codes
@@ -139,6 +142,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 CreatedBy = technician.CreatedBy,
                 UpdatedBy = technician.UpdatedBy,
                 UpdatedAt = technician.UpdatedAt,
+                IsActive = technician.IsActive,
                 SelectedCustomerNames = technician.Customers?.Select(c => c.Name).ToList(),
                 SelectedUserNames = technician.Users?.Select(u => u.UserName).ToList(),
             }).ToList();
@@ -187,6 +191,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         PhoneNumber3 = technician.PhoneNumber3,
                         SelectedGovernate = technician.Governate,
                         SelectedCity = technician.City,
+                        IsActive = technician.IsActive,
                         Customers = await GetCustomersForDropdownAsync(),
                         Users = await GetUsersForDropdownAsync(),
                     };
@@ -221,6 +226,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 existingTechnician.City = technicianViewModel.SelectedCity;
                 existingTechnician.UpdatedAt = DateTime.Now;
                 existingTechnician.UpdatedBy = technicianViewModel.UpdatedBy;
+                existingTechnician.IsActive = technicianViewModel.IsActive;
                 // Save the updated entity
                 return await _technicianRepo.UpdateAsync(existingTechnician);
             }
@@ -283,5 +289,120 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             viewModel.Governates = governates;
             viewModel.Cities = cities;
         }
+        public async Task<bool> ToggleActivationAsync(int technicianId)
+        {
+            var technician = await _technicianRepo.GetByIdAsync(technicianId);
+            if (technician == null)
+            {
+                return false;
+            }
+
+            technician.IsActive = !technician.IsActive;
+            technician.UpdatedAt = DateTime.Now;
+
+            return await _technicianRepo.UpdateAsync(technician);
+        }
+
+        public async Task<bool> ImportTechniciansFromExcelAsync(Stream stream)
+        {
+            try
+            {
+                using var package = new ExcelPackage(stream);
+                var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+
+                if (worksheet == null)
+                    throw new Exception("No worksheet found in the Excel file.");
+
+                var rowCount = worksheet.Dimension.Rows;
+                var technicians = new List<Technician>();
+
+                for (int row = 2; row <= rowCount; row++) // Assuming first row contains headers
+                {
+                    var name = worksheet.Cells[row, 1].Text; // Column 1: Technician Name
+                    var code = worksheet.Cells[row, 2].Text; // Column 2: Technician Code
+                    var nickName = worksheet.Cells[row, 3].Text; // Column 3: Nickname
+                    var nationalID = worksheet.Cells[row, 4].Text; // Column 4: National ID
+                    var phoneNumberText = worksheet.Cells[row, 5].Text; // Column 5: Phone Numbers (comma-separated)
+                    var governate = worksheet.Cells[row, 6].Text; // Column 6: Governate
+                    var city = worksheet.Cells[row, 7].Text; // Column 7: City
+                    var selectedCustomerCodes = worksheet.Cells[row, 8].Text; // Column 8: Customer Codes (comma-separated)
+                    var selectedUsernames = worksheet.Cells[row, 9].Text; // Column 9: Usernames (comma-separated)
+
+                    if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(code) && !string.IsNullOrWhiteSpace(phoneNumberText))
+                    {
+                        // Split the phone numbers
+                        var phoneNumbers = phoneNumberText.Split(',')
+                                                           .Select(p => p.Trim())
+                                                           .ToList();
+
+                        // Initialize phone number variables with default values
+                        int phoneNumber1 = 0;
+                        int? phoneNumber2 = null;
+                        int? phoneNumber3 = null;
+
+                        // Try parsing phone numbers to integers
+                        if (phoneNumbers.Count > 0 && int.TryParse(phoneNumbers[0], out var parsedPhone1))
+                            phoneNumber1 = parsedPhone1;
+
+                        if (phoneNumbers.Count > 1 && int.TryParse(phoneNumbers[1], out var parsedPhone2))
+                            phoneNumber2 = parsedPhone2;
+
+                        if (phoneNumbers.Count > 2 && int.TryParse(phoneNumbers[2], out var parsedPhone3))
+                            phoneNumber3 = parsedPhone3;
+
+                        var technician = new Technician
+                        {
+                            Name = name,
+                            Code = code,
+                            NickName = nickName,
+                            NationalID = nationalID,
+                            PhoneNumber1 = phoneNumber1, // Assign first phone number
+                            PhoneNumber2 = phoneNumber2, // Assign second phone number if available
+                            PhoneNumber3 = phoneNumber3, // Assign third phone number if available
+                            Governate = governate,
+                            City = city,
+                            IsActive = true,
+                            CreatedAt = DateTime.Now,
+                        };
+
+                        // Split the customer codes and get customer IDs from the repository
+                        var customerCodes = selectedCustomerCodes.Split(',').Select(c => c.Trim()).ToList();
+                        var customerIds = await _customerRepo.GetCustomerIdsByCodesAsync(customerCodes);
+
+                        // Add customers to the technician
+                        technician.Customers = await _customerRepo.GetCustomersByIdsAsync(customerIds);
+
+                        // Split the usernames and get user IDs from the UserManager
+                        var usernames = selectedUsernames.Split(',').Select(c => c.Trim()).ToList();
+                        var users = await _userManager.Users
+                            .Where(u => usernames.Contains(u.UserName))
+                            .ToListAsync();
+
+                        // Assign users to the technician
+                        technician.Users = users;
+
+                        technicians.Add(technician);
+                    }
+                }
+
+                // Save technicians to the database
+                foreach (var technician in technicians)
+                {
+                    await _technicianRepo.AddAsync(technician);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging (optional)
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+
+
+
     }
 }

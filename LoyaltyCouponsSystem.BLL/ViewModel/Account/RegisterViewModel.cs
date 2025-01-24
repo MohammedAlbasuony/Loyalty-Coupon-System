@@ -22,11 +22,9 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Account
         public string? OptionalPhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Governorate is required.")]
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Governorate must contain only letters and spaces.")]
         public string Governorate { get; set; }
 
         [Required(ErrorMessage = "City is required.")]
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "City must contain only letters and spaces.")]
         public string City { get; set; }
 
         [Required]
@@ -43,6 +41,8 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Account
         [DataType(DataType.Password)]
         [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; }
+        public List<string>? AvailableRoles { get; set; } 
+
 
     }
 }

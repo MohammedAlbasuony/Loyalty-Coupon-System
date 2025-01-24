@@ -303,6 +303,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Fonts and icons -->
     <script src="~/assets/js/plugin/webfont/webfont.min.js"></script>
@@ -325,7 +326,9 @@
     <link rel="stylesheet" href="~/assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/assets/css/plugins.min.css" />
     <link rel="stylesheet" href="~/assets/css/kaiadmin.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
+
         .sidebar {
             transition: all 0.3s ease;
             width: 250px;
@@ -359,6 +362,28 @@
                 display: none;
             }
 
+            /* Log Out Button Specific Styling */
+            .sidebar.collapsed .logout-btn {
+                justify-content: center;
+                padding: 10px;
+                text-align: center;
+            }
+
+            /* Sidebar expands temporarily on hover */
+            .sidebar:hover:not(.static) {
+                width: 250px;
+            }
+
+                .sidebar:hover:not(.static) .nav-item .btn span,
+                .sidebar:hover:not(.static) .nav-item a span {
+                    display: inline-block;
+                }
+
+            /* Static state for the sidebar */
+            .sidebar.static {
+                width: 250px;
+            }
+
         /* Collapse Button */
         #collapseSidebar {
             background: none;
@@ -366,16 +391,42 @@
             font-size: 20px;
             margin: 10px;
             color: white;
+            cursor: pointer;
         }
+
+            #collapseSidebar:hover {
+                opacity: 0.8;
+            }
 
         /* Log Out Button */
         .logout-btn {
-            background-color: #dc3545;
-            border-radius: 20px;
+            background: linear-gradient(90deg, #ff4d4d, #ff3333);
+            border: none;
+            border-radius: 25px;
             font-weight: bold;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
             transition: all 0.3s ease;
+            width: 90%;
+            margin: 10px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
+            .logout-btn i {
+                font-size: 20px;
+            }
+
+            .logout-btn:hover {
+                background: linear-gradient(90deg, #ff6666, #ff4d4d);
+                box-shadow: 0 4px 15px rgba(255, 77, 77, 0.5);
+                transform: scale(1.05);
+            }
     </style>
+
+
 </head>
 <body>
     <div class="wrapper">
@@ -400,42 +451,6 @@
                                 <i class="fas fa-tachometer-alt"></i>
                                 <span>Home</span>
                             </a>
-                        </li>
-
-                        <!-- Manage Representatives -->
-                        <li class="nav-item">
-                            <a href="@Url.Action("ManageUsers", "Admin")">
-                                <i class="fas fa-user-tie"></i>
-                                <span>Manage Users</span>
-                            </a>
-                        </li>
-
-                        <!-- Manage Users -->
-                        <li class="nav-item">
-                            <a data-bs-toggle="collapse" href="#manageUsers" aria-expanded="false" class="collapsed">
-                                <i class="fas fa-users"></i>
-                                <span>Manage Customers</span>
-                                <span class="caret"></span>
-                            </a>
-                            <div class="collapse" id="manageUsers">
-                                <ul class="nav nav-collapse">
-                                    <li>
-                                        <a href="@Url.Action("GetAllCustomers", "Customer")">
-                                            <span class="sub-item">Manage Merchant</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="@Url.Action("GetAllDistributors", "Distributor")">
-                                            <span class="sub-item">Manage Distributor</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="@Url.Action("GetAllTechnicians", "Technician")">
-                                            <span class="sub-item">Manage Technician</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
                         </li>
 
                         <!-- QR Codes -->
@@ -489,13 +504,49 @@
                             </div>
                         </li>
 
+                        <!-- Manage Users -->
+                        <li class="nav-item">
+                            <a data-bs-toggle="collapse" href="#manageUsers" aria-expanded="false" class="collapsed">
+                                <i class="fas fa-users"></i>
+                                <span>Manage Customers</span>
+                                <span class="caret"></span>
+                            </a>
+                            <div class="collapse" id="manageUsers">
+                                <ul class="nav nav-collapse">
+                                    <li>
+                                        <a href="@Url.Action("GetAllCustomers", "Customer")">
+                                            <span class="sub-item">Manage Merchant</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("GetAllDistributors", "Distributor")">
+                                            <span class="sub-item">Manage Distributor</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("GetAllTechnicians", "Technician")">
+                                            <span class="sub-item">Manage Technician</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+
+                        <!-- Manage Representatives -->
+                        <li class="nav-item">
+                            <a href="@Url.Action("ManageUsers", "Admin")">
+                                <i class="fas fa-user-tie"></i>
+                                <span>Manage Users</span>
+                            </a>
+                        </li>
+
                         <!-- Log Out -->
                         <li class="nav-item mt-auto">
-                            <form action="/Account/Logout" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-danger w-100 logout-btn">
-                                    <i class="fas fa-sign-out-alt"></i> Log Out
-                                </button>
-                            </form>
+                            <button id="logout-btn" class="btn logout-btn">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Log Out</span>
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -515,11 +566,81 @@
 
     <!-- Sidebar Toggle Script -->
     <script>
-        document.getElementById("collapseSidebar").addEventListener("click", function () {
-            const sidebar = document.querySelector(".sidebar");
-            sidebar.classList.toggle("collapsed");
+        document.addEventListener("DOMContentLoaded", function () {
+        const sidebar = document.querySelector(".sidebar");
+        const collapseButton = document.getElementById("collapseSidebar");
+        let isStatic = true;
+
+        // Toggle sidebar collapse and static states
+        collapseButton.addEventListener("click", function () {
+            if (sidebar.classList.contains("collapsed")) {
+                sidebar.classList.remove("collapsed");
+                sidebar.classList.add("static");
+                isStatic = true;
+            } else if (isStatic) {
+                sidebar.classList.remove("static");
+                sidebar.classList.add("collapsed");
+                isStatic = false;
+            } else {
+                sidebar.classList.add("collapsed");
+            }
+        });
+
+        // Expand sidebar temporarily on hover when collapsed
+        sidebar.addEventListener("mouseenter", function () {
+            if (!isStatic && sidebar.classList.contains("collapsed")) {
+                sidebar.classList.remove("collapsed");
+            }
+        });
+
+        // Collapse sidebar when mouse leaves, unless static
+        sidebar.addEventListener("mouseleave", function () {
+            if (!isStatic && !sidebar.classList.contains("static")) {
+                sidebar.classList.add("collapsed");
+            }
+        });
+
+        // Handle submenu toggling
+        const toggles = document.querySelectorAll('.nav-item a[data-bs-toggle="collapse"]');
+        toggles.forEach(toggle => {
+            toggle.addEventListener("click", function (event) {
+                const target = document.querySelector(this.getAttribute("href"));
+                if (target) {
+                    event.preventDefault();
+                    const isCollapsed = target.classList.contains("show");
+                    document.querySelectorAll(".collapse").forEach(el => el.classList.remove("show"));
+                    if (!isCollapsed) {
+                        target.classList.add("show");
+                    }
+                }
+            });
+        });
+
+            // Logout button logic with confirmation
+        document.getElementById("logout-btn").addEventListener("click", function () {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You will be logged out of your session.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, log me out!",
+                cancelButtonText: "Cancel",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit logout form
+                    const logoutForm = document.createElement("form");
+                    logoutForm.method = "POST";
+                    logoutForm.action = "/Account/Logout";
+                    document.body.appendChild(logoutForm);
+                    logoutForm.submit();
+                }
+            });
+        });
         });
     </script>
+
     @RenderSection("script", required: false)
     @RenderSection("Scripts", required: false)
 </body>

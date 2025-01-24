@@ -1,7 +1,12 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using DocumentFormat.OpenXml.InkML;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
+using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
@@ -10,9 +15,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
     {
         private readonly IDistributorService _distributorService;
         private readonly ICustomerService _customerService;
+        private readonly ApplicationDbContext _DBcontext;
 
-        public DistributorController(IDistributorService distributorService, ICustomerService customerService)
+        public DistributorController(ApplicationDbContext context, IDistributorService distributorService, ICustomerService customerService)
         {
+            _DBcontext = context;
             _distributorService = distributorService;
             _customerService = customerService;
         }
@@ -29,7 +36,14 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var viewModel = new DistributorViewModel
             {
                 Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync(),
-                Customers = await _distributorService.GetCustomersForDropdownAsync()
+                Customers = (await _customerService.GetAllAsync())
+                    .Where(c => c.IsActive) // Only include active customers
+                    .Select(c => new SelectListItem
+                    {
+                        Value = c.CustomerID.ToString(),
+                        Text = $"{c.Name} - {c.Code}"
+                    })
+                    .ToList()
             };
 
             return View(viewModel);
@@ -53,7 +67,15 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             // If validation fails, re-populate dropdowns and return the view
             model.Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync();
-            model.Customers = await _distributorService.GetCustomersForDropdownAsync();
+            model.Customers = (await _customerService.GetAllAsync())
+                .Where(c => c.IsActive)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.CustomerID.ToString(),
+                    Text = $"{c.Name} - {c.Code}"
+                })
+                .ToList();
+
             return View(model);
         }
 
@@ -70,11 +92,18 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var distributorViewModel = await _distributorService.GetByIdAsync(id);
             if (distributorViewModel == null)
             {
-                return NotFound();  
+                return NotFound();
             }
 
             distributorViewModel.Governates = (List<SelectListItem>)await _distributorService.GetGovernatesForDropdownAsync();
-            distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
+            distributorViewModel.Customers = (await _customerService.GetAllAsync())
+                .Where(c => c.IsActive)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.CustomerID.ToString(),
+                    Text = $"{c.Name} ({c.Code})"
+                })
+                .ToList();
 
             return View(distributorViewModel); // Return populated ViewModel to the view
         }
@@ -95,7 +124,15 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
 
             // If update fails, re-populate dropdowns and return the view again
-            distributorViewModel.Customers = await _distributorService.GetCustomersForDropdownAsync();
+            distributorViewModel.Customers = (await _customerService.GetAllAsync())
+                .Where(c => c.IsActive)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.CustomerID.ToString(),
+                    Text = $"{c.Name} ({c.Code})"
+                })
+                .ToList();
+
             return View(distributorViewModel);
         }
 
@@ -120,5 +157,61 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             ModelState.AddModelError("", "Unable to delete distributor. Please try again.");
             return RedirectToAction("GetAllDistributors");
         }
+
+        // Toggle Distributor Activation
+        [HttpPost]
+        public async Task<IActionResult> ToggleActivation(int distributorId)
+        {
+            var distributor = await _DBcontext.Distributors.FirstOrDefaultAsync(d => d.DistributorID == distributorId);
+            if (distributor == null)
+            {
+                return Json(new { success = false, message = "Distributor not found." });
+            }
+
+            distributor.IsActive = !distributor.IsActive;
+            distributor.UpdatedAt = DateTime.Now;
+            distributor.UpdatedBy = User.Identity.Name ?? "Unknown"; // Assuming authentication is enabled
+
+            await _DBcontext.SaveChangesAsync();
+
+            return Json(new { success = true, isActive = distributor.IsActive });
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> UploadExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Please select a valid Excel file.";
+                return RedirectToAction("GetAllCustomers");
+            }
+
+            try
+            {
+                using var stream = new MemoryStream();
+                await file.CopyToAsync(stream);
+
+                // Process the file in the service
+                var result = await _distributorService.ImportDistributorsFromExcelAsync(stream);
+
+                if (result)
+                {
+                    TempData["SuccessMessage"] = "Distibutor imported successfully!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to import Distibutor. Please check the file format.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+            }
+
+            return RedirectToAction("GetAllDistributors");
+        }
+
     }
 }
+

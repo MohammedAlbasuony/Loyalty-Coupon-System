@@ -5,109 +5,106 @@
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
 }
 <br />
-<form asp-action="AssignQRCode" method="post" id="assignForm" class="shadow-lg p-4 bg-white rounded">
-    <h2 class="text-center text-primary mb-4">Exchange Permmision </h2>
-
-
-    <div class="row g-3">
-        <!-- Select Customer -->
-        <div class="col-md-6">
-            <label for="CustomerCodeOrName" class="form-label fw-bold">Select Customer</label>
-            <select asp-for="SelectedCustomerCode" class="form-select" required>
-                <option value="">Select Customer</option>
-                @foreach (var customer in Model.Customers)
-                {
-                    <option value="@customer.Value">@customer.Text</option>
-                }
-            </select>
-        </div>
-
-        <!-- Select Technician -->
-        <div class="col-md-6">
-            <label for="TechnicianCodeOrName" class="form-label fw-bold">Select Technician</label>
-            <select asp-for="SelectedTechnicianCode" class="form-select" required>
-                <option value="">Select Technician</option>
-                @foreach (var technician in Model.Technicians)
-                {
-                    <option value="@technician.Value">@technician.Text</option>
-                }
-            </select>
-        </div>
-
-        <!-- Select Governate -->
-        <div class="col-md-6">
-            <label for="Governate" class="form-label fw-bold">Select Governate</label>
-            <select asp-for="SelectedGovernate" class="form-select" id="Governate" required>
-                <option value="">Select Governate</option>
-                @foreach (var governate in Model.Governates)
-                {
-                    <option value="@governate.Value">@governate.Text</option>
-                }
-            </select>
-        </div>
-
-        <!-- Select City -->
-        <div class="col-md-6">
-            <label for="City" class="form-label fw-bold">Select City</label>
-            <select asp-for="SelectedCity" class="form-select" id="City" required>
-                <option value="">Select City</option>
-            </select>
-        </div>
-
-        <!-- Exchange Permission -->
-        <div class="col-md-6">
-            <label for="ExchangePermission" class="form-label fw-bold">Exchange Permission Number</label>
-            <input asp-for="ExchangePermission" name="Transactions[0].ExchangePermission" class="form-control" placeholder="Enter exchange permission number" required />
-        </div>
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h1 class="display-5 text-primary"><b>Exchange Permission</b></h1>
+        <p class="lead text-secondary">Assign QR Codes with a streamlined and modern interface.</p>
     </div>
 
-    <!-- Dynamic Coupon Fields -->
-    <div id="couponFieldsContainer" class="mt-4">
-        <div class="row g-3 align-items-center couponFields">
-            <div class="col-md-3">
-                <label for="CouponSort" class="form-label fw-bold">Coupon Sort</label>
-                <select name="Transactions[0].SelectedCouponSort" class="form-select" required>
-                    <option value="">Select Coupon Sort</option>
-                    @foreach (var sort in Model.CouponSorts)
+    <form asp-action="AssignQRCode" method="post" id="assignForm" class="shadow-lg p-4 bg-white rounded">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="CustomerCodeOrName" class="form-label"><b>Select Customer</b></label>
+                <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-control select2" multiple required>
+                    <option></option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="TechnicianCodeOrName" class="form-label"><b>Select Technician</b></label>
+                <select asp-for="SelectedTechnicianCode" asp-items="Model.Technicians" class="form-control select2" multiple required>
+                    <option></option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-3">
+            <div class="col-md-6">
+                <label for="Governate" class="form-label"><b>Select Governate</b></label>
+                <select asp-for="SelectedGovernate" class="form-select" id="Governate" required>
+                    <option value="">Select Governate</option>
+                    @foreach (var governate in Model.Governates)
                     {
-                        <option value="@sort.Value">@sort.Text</option>
+                        <option value="@governate.Value">@governate.Text</option>
                     }
                 </select>
             </div>
-            <div class="col-md-3">
-                <label for="CouponType" class="form-label fw-bold">Coupon Type</label>
-                <select name="Transactions[0].SelectedCouponType" class="form-select" required>
-                    <option value="">Select Coupon Type</option>
-                    @foreach (var type in Model.CouponTypes)
-                    {
-                        <option value="@type.Value">@type.Text</option>
-                    }
+            <div class="col-md-6">
+                <label for="City" class="form-label"><b>Select City</b></label>
+                <select asp-for="SelectedCity" class="form-select" id="City" required>
+                    <option value="">Select City</option>
                 </select>
             </div>
-            <div class="col-md-3">
-                <label for="StartSequenceNumber" class="form-label fw-bold">Start Sequence Number</label>
-                <input type="number" name="Transactions[0].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
-            </div>
-            <div class="col-md-3">
-                <label for="EndSequenceNumber" class="form-label fw-bold">End Sequence Number</label>
-                <input type="number" name="Transactions[0].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
-            </div>
-            <div class="col-md-1 d-flex align-items-end">
-                <button type="button" class="btn btn-danger removeFieldsButton">Remove</button>
+        </div>
+
+        <div class="row g-3 mt-3">
+            <div class="col-md-6">
+                <label for="ExchangePermission" class="form-label"><b>Exchange Permission Number</b></label>
+                <input asp-for="ExchangePermission" name="Transactions[0].ExchangePermission" class="form-control" placeholder="Enter exchange permission number" required />
             </div>
         </div>
-    </div>
 
-    <!-- Add Another Button -->
-    <div class="text-center mt-3">
-        <button type="button" class="btn btn-outline-secondary" id="addFieldsButton">Add Another</button>
-    </div>
+        <div id="couponFieldsContainer" class="mt-4">
+            <div class="row g-3 align-items-center couponFields">
+                <div class="col-md-3">
+                    <label for="CouponSort" class="form-label"><b>Coupon Sort</b></label>
+                    <select name="Transactions[0].SelectedCouponSort" class="form-select" required>
+                        <option value="">Select Coupon Sort</option>
+                        @foreach (var sort in Model.CouponSorts)
+                        {
+                            <option value="@sort.Value">@sort.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="CouponType" class="form-label"><b>Coupon Type</b></label>
+                    <select name="Transactions[0].SelectedCouponType" class="form-select" required>
+                        <option value="">Select Coupon Type</option>
+                        @foreach (var type in Model.CouponTypes)
+                        {
+                            <option value="@type.Value">@type.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="StartSequenceNumber" class="form-label"><b>Start Sequence Number</b></label>
+                    <input type="number" name="Transactions[0].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required min="1" />
+                </div>
+                <div class="col-md-3">
+                    <label for="EndSequenceNumber" class="form-label"><b>End Sequence Number</b></label>
+                    <input type="number" name="Transactions[0].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required min="1" />
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger removeFieldsButton">Remove</button>
+                </div>
+            </div>
+        </div>
 
-    <!-- Submit Button -->
-    <div class="text-center mt-4">
-        <button type="submit" class="btn btn-primary mt-3 px-4 py-2 rounded-pill shadow-sm" style="font-size: 16px;">Assign</button>
-    </div>
-</form>
+        <div class="text-center mt-3">
+            <button type="button" class="btn btn-outline-secondary" id="addFieldsButton">Add Another</button>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-custom">
+                <i class="fas fa-paper-plane"></i> Assign
+            </button>
+        </div>
+    </form>
+</div>
+
+
+
 
 <br />
 <br />
@@ -116,7 +113,7 @@
 @section Scripts {
     <script>
 
-                        let index = 1; // Initialize index for dynamic rows
+        let index = 1; // Initialize index for dynamic rows
 
         // Add new row
         document.getElementById("addFieldsButton").addEventListener("click", function () {
@@ -199,10 +196,10 @@
 
             // Define static cities for demonstration
             var cities = {
-                "Cairo": ["City1", "City2"],
+                "Cairo": ["Nasr City", "City2"],
                 "Gharbeia": ["Tanta", "Qotor"],
                 "Sharqeia": ["City5", "City6"],
-                "Alexandria": ["City7", "City8"]
+                "Alexandria": ["Smouha", "City8"]
             };
 
             // Populate city dropdown based on selected governate
@@ -219,12 +216,16 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/additional-methods.min.js"></script>
+
 
     <script>
         // Initialize Select2 on the Customer dropdown
         $(document).ready(function () {
             $('.select2').select2({
                 placeholder: 'Select Customer',
+
                 allowClear: true
             });
         });
@@ -236,44 +237,85 @@
 
 <style>
     .form-label {
-        color: #0056b3;
+        color: #007bff !important;
         font-weight: bold;
     }
 
-    .form-select,
-    .form-control {
-        border-radius: 8px;
-        border: 2px solid #007bff;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    .form-control, .form-select {
+        border-radius: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 14px;
+        padding: 10px 15px;
         transition: all 0.3s ease;
     }
 
-        .form-select:focus,
-        .form-control:focus {
+        .form-control:focus, .form-select:focus {
             border-color: #0056b3;
-            box-shadow: 0 0 8px rgba(0, 86, 179, 0.5);
+            box-shadow: 0 0 10px rgba(0, 86, 179, 0.3);
         }
 
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-        border-radius: 25px;
-        padding: 10px 30px;
-        font-size: 16px;
+
+    label {
+        font-weight: bold;
     }
 
+
     .btn-outline-secondary {
-        border-radius: 25px;
-        color: #007bff;
+        border-radius: 30px;
         border: 2px solid #007bff;
+        color: #007bff;
         padding: 8px 20px;
         transition: all 0.3s ease;
     }
 
         .btn-outline-secondary:hover {
             background-color: #007bff;
-            color: #fff;
+            color: white;
         }
+
+    .btn-custom {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 20px;
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+        font-size: 14px;
+        border: none;
+        border-radius: 25px;
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 8px rgba(0, 86, 179, 0.3);
+        }
+
+        .btn-custom:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+    .btn-danger {
+        border-radius: 20px;
+    }
+
+    .couponFields {
+        border-bottom: 1px dashed #e0e0e0;
+        padding-bottom: 15px;
+        margin-bottom: 10px;
+    }
+
+    .container h1 {
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+
 
     .select2-container .select2-selection--single {
         height: 38px; /* Adjust height to match `form-select` */
@@ -292,7 +334,7 @@
     }
 
     hr {
-        border-top: 2px solid #e0e0e0;
+        border-top: 2px solid #808080;
         margin-top: 20px;
         margin-bottom: 20px;
     }

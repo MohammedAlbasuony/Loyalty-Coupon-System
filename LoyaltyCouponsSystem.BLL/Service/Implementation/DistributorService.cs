@@ -5,6 +5,7 @@ using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
 using LoyaltyCouponsSystem.DAL.Repo.Implementation;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using OfficeOpenXml;
 using Distributor = LoyaltyCouponsSystem.DAL.Entity.Distributor;
 
 namespace LoyaltyCouponsSystem.BLL.Service.Implementation
@@ -37,6 +38,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 IsDeleted = distributorViewModel.IsDeleted,
                 CreatedBy = distributorViewModel.CreatedBy,
                 CreatedAt = distributorViewModel.CreatedAt,
+                IsActive = distributorViewModel.IsActive,
                 DistributorCustomers = new List<DistributorCustomer>()
             };
 
@@ -81,6 +83,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 CreatedBy = d.CreatedBy,
                 UpdatedBy = d.UpdatedBy,
                 UpdatedAt = d.UpdatedAt,
+                IsActive = d.IsActive,
                 SelectedCustomerNames = d.DistributorCustomers.Where(dc => dc.Customer != null)
                 .Select(x => x.Customer.Name)
                 .Distinct().ToList()
@@ -104,6 +107,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         SelectedCity = distributor.City,
                         Code = distributor.Code,
                         IsDeleted = distributor.IsDeleted,
+                        IsActive = distributor.IsActive,
                         SelectedCustomerNames = distributorCustomers.Where(dc => dc.Customer != null)
                         .Select(x => x.Customer.Name)
                         .Distinct().ToList()
@@ -137,7 +141,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     Code = distributorViewModel.Code,
                     IsDeleted = distributorViewModel.IsDeleted,
                     UpdatedBy = distributorViewModel.UpdatedBy,
-                    UpdatedAt = distributorViewModel.UpdatedAt
+                    UpdatedAt = distributorViewModel.UpdatedAt,
+                    IsActive = distributorViewModel.IsActive,
                 };
 
                 // Call the repository update method
@@ -191,6 +196,97 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         new SelectListItem { Text = "Sharkia", Value = "Sharkia" }
     };
         }
+        public async Task<bool> ToggleActivationAsync(int distributorId)
+        {
+            var distributor = await _distributorRepo.GetByIdAsync(distributorId);
+            if (distributor == null)
+            {
+                return false;
+            }
+
+            // Toggle the IsActive status
+            distributor.IsActive = !distributor.IsActive;
+
+            // Save the updated distributor
+            return await _distributorRepo.UpdateAsync(distributor);
+        }
+
+
+        public async Task<bool> ImportDistributorsFromExcelAsync(Stream stream)
+        {
+            try
+            {
+                using var package = new ExcelPackage(stream);
+                var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+
+                if (worksheet == null)
+                    throw new Exception("No worksheet found in the Excel file.");
+
+                var rowCount = worksheet.Dimension.Rows;
+                var distributors = new List<Distributor>();
+
+                for (int row = 2; row <= rowCount; row++) // Assuming first row contains headers
+                {
+                    var name = worksheet.Cells[row, 1].Text; // Column 1: Distributor Name
+                    var code = worksheet.Cells[row, 2].Text; // Column 2: Distributor Code
+                    var governate = worksheet.Cells[row, 3].Text; // Column 3: Governate
+                    var city = worksheet.Cells[row, 4].Text; // Column 4: City
+                    var phoneNumberText = worksheet.Cells[row, 5].Text; // Column 5: Phone Number
+                    var selectedCustomerCodes = worksheet.Cells[row, 6].Text; // Column 6: Customer Codes (comma-separated)
+
+                    if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(code) && !string.IsNullOrWhiteSpace(phoneNumberText))
+                    {
+                        // Parse the phone number as an integer
+                        if (!int.TryParse(phoneNumberText, out var phoneNumber))
+                        {
+                            // If phone number is invalid, skip this row or handle the error as needed
+                            continue;
+                        }
+
+                        var distributor = new Distributor
+                        {
+                            Name = name,
+                            Code = code,
+                            Governate = governate,
+                            City = city,
+                            PhoneNumber1 = phoneNumber,
+                            IsActive = true,
+                            CreatedAt = DateTime.Now,
+                            IsDeleted = false, // Default, could be adjusted as needed
+                        };
+
+                        // Split the customer codes and get customer IDs from the repository
+                        var customerCodes = selectedCustomerCodes.Split(',').Select(c => c.Trim()).ToList();
+                        var customerIds = await _customerRepo.GetCustomerIdsByCodesAsync(customerCodes);
+
+                        // Create DistributorCustomer mappings
+                        distributor.DistributorCustomers = customerIds
+                            .Select(customerId => new DistributorCustomer
+                            {
+                                CustomerID = customerId
+                            })
+                            .ToList();
+
+                        distributors.Add(distributor);
+                    }
+                }
+
+                // Save distributors to the database
+                foreach (var distributor in distributors)
+                {
+                    await _distributorRepo.AddAsync(distributor);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging (optional)
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
 
     }
 }

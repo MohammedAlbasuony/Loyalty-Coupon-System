@@ -3,6 +3,7 @@ using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
 using Microsoft.IdentityModel.Tokens;
+using OfficeOpenXml;
 
 namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 {
@@ -27,7 +28,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     Governate = customerViewModel.Governate,
                     City = customerViewModel.City,
                     PhoneNumber = customerViewModel.PhoneNumber,
-                    TechnicianId = customerViewModel.TechnicianID
+                    TechnicianId = customerViewModel.TechnicianID,
+                    IsActive = customerViewModel.IsActive
                 };
                 return await _customerRepo.AddAsync(customer);
             }
@@ -60,6 +62,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 CreatedAt = customer.CreatedAt,
                 UpdatedBy = customer.UpdatedBy,
                 UpdatedAt = customer.UpdatedAt,
+                IsActive = customer.IsActive,
             }).ToList();
 
             return customerViewModels;
@@ -81,7 +84,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         Governate = customer.Governate,
                         City = customer.City,
                         PhoneNumber = customer.PhoneNumber,
-                        TechnicianID = customer.TechnicianId
+                        TechnicianID = customer.TechnicianId,
+                        IsActive = customer.IsActive
                     };
                 }
             }
@@ -106,7 +110,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     existingCustomer.TechnicianId = updateCustomerViewModel.TechnicianID;
                     existingCustomer.UpdatedAt = DateTime.Now;
                     existingCustomer.UpdatedBy = updateCustomerViewModel.UpdatedBy;
-                    
+                    existingCustomer.IsActive = updateCustomerViewModel.IsActive;
 
                     return await _customerRepo.UpdateAsync(existingCustomer); 
                 }
@@ -124,5 +128,56 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             return await _customerRepo.UpdateAsync(customer);
         }
 
+        public async Task<bool> ImportCustomersFromExcelAsync(Stream stream)
+        {
+            try
+            {
+                using var package = new ExcelPackage(stream);
+                var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+
+                if (worksheet == null)
+                    throw new Exception("No worksheet found in the Excel file.");
+
+                var rowCount = worksheet.Dimension.Rows;
+                var customers = new List<Customer>();
+
+                for (int row = 2; row <= rowCount; row++) // Assuming first row contains headers
+                {
+                    var name = worksheet.Cells[row, 1].Text; // Adjust column indices as needed
+                    var code = worksheet.Cells[row, 2].Text;
+                    var governate = worksheet.Cells[row, 3].Text;
+                    var city = worksheet.Cells[row, 4].Text;
+                    var phoneNumber = worksheet.Cells[row, 5].Text;
+                    var technicianId = worksheet.Cells[row, 6].Text;
+
+                    if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(phoneNumber))
+                    {
+                        customers.Add(new Customer
+                        {
+                            Name = name,
+                            Code = code,
+                            Governate = governate,
+                            City = city,
+                            PhoneNumber = phoneNumber,
+                            TechnicianId = string.IsNullOrWhiteSpace(technicianId) ? null : int.Parse(technicianId),
+                            IsActive = true,
+                            CreatedAt = DateTime.Now,                        
+                        });
+                    }
+                }
+
+                // Save customers to the database
+                foreach (var customer in customers)
+                {
+                    await _customerRepo.AddAsync(customer);
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
