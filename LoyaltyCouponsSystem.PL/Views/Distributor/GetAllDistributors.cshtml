@@ -55,7 +55,6 @@
                                 <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#customersModal-@distributor.DistributorID">
                                     View Customers
                                 </button>
-
                                 <!-- Modal -->
                                 <div class="modal fade" id="customersModal-@distributor.DistributorID" tabindex="-1" aria-labelledby="customersModalLabel-@distributor.DistributorID" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -67,21 +66,40 @@
                                                 <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <!-- Stylish Search Box -->
+                                                <!-- Search Box -->
                                                 <div class="input-group mb-3">
                                                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                                    <input type="text" id="searchCustomers-@distributor.DistributorID" oninput="filterCustomers(@distributor.DistributorID)"
-                                                           class="form-control" placeholder="Search Customers...">
+                                                    <input type="text" id="searchCustomers-@distributor.DistributorID" oninput="filterCustomers(@distributor.DistributorID)" class="form-control" placeholder="Search Customers...">
                                                 </div>
-                                                <!-- Customer List -->
+
+                                                <!-- Existing Customers List -->
+                                                <h5>Assigned Customers:</h5>
                                                 <ul id="customerList-@distributor.DistributorID" class="list-group list-group-flush">
                                                     @foreach (var customer in distributor.SelectedCustomerNames)
                                                     {
                                                         <li class="list-group-item d-flex align-items-center">
                                                             <i class="fas fa-user-circle text-primary me-3"></i> @customer
+                                                            <button type="button" class="btn btn-danger btn-sm ms-auto" onclick="removeCustomerFromDistributor(@distributor.DistributorID, '@customer')">Delete</button>
                                                         </li>
                                                     }
                                                 </ul>
+
+                                                <!-- Add New Customers -->
+                                                <h5 class="mt-4">Add New Customers:</h5>
+
+                                                <!-- Dropdown for selecting a customer -->
+                                                <select id="activeCustomersSelect-@distributor.DistributorID" class="form-select mb-3">
+                                                    <option value="">Select a customer</option>
+                                                    @foreach (var customer in distributor.AvailableCustomers)
+                                                    {
+                                                        <option value="@customer.CustomerID">@customer.Name</option>  <!-- Pass Customer ID here -->
+                                                    }
+                                                </select>
+
+                                                <!-- Button to Add Customer -->
+                                                <button type="button" class="btn btn-success" onclick="addCustomerToDistributor(@distributor.DistributorID)">
+                                                    Add Selected Customer
+                                                </button>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -95,6 +113,10 @@
                                 <span>No Customers</span>
                             }
                         </td>
+
+
+
+
                         <td>@distributor.CreatedBy</td>
                         <td>@distributor.CreatedAt</td>
                         <td>@distributor.UpdatedBy</td>
@@ -329,6 +351,14 @@
 <!-- SweetAlert2 -->
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Include Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Include jQuery (required by Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
 
 
@@ -509,6 +539,80 @@
             }
         });
     }
+
+
+
+        function addCustomerToDistributor(distributorId) {
+        const customerSelectElement = document.getElementById(activeCustomersSelect-${distributorId});
+        const customerId = customerSelectElement.value; 
+
+        if (!customerId) {
+            alert("Please select a customer to add.");
+            return;
+        }
+
+        const modalElement = document.getElementById(customersModal-${distributorId});
+        const modal = new bootstrap.Modal(modalElement);
+
+        fetch(/Distributor/AddCustomer?distributorId=${distributorId}&customerId=${customerId}, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                let customerList = document.getElementById(customerList-${distributorId});
+                let newCustomerItem = document.createElement("li");
+                newCustomerItem.classList.add("list-group-item", "d-flex", "align-items-center");
+                newCustomerItem.innerHTML =
+                    <i class="fas fa-user-circle text-primary me-3"></i> ${data.customerName}
+                    <button type="button" class="btn btn-danger btn-sm ms-auto" onclick="removeCustomerFromDistributor(${distributorId}, '${data.customerId}')">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                ;
+                customerList.appendChild(newCustomerItem);
+
+                customerSelectElement.value = "";
+
+                modal.show(); 
+            } else {
+                alert("Failed to add the customer. " + (data.message || ""));
+            }
+        })
+        .catch(error => {
+            console.error("Error adding customer:", error);
+            alert("An error occurred while adding the customer. Please try again.");
+        });
+    }
+
+
+        function removeCustomerFromDistributor(distributorId, customerId) {
+        if (confirm("Are you sure you want to remove this customer?")) {
+            
+            fetch(`/Distributor/RemoveCustomer?distributorId=${distributorId}&customerId=${customerId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const customerItem = document.querySelector(`#customerList-${distributorId} li[data-customer-id="${customerId}"]`);
+                    if (customerItem) {
+                        customerItem.remove();
+                    }
+                } else {
+                    alert("Failed to remove customer.");
+                }
+            })
+            .catch(error => console.error("Error removing customer:", error));
+        }
+    }
+
+
 
 
 </script>
