@@ -238,11 +238,14 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         {
             var customers = await _technicianRepo.GetCustomersForDropdownAsync();
 
-            return customers.Select(c => new SelectListItem
-            {
-                Value = c.Code,
-                Text = $"{c.Code} - {c.Name}"
-            }).ToList();
+            return customers
+                .Where(c => c.IsActive) 
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Code,
+                    Text = $"{c.Code} - {c.Name}"
+                })
+                .ToList();
         }
         public async Task<List<SelectListItem>> GetUsersForDropdownAsync()
         {

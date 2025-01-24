@@ -187,7 +187,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             try
             {
                 return await _DBcontext.Customers
-                    .Select(c => new Customer { Name = c.Name, Code = c.Code })
+                    .Where(c => c.IsActive) // Filter only active customers
+                    .Select(c => new Customer
+                    {
+                        Name = c.Name,
+                        Code = c.Code
+                    })
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -196,6 +201,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 return new List<Customer>();
             }
         }
+
         public async Task<List<ApplicationUser>> GetUsersForDropdownAsync()
         {
             try
