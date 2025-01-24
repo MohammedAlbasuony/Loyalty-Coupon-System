@@ -67,11 +67,10 @@
                                             </div>
                                             <div class="modal-body">
                                                 <!-- Search Box -->
-                                               < div class="input-group mb-3">
-                                                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                                <input type="text" id="searchCustomers-@distributor.DistributorID" oninput="filterCustomers(@distributor.DistributorID)"
-                                                       class="form-control" placeholder="Search Customers...">
-                                            </div>
+                                                <div class="input-group mb-3">
+                                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                                    <input type="text" id="searchCustomers-@distributor.DistributorID" oninput="filterCustomers(@distributor.DistributorID)" class="form-control" placeholder="Search Customers...">
+                                                </div>
 
                                                 <!-- Existing Customers List -->
                                                 <h5>Assigned Customers:</h5>
@@ -107,6 +106,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
                             }
                             else
                             {
@@ -349,6 +349,7 @@
 
 
 <!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Include Select2 CSS -->
@@ -546,20 +547,20 @@
     }
 
 
-
         function addCustomerToDistributor(distributorId) {
-        const customerSelectElement = document.getElementById(activeCustomersSelect-${distributorId});
-        const customerId = customerSelectElement.value; 
+        const customerSelectElement = document.getElementById(`activeCustomersSelect-${distributorId}`);
+        const customerId = customerSelectElement.value; // Get selected customer ID
 
         if (!customerId) {
-            alert("Please select a customer to add.");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Oops...',
+                text: 'Please select a customer to add.',
+            });
             return;
         }
 
-        const modalElement = document.getElementById(customersModal-${distributorId});
-        const modal = new bootstrap.Modal(modalElement);
-
-        fetch(/Distributor/AddCustomer?distributorId=${distributorId}&customerId=${customerId}, {
+        fetch(`/Distributor/AddCustomer?distributorId=${distributorId}&customerId=${customerId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -568,29 +569,50 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                let customerList = document.getElementById(customerList-${distributorId});
+                // Update the customer list on success
+                let customerList = document.getElementById(`customerList-${distributorId}`);
                 let newCustomerItem = document.createElement("li");
                 newCustomerItem.classList.add("list-group-item", "d-flex", "align-items-center");
-                newCustomerItem.innerHTML =
+                newCustomerItem.innerHTML = `
                     <i class="fas fa-user-circle text-primary me-3"></i> ${data.customerName}
-                    <button type="button" class="btn btn-danger btn-sm ms-auto" onclick="removeCustomerFromDistributor(${distributorId}, '${data.customerId}')">
+                    <button type="button" class="btn btn-danger btn-sm ms-auto" onclick="removeCustomerFromDistributor(${distributorId}, ${data.customerId})">
                         <i class="fas fa-trash"></i> Remove
                     </button>
-                ;
+                `;
                 customerList.appendChild(newCustomerItem);
 
+                // Reset the select dropdown
                 customerSelectElement.value = "";
 
-                modal.show(); 
+                // Show success SweetAlert
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Customer Added!',
+                    text: `${data.customerName} has been added successfully.`,
+                }).then(() => {
+                    // Refresh the page after success
+                    location.reload();
+                });
             } else {
-                alert("Failed to add the customer. " + (data.message || ""));
+                // Show failure SweetAlert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to add the customer.',
+                });
             }
         })
         .catch(error => {
+            // Handle error
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'An error occurred while adding the customer.',
+            });
             console.error("Error adding customer:", error);
-            alert("An error occurred while adding the customer. Please try again.");
         });
     }
+
 
 
         function removeCustomerFromDistributor(distributorId, customerId) {
