@@ -89,7 +89,10 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             try
             {
                 return await _DBcontext.Distributors
-                    .Include(d => d.DistributorCustomers).ThenInclude(x => x.Customer) // if related data is required
+                    .Where(d => d.IsActive)  // Only include active distributors
+                    .Include(d => d.DistributorCustomers)
+                        .ThenInclude(dc => dc.Customer)  // Include related customer data
+                    .Where(d => d.DistributorCustomers.All(dc => dc.Customer.IsActive)) // Only include active customers related to the distributor
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -98,6 +101,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 return new List<Distributor>();
             }
         }
+
 
         // Get by Code method
         public async Task<Distributor> GetByIdAsync(int Id)
@@ -169,6 +173,23 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
         }
 
+        public async Task<Distributor> GetDistributorByIdAsync(int distributorId)
+        {
+            return await _DBcontext.Distributors
+                .Include(d => d.DistributorCustomers)
+                .ThenInclude(dc => dc.Customer)
+                .FirstOrDefaultAsync(d => d.DistributorID == distributorId);
+        }
 
+        public async Task<Customer> GetCustomerByIdAsync(int customerId)
+        {
+            return await _DBcontext.Customers
+                .FirstOrDefaultAsync(c => c.CustomerID == customerId);
+        }     
+
+        public async Task SaveAsync()
+        {
+            await _DBcontext.SaveChangesAsync();
+        }
     }
 }

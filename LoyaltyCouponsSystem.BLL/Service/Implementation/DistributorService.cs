@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Bibliography;
 using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
@@ -70,25 +71,45 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         public async Task<List<DistributorViewModel>> GetAllAsync()
         {
             var distributors = await _distributorRepo.GetAllAsync();
-            return distributors.Select(d => new DistributorViewModel
-            {
-                DistributorID = d.DistributorID,
-                Name = d.Name,
-                PhoneNumber1 = d.PhoneNumber1,
-                SelectedGovernate = d.Governate,
-                SelectedCity = d.City,
-                Code = d.Code,
-                IsDeleted = d.IsDeleted,
-                CreatedAt = d.CreatedAt,
-                CreatedBy = d.CreatedBy,
-                UpdatedBy = d.UpdatedBy,
-                UpdatedAt = d.UpdatedAt,
-                IsActive = d.IsActive,
-                SelectedCustomerNames = d.DistributorCustomers.Where(dc => dc.Customer != null)
-                .Select(x => x.Customer.Name)
-                .Distinct().ToList()
-            }).ToList();
+            var allCustomers = await _customerRepo.GetAllAsync();
+
+            return distributors
+                .Where(d => d.IsActive)  // Only include active distributors
+                .Select(d => new DistributorViewModel
+                {
+                    DistributorID = d.DistributorID,
+                    Name = d.Name,
+                    PhoneNumber1 = d.PhoneNumber1,
+                    SelectedGovernate = d.Governate,
+                    SelectedCity = d.City,
+                    Code = d.Code,
+                    IsDeleted = d.IsDeleted,
+                    CreatedAt = d.CreatedAt,
+                    CreatedBy = d.CreatedBy,
+                    UpdatedBy = d.UpdatedBy,
+                    UpdatedAt = d.UpdatedAt,
+                    IsActive = d.IsActive,
+                    SelectedCustomerNames = d.DistributorCustomers
+                        .Where(dc => dc.Customer != null && dc.Customer.IsActive) // Only active customers
+                        .Select(x => x.Customer.Name)
+                        .Distinct()
+                        .ToList(),
+
+                    // Populate AvailableCustomers with only active customers not already assigned to the distributor
+                    AvailableCustomers = allCustomers
+                        .Where(c => c.IsActive && !d.DistributorCustomers.Any(dc => dc.CustomerID == c.CustomerID)) // Exclude already assigned customers and only active customers
+                        .Select(c => new CustomerViewModel
+                        {
+                            CustomerID = c.CustomerID,
+                            Name = c.Name,
+                            Code = c.Code
+                        })
+                        .ToList()
+                })
+                .ToList();
         }
+
+
 
         public async Task<DistributorViewModel> GetByIdAsync(int id)
         {
@@ -127,7 +148,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
                 if (existingDistributor == null)
                 {
-                     return false;
+                    return false;
                 }
 
                 // Map to Distributor entity for update
@@ -287,6 +308,50 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             }
         }
 
+        public async Task<bool> AddCustomerToDistributorAsync(int distributorId, int customerId)
+        {
+            var distributor = await _distributorRepo.GetDistributorByIdAsync(distributorId);
+            var customer = await _distributorRepo.GetCustomerByIdAsync(customerId);
+
+            if (distributor == null || customer == null)
+            {
+                return false;
+            }
+
+            if (!distributor.DistributorCustomers.Any(dc => dc.CustomerID == customerId))
+            {
+                distributor.DistributorCustomers.Add(new DistributorCustomer
+                {
+                    DistributorID = distributorId,
+                    CustomerID = customerId
+                });
+                await _distributorRepo.SaveAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+
+        // Remove Customer from Distributor by Name
+        public async Task<bool> RemoveCustomerFromDistributorByNameAsync(int distributorId, string customerName)
+        {
+            var distributor = await _distributorRepo.GetDistributorByIdAsync(distributorId);
+            if (distributor == null) return false;
+
+            // Find the DistributorCustomer entry to remove based on the Customer's Name
+            var distributorCustomer = distributor.DistributorCustomers.Where(x => x.DistributorID == distributorId)
+                .FirstOrDefault(dc => dc.Customer.Name.Equals(customerName, StringComparison.OrdinalIgnoreCase));
+
+            if (distributorCustomer != null)
+            {
+                distributor.DistributorCustomers.Remove(distributorCustomer);
+                await _distributorRepo.SaveAsync();
+                return true;
+            }
+
+            return false;
+        }
 
     }
 }
