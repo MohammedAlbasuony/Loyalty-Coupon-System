@@ -12,7 +12,7 @@
     <div class="row mb-4 justify-content-center">
         <div class="col-md-8">
             <div class="input-group shadow-sm">
-                <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, Code, Governorate, City, or Phone Number...">
+                <input type="text" id="searchBox" class="form-control" placeholder="Search by Code, Name, Phone Number, Governorate, City, Created By/At, Updated By/At or Status...">
                 <a href="@Url.Action("AddDistributor", "Distributor")" class="btn btn-add-customer ms-2">
                     <i class="fas fa-plus"></i> Add New Distributor
                 </a>
@@ -388,31 +388,36 @@
 
          // Search functionality
          document.getElementById("searchBox").addEventListener("input", function () {
-             const searchValue = this.value.toLowerCase().trim();
-             const rows = document.querySelectorAll("#distributorTable tbody tr");
+            const searchValue = this.value.toLowerCase().trim();
+            const rows = document.querySelectorAll("#distributorTable tbody tr");
 
-             rows.forEach(row => {
-                 const code = row.children[0]?.textContent.toLowerCase();
-                 const name = row.children[1]?.textContent.toLowerCase();
-                 const phoneNumber = row.children[2]?.textContent.toLowerCase();
-                 const governorate = row.children[3]?.textContent.toLowerCase();
-                 const city = row.children[4]?.textContent.toLowerCase();
-                 const status = row.children[10]?.querySelector("span")?.textContent.toLowerCase().trim();
+            rows.forEach(row => {
+                const code = row.children[0]?.textContent.toLowerCase();
+                const name = row.children[1]?.textContent.toLowerCase();
+                const phoneNumber = row.children[2]?.textContent.toLowerCase();
+                const governorate = row.children[3]?.textContent.toLowerCase();
+                const city = row.children[4]?.textContent.toLowerCase();
+                const createdBy = row.children[6]?.textContent.toLowerCase();
+                const createdAt = row.children[7]?.textContent.toLowerCase();
+                const updatedBy = row.children[8]?.textContent.toLowerCase();
+                const updatedAt = row.children[9]?.textContent.toLowerCase();
+                const status = row.children[10]?.querySelector("span")?.textContent.toLowerCase().trim();
 
-                 const isStatusMatch =
-                     searchValue === "active" ? status === "active" :
-                     searchValue === "inactive" ? status === "inactive" :
-                     status.includes(searchValue);
+                const isStatusMatch = searchValue === "active" ? status === "active" :
+                    searchValue === "inactive" ? status === "inactive" : status.includes(searchValue);
 
-                 const isOtherMatch =
-                     code.includes(searchValue) ||
-                     name.includes(searchValue) ||
-                     phoneNumber.includes(searchValue) ||
-                     governorate.includes(searchValue) ||
-                     city.includes(searchValue);
+                const isOtherMatch = code.includes(searchValue) ||
+                    name.includes(searchValue) ||
+                    phoneNumber.includes(searchValue) ||
+                    governorate.includes(searchValue) ||
+                    city.includes(searchValue) ||
+                    createdBy.includes(searchValue) ||
+                    createdAt.includes(searchValue) ||
+                    updatedBy.includes(searchValue) ||
+                    updatedAt.includes(searchValue);
 
-                 row.style.display = isStatusMatch || isOtherMatch ? "" : "none";
-             });
+                row.style.display = isStatusMatch || isOtherMatch ? "" : "none";
+            });
 
              paginateRows(1); // Reset to the first page after a search
          });
