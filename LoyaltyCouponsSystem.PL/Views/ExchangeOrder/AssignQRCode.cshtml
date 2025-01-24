@@ -52,6 +52,7 @@
             <div class="col-md-6">
                 <label for="ExchangePermission" class="form-label"><b>Exchange Permission Number</b></label>
                 <input asp-for="ExchangePermission" name="Transactions[0].ExchangePermission" class="form-control" placeholder="Enter exchange permission number" required />
+                <span id="exchangePermissionError" class="text-danger" style="display: none;"></span>
             </div>
         </div>
 
@@ -179,13 +180,6 @@
 
 
 
-
-
-
-
-
-
-
         // Make the city dropdown dynamic based on selected governate
         document.getElementById("Governate").addEventListener("change", function () {
             var governate = this.value;
@@ -212,6 +206,46 @@
                 });
             }
         });
+
+
+
+        // Function to validate and check that Exchange Permission Number is unique
+                        document.getElementById('assignForm').addEventListener('submit', function (event) {
+            const exchangePermissionInput = document.querySelector('[name="Transactions[0].ExchangePermission"]');
+            const exchangePermissionError = document.getElementById('exchangePermissionError');
+            const exchangePermission = exchangePermissionInput.value;
+
+            $.ajax({
+                url: '/ExchangeOrder/CheckExchangePermission', // Ensure this URL is correct
+                type: 'POST',
+                data: { exchangePermission },
+                async: false,
+                success: function (isDuplicate) {
+                    if (isDuplicate) {
+                        event.preventDefault();
+                        // Show the error message in red below the field
+                        exchangePermissionError.textContent = 'This Exchange Permission Number is already used.';
+                        exchangePermissionError.style.display = 'block';
+                        exchangePermissionInput.classList.add('is-invalid');
+                        exchangePermissionInput.focus();
+                    } else {
+                        // Hide the error message if no duplicate is found
+                        exchangePermissionError.style.display = 'none';
+                        exchangePermissionInput.classList.remove('is-invalid');
+                    }
+                },
+                error: function () {
+                    event.preventDefault();
+                    // Show a generic error message
+                    exchangePermissionError.textContent = 'An error occurred while checking the Exchange Permission Number.';
+                    exchangePermissionError.style.display = 'block';
+                    exchangePermissionInput.classList.add('is-invalid');
+                }
+            });
+        });
+
+
+
     </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -315,7 +349,15 @@
         font-weight: bold;
     }
 
+    .is-invalid {
+        border-color: #dc3545; /* Red border */
+        box-shadow: 0 0 5px rgba(220, 53, 69, 0.5); /* Optional red shadow */
+    }
 
+    .text-danger {
+        font-size: 0.875em; /* Adjust font size if needed */
+        margin-top: 5px;
+    }
 
     .select2-container .select2-selection--single {
         height: 38px; /* Adjust height to match `form-select` */

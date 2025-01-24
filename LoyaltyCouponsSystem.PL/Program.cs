@@ -4,7 +4,6 @@ using LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateQR;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
 using LoyaltyCouponsSystem.DAL.Repo.Implementation;
-using LoyaltyCouponsSystem.DAL.Repo.Implementation.LoyaltyCouponsSystem.DAL.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

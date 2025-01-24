@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 {
@@ -30,8 +31,6 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 Governate = customer.Governate,
                 City = customer.City,
                 PhoneNumber = customer.PhoneNumber
-
-
             };
         }
 
@@ -68,7 +67,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     Text = $"{t.Name} ({t.Code})"
                 }).ToList(),
 
-                Governates = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
+                Governates = new List<SelectListItem>
                 {
                     new SelectListItem { Value = "Cairo", Text = "Cairo" },
                     new SelectListItem { Value = "Gharbeia", Text = "Gharbeia" },
@@ -76,7 +75,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     new SelectListItem { Value = "Alexandria", Text = "Alexandria" }
                 },
 
-                CouponSorts = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
+                CouponSorts = new List<SelectListItem>
                 {
                     new SelectListItem { Value = "اختبار", Text = "كعب إختبار" },
                     new SelectListItem { Value = "عادي", Text = "كوبون عادي" },
@@ -113,6 +112,11 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             foreach (var transaction in transactions)
             {
+                if (await IsExchangePermissionDuplicateAsync(transaction.ExchangePermission))
+                {
+                    throw new InvalidOperationException($"Exchange Permission Number {transaction.ExchangePermission} is already used.");
+                }
+
                 if (transaction.StartSequenceNumber > transaction.EndSequenceNumber)
                     throw new ArgumentException("Start sequence number cannot be greater than end sequence number.");
 
@@ -145,5 +149,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             await _repository.SaveChangesAsync();
         }
 
+        public async Task<bool> IsExchangePermissionDuplicateAsync(string exchangePermission)
+        {
+            return await _repository.ExchangePermissionExistsAsync(exchangePermission);
+        }
     }
 }

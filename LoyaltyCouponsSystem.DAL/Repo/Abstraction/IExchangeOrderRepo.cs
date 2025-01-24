@@ -1,8 +1,5 @@
 ﻿using LoyaltyCouponsSystem.DAL.Entity;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.DAL.Repo.Abstraction
@@ -16,5 +13,8 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Abstraction
         Task AddTransactionAsync(Transaction transaction);
         Task SaveChangesAsync();
         Task<bool> TransactionExistsAsync(string exchangePermission, long sequenceNumber);
+
+        // New method to check for duplicate Exchange Permission Number
+        Task<bool> ExchangePermissionExistsAsync(string exchangePermission);
     }
 }
