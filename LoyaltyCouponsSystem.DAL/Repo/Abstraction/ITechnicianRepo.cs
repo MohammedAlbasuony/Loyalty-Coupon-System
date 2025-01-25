@@ -14,5 +14,6 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Abstraction
         Task<List<int>> GetValidCustomerIdsAsync(List<string> customerCodes);
         Task<List<Customer>> GetCustomersForDropdownAsync();
         Task<List<ApplicationUser>> GetUsersForDropdownAsync();
+        Task<bool> DeleteCustomerAsync(int customerId); // Delete customer by ID
     }
 }

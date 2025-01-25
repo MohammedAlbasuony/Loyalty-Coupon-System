@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SkiaSharp;
 
 namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
 {
@@ -215,6 +216,17 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 Console.WriteLine($"Error fetching users for dropdown: {ex.Message}");
                 return new List<ApplicationUser>();
             }
+        }
+
+        public async Task<bool> DeleteCustomerAsync(int customerId)
+        {
+            var customer = await _DBcontext.Customers.FindAsync(customerId);
+            if (customer == null)
+                return false;
+
+            _DBcontext.Customers.Remove(customer);
+            await _DBcontext.SaveChangesAsync();
+            return true;
         }
 
     }
