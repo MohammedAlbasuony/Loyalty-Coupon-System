@@ -17,15 +17,24 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="CustomerCodeOrName" class="form-label"><b>Select Customer</b></label>
-                <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-control select2" required>
-                    <option></option>
-                </select>
+                <input list="customers" id="CustomerCodeOrName" name="SelectedCustomerCode" class="form-control" placeholder="Select Customer" required />
+                <datalist id="customers">
+                    @foreach (var customer in Model.Customers)
+                    {
+                        <option value="@customer.Text">@customer.Text</option>
+                    }
+                </datalist>
             </div>
+
             <div class="col-md-6">
                 <label for="TechnicianCodeOrName" class="form-label"><b>Select Technician</b></label>
-                <select asp-for="SelectedTechnicianCode" asp-items="Model.Technicians" class="form-control select2"  required>
-                    <option></option>
-                </select>
+                <input list="technicians" id="TechnicianCodeOrName" name="SelectedTechnicianCode" class="form-control" placeholder="Select Technician" required />
+                <datalist id="technicians">
+                    @foreach (var technician in Model.Technicians)
+                    {
+                        <option value="@technician.Text">@technician.Text</option>
+                    }
+                </datalist>
             </div>
         </div>
 
@@ -246,6 +255,16 @@
 
 
 
+            $(document).ready(function () {
+            // Initialize Select2 on dropdowns
+            $('.select2').select2({
+                placeholder: "Select an option",
+                allowClear: true,
+                width: '100%' // Adjust width to fit container
+            });
+        });
+
+
     </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -254,20 +273,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/additional-methods.min.js"></script>
 
 
-    <script>
-        // Initialize Select2 on the Customer dropdown
-        $(document).ready(function () {
-            $('.select2').select2({
-                placeholder: 'Select Customer',
-
-                allowClear: true
-            });
-        });
-    </script>
-
-    <!-- Include Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
 }
+
+<!-- Include Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
 
 <style>
     .form-label {
