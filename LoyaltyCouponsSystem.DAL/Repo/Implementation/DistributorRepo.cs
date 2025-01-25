@@ -89,7 +89,6 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             try
             {
                 return await _DBcontext.Distributors
-                    .Where(d => d.IsActive)  // Only include active distributors
                     .Include(d => d.DistributorCustomers)
                         .ThenInclude(dc => dc.Customer)  // Include related customer data
                     .Where(d => d.DistributorCustomers.All(dc => dc.Customer.IsActive)) // Only include active customers related to the distributor
