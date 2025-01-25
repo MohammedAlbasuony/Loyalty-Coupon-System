@@ -406,6 +406,54 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         }
 
 
+        public async Task<bool> DeleteCustomerAsync(string customerName)
+{
+    if (string.IsNullOrEmpty(customerName))
+        return false;
+
+    try
+    {
+        // Retrieve the customer entity by name
+        var customer = await _customerRepo.GetByNameAsync(customerName);
+        if (customer == null)
+            return false;
+
+        // Remove the customer entity from the database
+        return await _customerRepo.DeleteAsync(customer.CustomerID);
+    }
+    catch (Exception ex)
+    {
+        // Log the exception (if necessary)
+        Console.WriteLine(ex.Message);
+        return false;
+    }
+}
+
+public async Task<bool> DeleteRepresentativeAsync(string representativeName)
+{
+    if (string.IsNullOrEmpty(representativeName))
+        return false;
+
+    try
+    {
+        // Retrieve the user entity by username
+        var representative = await _userManager.Users
+            .FirstOrDefaultAsync(u => u.UserName == representativeName);
+        if (representative == null)
+            return false;
+
+        // Remove the representative from the database
+        // (Assuming your UserManager supports deletion)
+        var result = await _userManager.DeleteAsync(representative);
+        return result.Succeeded;
+    }
+    catch (Exception ex)
+    {
+        // Log the exception (if necessary)
+        Console.WriteLine(ex.Message);
+        return false;
+    }
+}
 
 
     }
