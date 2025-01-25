@@ -66,6 +66,7 @@
                                                 <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
+
                                                 <!-- Existing Customers List -->
                                                 <h5>Assigned Customers:</h5>
                                                 <ul id="customerList-@distributor.DistributorID" class="list-group list-group-flush">
@@ -91,6 +92,7 @@
                                                     Add Selected Customer
                                                 </button>
                                             </div>
+
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             </div>
@@ -338,14 +340,35 @@
 
 <script>
 
-            document.addEventListener("DOMContentLoaded", function () {
-        const searchBox = document.getElementById("searchBox");
-        const tableRows = document.querySelectorAll("#distributorTable tbody tr");
 
-        searchBox.addEventListener("input", function () {
-            const searchTerm = searchBox.value.toLowerCase().trim();
+    //serach function for search box above the table
+                    document.addEventListener("DOMContentLoaded", function () {
+    const searchBox = document.getElementById("searchBox");
+    const tableRows = document.querySelectorAll("#distributorTable tbody tr");
 
-            tableRows.forEach(row => {
+    searchBox.addEventListener("input", function () {
+        const searchTerm = searchBox.value.toLowerCase().trim();
+
+        tableRows.forEach(row => {
+            const statusBadge = row.querySelector(".badge");
+            const status = statusBadge ? statusBadge.textContent.toLowerCase().trim() : "";
+
+            if (searchTerm === "active") {
+                // Show only rows with status "Active"
+                if (status === "active") {
+                    row.style.display = ""; // Show
+                } else {
+                    row.style.display = "none"; // Hide
+                }
+            } else if (searchTerm === "inactive") {
+                // Show only rows with status "Inactive"
+                if (status === "inactive") {
+                    row.style.display = ""; // Show
+                } else {
+                    row.style.display = "none"; // Hide
+                }
+            } else {
+                // General search for other terms (non-status terms)
                 const rowText = Array.from(row.children)
                     .map(cell => cell.textContent.toLowerCase())
                     .join(" ");
@@ -355,9 +378,12 @@
                 } else {
                     row.style.display = "none"; // Hide non-matching rows
                 }
-            });
+            }
         });
     });
+});
+
+
 
 
 
@@ -578,7 +604,6 @@
                             if (customerItem) {
                                 customerItem.remove();
                             }
-
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Customer Removed!',
@@ -604,5 +629,3 @@
         });
     }
 </script>
-
-

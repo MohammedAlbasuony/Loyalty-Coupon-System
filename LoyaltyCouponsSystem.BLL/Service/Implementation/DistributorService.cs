@@ -74,7 +74,6 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             var allCustomers = await _customerRepo.GetAllAsync();
 
             return distributors
-                .Where(d => d.IsActive)  // Only include active distributors
                 .Select(d => new DistributorViewModel
                 {
                     DistributorID = d.DistributorID,
