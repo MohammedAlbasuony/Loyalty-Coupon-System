@@ -14,7 +14,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
         Task<IEnumerable<SelectListItem>> GetGovernatesForDropdownAsync();
         Task<bool> ToggleActivationAsync(int distributorId);
         Task<bool> ImportDistributorsFromExcelAsync(Stream stream);
-        Task<bool> RemoveCustomerFromDistributorByNameAsync(int distributorId, string customerName);
+        Task<bool> RemoveCustomerFromDistributorByNameAsync(int distributorId, string customerName);   
         Task<bool> AddCustomerToDistributorAsync(int distributorId, int customerId);
     }
 }

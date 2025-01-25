@@ -77,12 +77,13 @@
                                                 <ul id="customerList-@distributor.DistributorID" class="list-group list-group-flush">
                                                     @foreach (var customer in distributor.SelectedCustomerNames)
                                                     {
-                                                        <li class="list-group-item d-flex align-items-center">
+                                                        <li class="list-group-item d-flex align-items-center" data-customer-name="@customer">
                                                             <i class="fas fa-user-circle text-primary me-3"></i> @customer
                                                             <button type="button" class="btn btn-danger btn-sm ms-auto" onclick="removeCustomerFromDistributor(@distributor.DistributorID, '@customer')">Delete</button>
                                                         </li>
                                                     }
                                                 </ul>
+
 
                                                 <!-- Add New Customers -->
                                                 <h5 class="mt-4">Add New Customers:</h5>
@@ -363,284 +364,303 @@
 
 
 
-    <script>
-     document.addEventListener("DOMContentLoaded", function () {
-         const tableBody = document.querySelector("#distributorTable tbody");
-         const rowsPerPage = 10;
-         const paginationContainer = document.getElementById("paginationContainer");
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.querySelector("#distributorTable tbody");
+        const rowsPerPage = 10;
+        const paginationContainer = document.getElementById("paginationContainer");
 
-         // Rearrange rows based on status
-         function rearrangeRows() {
-             const rows = Array.from(tableBody.querySelectorAll("tr"));
-             const activeRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Active");
-             const inactiveRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Inactive");
+        // Rearrange rows based on status
+        function rearrangeRows() {
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
+            const activeRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Active");
+            const inactiveRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Inactive");
 
-             tableBody.innerHTML = "";
-             activeRows.forEach(row => tableBody.appendChild(row));
-             inactiveRows.forEach(row => tableBody.appendChild(row));
-         }
-
-         // Style rows dynamically
-         function styleRows() {
-             const rows = Array.from(tableBody.querySelectorAll("tr"));
-             rows.forEach(row => {
-                 const badge = row.querySelector(".badge");
-                 if (badge && badge.textContent.trim() === "Inactive") {
-                     row.classList.add("inactive-row");
-                 } else {
-                     row.classList.remove("inactive-row");
-                 }
-             });
-         }
-
-         // Paginate rows
-         function paginateRows(pageNumber) {
-             const rows = Array.from(tableBody.querySelectorAll("tr"));
-             rows.forEach((row, index) => {
-                 row.style.display = (index >= (pageNumber - 1) * rowsPerPage && index < pageNumber * rowsPerPage) ? "" : "none";
-             });
-             updatePagination(pageNumber, Math.ceil(rows.length / rowsPerPage));
-         }
-
-         // Update pagination controls
-             function updatePagination(currentPage, totalPages) {
-        paginationContainer.innerHTML = ""; // Clear previous buttons
-        for (let i = 1; i <= totalPages; i++) {
-            const button = document.createElement("button");
-            button.textContent = i;
-            button.className = `btn btn-sm mx-1 ${i === currentPage ? "btn-primary" : "btn-outline-primary"}`;
-            button.addEventListener("click", () => {
-                paginateRows(i); // Show rows for the clicked page
-            });
-            paginationContainer.appendChild(button);
+            tableBody.innerHTML = "";
+            activeRows.forEach(row => tableBody.appendChild(row));
+            inactiveRows.forEach(row => tableBody.appendChild(row));
         }
-    }
 
-
-         // Search functionality
-         document.getElementById("searchBox").addEventListener("input", function () {
-            const searchValue = this.value.toLowerCase().trim();
-            const rows = document.querySelectorAll("#distributorTable tbody tr");
-
+        // Style rows dynamically
+        function styleRows() {
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
             rows.forEach(row => {
-                const code = row.children[0]?.textContent.toLowerCase();
-                const name = row.children[1]?.textContent.toLowerCase();
-                const phoneNumber = row.children[2]?.textContent.toLowerCase();
-                const governorate = row.children[3]?.textContent.toLowerCase();
-                const city = row.children[4]?.textContent.toLowerCase();
-                const createdBy = row.children[6]?.textContent.toLowerCase();
-                const createdAt = row.children[7]?.textContent.toLowerCase();
-                const updatedBy = row.children[8]?.textContent.toLowerCase();
-                const updatedAt = row.children[9]?.textContent.toLowerCase();
-                const status = row.children[10]?.querySelector("span")?.textContent.toLowerCase().trim();
-
-                const isStatusMatch = searchValue === "active" ? status === "active" :
-                    searchValue === "inactive" ? status === "inactive" : status.includes(searchValue);
-
-                const isOtherMatch = code.includes(searchValue) ||
-                    name.includes(searchValue) ||
-                    phoneNumber.includes(searchValue) ||
-                    governorate.includes(searchValue) ||
-                    city.includes(searchValue) ||
-                    createdBy.includes(searchValue) ||
-                    createdAt.includes(searchValue) ||
-                    updatedBy.includes(searchValue) ||
-                    updatedAt.includes(searchValue);
-
-                row.style.display = isStatusMatch || isOtherMatch ? "" : "none";
-            });
-
-             paginateRows(1); // Reset to the first page after a search
-         });
-
-         // Toggle Activation with SweetAlert
-         document.querySelectorAll(".toggle-activation").forEach(button => {
-             button.addEventListener("click", function () {
-                 const distributorId = this.getAttribute("data-distributor-id");
-                 const isActive = this.getAttribute("data-is-active") === "True";
-                 const action = isActive ? "Deactivate" : "Activate";
-
-                 Swal.fire({
-                     title: `Are you sure?`,
-                     text: `You are about to ${action} this distributor.`,
-                     icon: "warning",
-                     showCancelButton: true,
-                     confirmButtonColor: isActive ? "#d33" : "#28a745",
-                     cancelButtonColor: "#6c757d",
-                     confirmButtonText: `Yes, ${action}!`
-                 }).then((result) => {
-                     if (result.isConfirmed) {
-                         fetch(`/Distributor/ToggleActivation?distributorId=${distributorId}`, {
-                             method: "POST",
-                             headers: {
-                                 "Content-Type": "application/json"
-                             },
-                         })
-                             .then(response => response.json())
-                             .then(data => {
-                                 if (data.success) {
-                                     const row = document.getElementById(`row-${distributorId}`);
-                                     const statusBadge = row.querySelector(".badge");
-                                     const toggleButton = row.querySelector(".toggle-activation");
-
-                                     if (data.isActive) {
-                                         statusBadge.textContent = "Active";
-                                         statusBadge.classList.remove("bg-danger");
-                                         statusBadge.classList.add("bg-success");
-                                         toggleButton.textContent = "Deactivate";
-                                         toggleButton.classList.remove("btn-success");
-                                         toggleButton.classList.add("btn-danger");
-                                         toggleButton.setAttribute("data-is-active", "True");
-                                     } else {
-                                         statusBadge.textContent = "Inactive";
-                                         statusBadge.classList.remove("bg-success");
-                                         statusBadge.classList.add("bg-danger");
-                                         toggleButton.textContent = "Activate";
-                                         toggleButton.classList.remove("btn-danger");
-                                         toggleButton.classList.add("btn-success");
-                                         toggleButton.setAttribute("data-is-active", "False");
-                                     }
-
-                                     rearrangeRows();
-                                     styleRows();
-                                     paginateRows(1); // Refresh pagination
-
-                                     Swal.fire("Success!", `Distributor has been ${action.toLowerCase()}d successfully.`, "success");
-                                 } else {
-                                     Swal.fire("Error!", data.message || "Failed to toggle activation.", "error");
-                                 }
-                             })
-                             .catch(error => {
-                                 Swal.fire("Error!", "An error occurred. Please try again.", "error");
-                             });
-                     }
-                 });
-             });
-         });
-
-         // Initialize rearrangement, styling, and pagination
-         rearrangeRows();
-         styleRows();
-         paginateRows(1);
-     });
-
-     // Search in view customer pop up window
-                 function filterCustomers(distributorId) {
-        // Get the search input value
-        const searchInput = document.getElementById(`searchCustomers-${distributorId}`).value.toLowerCase().trim();
-        const customerList = document.getElementById(`customerList-${distributorId}`);
-
-        if (!customerList) return; // Safety check
-
-        // Get all customer list items
-        const customers = customerList.querySelectorAll("li");
-
-        // Loop through customers and filter
-        customers.forEach(customer => {
-            const customerName = customer.textContent.toLowerCase();
-            if (customerName.includes(searchInput)) {
-                customer.style.display = ""; // Show matching items
-            } else {
-                customer.style.display = "none"; // Hide non-matching items
-            }
-        });
-    }
-
-
-        function addCustomerToDistributor(distributorId) {
-        const customerSelectElement = document.getElementById(`activeCustomersSelect-${distributorId}`);
-        const customerId = customerSelectElement.value; // Get selected customer ID
-
-        if (!customerId) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Oops...',
-                text: 'Please select a customer to add.',
-            });
-            return;
-        }
-
-        fetch(`/Distributor/AddCustomer?distributorId=${distributorId}&customerId=${customerId}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Update the customer list on success
-                let customerList = document.getElementById(`customerList-${distributorId}`);
-                let newCustomerItem = document.createElement("li");
-                newCustomerItem.classList.add("list-group-item", "d-flex", "align-items-center");
-                newCustomerItem.innerHTML = `
-                    <i class="fas fa-user-circle text-primary me-3"></i> ${data.customerName}
-                    <button type="button" class="btn btn-danger btn-sm ms-auto" onclick="removeCustomerFromDistributor(${distributorId}, ${data.customerId})">
-                        <i class="fas fa-trash"></i> Remove
-                    </button>
-                `;
-                customerList.appendChild(newCustomerItem);
-
-                // Reset the select dropdown
-                customerSelectElement.value = "";
-
-                // Show success SweetAlert
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Customer Added!',
-                    text: `${data.customerName} has been added successfully.`,
-                }).then(() => {
-                    // Refresh the page after success
-                    location.reload();
-                });
-            } else {
-                // Show failure SweetAlert
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Failed to add the customer.',
-                });
-            }
-        })
-        .catch(error => {
-            // Handle error
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'An error occurred while adding the customer.',
-            });
-            console.error("Error adding customer:", error);
-        });
-    }
-
-
-
-        function removeCustomerFromDistributor(distributorId, customerId) {
-        if (confirm("Are you sure you want to remove this customer?")) {
-            
-            fetch(`/Distributor/RemoveCustomer?distributorId=${distributorId}&customerId=${customerId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const customerItem = document.querySelector(`#customerList-${distributorId} li[data-customer-id="${customerId}"]`);
-                    if (customerItem) {
-                        customerItem.remove();
-                    }
+                const badge = row.querySelector(".badge");
+                if (badge && badge.textContent.trim() === "Inactive") {
+                    row.classList.add("inactive-row");
                 } else {
-                    alert("Failed to remove customer.");
+                    row.classList.remove("inactive-row");
                 }
-            })
-            .catch(error => console.error("Error removing customer:", error));
+            });
         }
+
+        // Paginate rows
+        function paginateRows(pageNumber) {
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
+            rows.forEach((row, index) => {
+                row.style.display = (index >= (pageNumber - 1) * rowsPerPage && index < pageNumber * rowsPerPage) ? "" : "none";
+            });
+            updatePagination(pageNumber, Math.ceil(rows.length / rowsPerPage));
+        }
+
+        // Update pagination controls
+        function updatePagination(currentPage, totalPages) {
+           paginationContainer.innerHTML = ""; // Clear previous buttons
+           for (let i = 1; i <= totalPages; i++) {
+               const button = document.createElement("button");
+               button.textContent = i;
+               button.className = `btn btn-sm mx-1 ${i === currentPage ? "btn-primary" : "btn-outline-primary"}`;
+               button.addEventListener("click", () => {
+                   paginateRows(i); // Show rows for the clicked page
+               });
+               paginationContainer.appendChild(button);
+           }
+       }
+
+        // Search functionality
+        document.getElementById("searchBox").addEventListener("input", function () {
+           const searchValue = this.value.toLowerCase().trim();
+           const rows = document.querySelectorAll("#distributorTable tbody tr");
+
+           rows.forEach(row => {
+               const code = row.children[0]?.textContent.toLowerCase();
+               const name = row.children[1]?.textContent.toLowerCase();
+               const phoneNumber = row.children[2]?.textContent.toLowerCase();
+               const governorate = row.children[3]?.textContent.toLowerCase();
+               const city = row.children[4]?.textContent.toLowerCase();
+               const createdBy = row.children[6]?.textContent.toLowerCase();
+               const createdAt = row.children[7]?.textContent.toLowerCase();
+               const updatedBy = row.children[8]?.textContent.toLowerCase();
+               const updatedAt = row.children[9]?.textContent.toLowerCase();
+               const status = row.children[10]?.querySelector("span")?.textContent.toLowerCase().trim();
+
+               const isStatusMatch = searchValue === "active" ? status === "active" :
+                   searchValue === "inactive" ? status === "inactive" : status.includes(searchValue);
+
+               const isOtherMatch = code.includes(searchValue) ||
+                   name.includes(searchValue) ||
+                   phoneNumber.includes(searchValue) ||
+                   governorate.includes(searchValue) ||
+                   city.includes(searchValue) ||
+                   createdBy.includes(searchValue) ||
+                   createdAt.includes(searchValue) ||
+                   updatedBy.includes(searchValue) ||
+                   updatedAt.includes(searchValue);
+
+               row.style.display = isStatusMatch || isOtherMatch ? "" : "none";
+           });
+
+            paginateRows(1); // Reset to the first page after a search
+        });
+
+        // Toggle Activation with SweetAlert
+        document.querySelectorAll(".toggle-activation").forEach(button => {
+            button.addEventListener("click", function () {
+                const distributorId = this.getAttribute("data-distributor-id");
+                const isActive = this.getAttribute("data-is-active") === "True";
+                const action = isActive ? "Deactivate" : "Activate";
+
+                Swal.fire({
+                    title: `Are you sure?`,
+                    text: `You are about to ${action} this distributor.`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: isActive ? "#d33" : "#28a745",
+                    cancelButtonColor: "#6c757d",
+                    confirmButtonText: `Yes, ${action}!`
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/Distributor/ToggleActivation?distributorId=${distributorId}`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const row = document.getElementById(`row-${distributorId}`);
+                                    const statusBadge = row.querySelector(".badge");
+                                    const toggleButton = row.querySelector(".toggle-activation");
+
+                                    if (data.isActive) {
+                                        statusBadge.textContent = "Active";
+                                        statusBadge.classList.remove("bg-danger");
+                                        statusBadge.classList.add("bg-success");
+                                        toggleButton.textContent = "Deactivate";
+                                        toggleButton.classList.remove("btn-success");
+                                        toggleButton.classList.add("btn-danger");
+                                        toggleButton.setAttribute("data-is-active", "True");
+                                    } else {
+                                        statusBadge.textContent = "Inactive";
+                                        statusBadge.classList.remove("bg-success");
+                                        statusBadge.classList.add("bg-danger");
+                                        toggleButton.textContent = "Activate";
+                                        toggleButton.classList.remove("btn-danger");
+                                        toggleButton.classList.add("btn-success");
+                                        toggleButton.setAttribute("data-is-active", "False");
+                                    }
+
+                                    rearrangeRows();
+                                    styleRows();
+                                    paginateRows(1); // Refresh pagination
+
+                                    Swal.fire("Success!", `Distributor has been ${action.toLowerCase()}d successfully.`, "success");
+                                } else {
+                                    Swal.fire("Error!", data.message || "Failed to toggle activation.", "error");
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire("Error!", "An error occurred. Please try again.", "error");
+                            });
+                    }
+                });
+            });
+        });
+
+        // Initialize rearrangement, styling, and pagination
+        rearrangeRows();
+        styleRows();
+        paginateRows(1);
+    });
+
+    // Search in view customer pop up window
+    function filterCustomers(distributorId) {
+       const searchInput = document.getElementById(`searchCustomers-${distributorId}`).value.toLowerCase().trim();
+       const customerList = document.getElementById(`customerList-${distributorId}`);
+
+       if (!customerList) return; // Safety check
+
+       const customers = customerList.querySelectorAll("li");
+
+       customers.forEach(customer => {
+           const customerName = customer.textContent.toLowerCase();
+           if (customerName.includes(searchInput)) {
+               customer.style.display = ""; // Show matching items
+           } else {
+               customer.style.display = "none"; // Hide non-matching items
+           }
+       });
     }
 
+    function addCustomerToDistributor(distributorId) {
+       const customerSelectElement = document.getElementById(`activeCustomersSelect-${distributorId}`);
+       const customerId = customerSelectElement.value;
 
+       if (!customerId) {
+           Swal.fire({
+               icon: 'warning',
+               title: 'Oops...',
+               text: 'Please select a customer to add.',
+           });
+           return;
+       }
 
+       Swal.fire({
+           title: 'Are you sure?',
+           text: 'Do you want to add this customer to the distributor?',
+           icon: 'question',
+           showCancelButton: true,
+           confirmButtonText: 'Yes, add it!',
+           cancelButtonText: 'No, cancel',
+       }).then((result) => {
+           if (result.isConfirmed) {
+               fetch(`/Distributor/AddCustomer?distributorId=${distributorId}&customerId=${customerId}`, {
+                   method: "POST",
+                   headers: {
+                       "Content-Type": "application/json"
+                   }
+               })
+               .then(response => response.json())
+               .then(data => {
+                   if (data.success) {
+                       let customerList = document.getElementById(`customerList-${distributorId}`);
+                       let newCustomerItem = document.createElement("li");
+                       newCustomerItem.classList.add("list-group-item", "d-flex", "align-items-center");
+                       newCustomerItem.innerHTML = `
+                           <i class="fas fa-user-circle text-primary me-3"></i> ${data.customerName}
+                           <button type="button" class="btn btn-danger btn-sm ms-auto" onclick="removeCustomerFromDistributor(${distributorId}, ${data.customerId})">
+                               <i class="fas fa-trash"></i> Remove
+                           </button>
+                       `;
+                       customerList.appendChild(newCustomerItem);
 
+                       customerSelectElement.value = "";
+
+                       Swal.fire({
+                           icon: 'success',
+                           title: 'Customer Added!',
+                           text: `${data.customerName} has been added successfully.`,
+                       }).then(() => {
+                           location.reload();
+                       });
+                   } else {
+                       Swal.fire({
+                           icon: 'error',
+                           title: 'Error!',
+                           text: 'Failed to add the customer.',
+                       });
+                   }
+               })
+               .catch(error => {
+                   Swal.fire({
+                       icon: 'error',
+                       title: 'Error!',
+                       text: 'An error occurred while adding the customer.',
+                   });
+                   console.error("Error adding customer:", error);
+               });
+           }
+       });
+    }
+
+    function removeCustomerFromDistributor(distributorId, customerName) {
+       Swal.fire({
+           title: 'Are you sure?',
+           text: 'Do you want to remove this customer from the distributor?',
+           icon: 'warning',
+           showCancelButton: true,
+           confirmButtonText: 'Yes, delete it!',
+           cancelButtonText: 'No, cancel',
+       }).then((result) => {
+           if (result.isConfirmed) {
+               fetch(`/Distributor/RemoveCustomer?distributorId=${distributorId}&name=${encodeURIComponent(customerName)}`, {
+                   method: "POST",
+                   headers: {
+                       "Content-Type": "application/json"
+                   }
+               })
+               .then(response => response.json())
+               .then(data => {
+                   if (data.success) {
+                       const customerItem = document.querySelector(`#customerList-${distributorId} li[data-customer-name="${customerName}"]`);
+                       if (customerItem) {
+                           customerItem.remove();
+                       }
+
+                       Swal.fire({
+                           icon: 'success',
+                           title: 'Customer Removed!',
+                           text: `${customerName} has been removed from the distributor.`,
+                       });
+                   } else {
+                       Swal.fire({
+                           icon: 'error',
+                           title: 'Error!',
+                           text: 'Failed to remove the customer.',
+                       });
+                   }
+               })
+               .catch(error => {
+                   Swal.fire({
+                       icon: 'error',
+                       title: 'Error!',
+                       text: 'An error occurred while removing the customer.',
+                   });
+                   console.error("Error removing customer:", error);
+               });
+           }
+       });
+    }
 </script>
 
