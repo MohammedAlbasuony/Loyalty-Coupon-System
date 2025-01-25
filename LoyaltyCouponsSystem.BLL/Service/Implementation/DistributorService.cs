@@ -333,25 +333,28 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         }
 
 
-        // Remove Customer from Distributor by Name
         public async Task<bool> RemoveCustomerFromDistributorByNameAsync(int distributorId, string customerName)
         {
+            // Fetch the distributor and its related customers
             var distributor = await _distributorRepo.GetDistributorByIdAsync(distributorId);
             if (distributor == null) return false;
 
-            // Find the DistributorCustomer entry to remove based on the Customer's Name
-            var distributorCustomer = distributor.DistributorCustomers.Where(x => x.DistributorID == distributorId)
+            // Find the specific DistributorCustomer by matching the customer's name
+            var distributorCustomer = distributor.DistributorCustomers
                 .FirstOrDefault(dc => dc.Customer.Name.Equals(customerName, StringComparison.OrdinalIgnoreCase));
 
             if (distributorCustomer != null)
             {
+                // Remove the customer association
                 distributor.DistributorCustomers.Remove(distributorCustomer);
-                await _distributorRepo.SaveAsync();
+                await _distributorRepo.SaveAsync(); // Save changes to the database
                 return true;
             }
 
-            return false;
+            return false; // Customer not found
         }
+
+
 
     }
 }

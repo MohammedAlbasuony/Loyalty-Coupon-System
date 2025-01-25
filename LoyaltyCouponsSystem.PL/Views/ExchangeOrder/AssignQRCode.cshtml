@@ -17,13 +17,13 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="CustomerCodeOrName" class="form-label"><b>Select Customer</b></label>
-                <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-control select2" multiple required>
+                <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-control select2" required>
                     <option></option>
                 </select>
             </div>
             <div class="col-md-6">
                 <label for="TechnicianCodeOrName" class="form-label"><b>Select Technician</b></label>
-                <select asp-for="SelectedTechnicianCode" asp-items="Model.Technicians" class="form-control select2" multiple required>
+                <select asp-for="SelectedTechnicianCode" asp-items="Model.Technicians" class="form-control select2"  required>
                     <option></option>
                 </select>
             </div>

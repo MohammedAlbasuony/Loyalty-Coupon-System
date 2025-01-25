@@ -73,19 +73,19 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 .IsUnique();
 
             modelBuilder.Entity<DistributorCustomer>()
-                .HasKey(dc => new { dc.DistributorID, dc.CustomerID });
+    .HasKey(dc => new { dc.DistributorID, dc.CustomerID });
 
             modelBuilder.Entity<DistributorCustomer>()
                 .HasOne(dc => dc.Distributor)
                 .WithMany(d => d.DistributorCustomers)
                 .HasForeignKey(dc => dc.DistributorID)
-                .IsRequired(false); // Make the relationship optional
-
+                .OnDelete(DeleteBehavior.Cascade); // Ensures cascading deletes if a Distributor is removed
 
             modelBuilder.Entity<DistributorCustomer>()
                 .HasOne(dc => dc.Customer)
                 .WithMany(c => c.DistributorCustomers)
-                .HasForeignKey(dc => dc.CustomerID);
+                .HasForeignKey(dc => dc.CustomerID)
+                .OnDelete(DeleteBehavior.Restrict); // Prevents accidental customer deletion
 
 
             //Governate and Area

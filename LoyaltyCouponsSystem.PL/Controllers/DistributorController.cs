@@ -235,14 +235,16 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
         }
 
-        // Remove Customer from Distributor by Name
         [HttpPost]
-        public async Task<IActionResult> RemoveCustomer(int distributorId, string customerId)
+        public async Task<IActionResult> RemoveCustomer(int distributorId, string name)
         {
-            var success = await _distributorService.RemoveCustomerFromDistributorByNameAsync(distributorId, customerId);
+            // Call the service method using the distributor ID and customer name
+            var success = await _distributorService.RemoveCustomerFromDistributorByNameAsync(distributorId, name);
 
+            // Return the result as JSON
             return Json(new { success });
         }
+
 
     }
 }
