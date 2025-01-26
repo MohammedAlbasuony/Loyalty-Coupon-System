@@ -111,7 +111,6 @@
                                 
 
                                     <!-- Searchable List of Assigned Customers -->
-                                    <input type="text" class="form-control mb-3 modal-search-box" placeholder="Search Assigned Customers..." onkeyup="filterCustomersList(this, '@technician.TechnicianID')">
                                     <ul class="list-group" id="customerList-@technician.TechnicianID">
                                         @foreach (var customer in technician.SelectedCustomerNames)
                                         {
@@ -159,10 +158,6 @@
                                     }
 
                                     <!-- Searchable List of Assigned Representatives -->
-                                    <input type="text" class="form-control mb-3 modal-search-box" placeholder="Search Assigned Representatives..."
-                                           aria-label="Search representatives"
-                                           onkeyup="filterRepresentativesList(this, '@technician.TechnicianID')">
-
                                     @if (technician.SelectedUserNames != null && technician.SelectedUserNames.Any())
                                     {
                                         <ul class="list-group" id="representativeList-@technician.TechnicianID">
