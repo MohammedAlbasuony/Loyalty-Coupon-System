@@ -183,6 +183,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 return false;
             }
         }
+
+        
+
         public async Task<List<Customer>> GetCustomersForDropdownAsync()
         {
             try

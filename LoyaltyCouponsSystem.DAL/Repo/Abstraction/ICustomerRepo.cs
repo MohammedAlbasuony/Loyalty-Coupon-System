@@ -14,6 +14,6 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Abstraction
         Task<bool> IsUniquePhoneNumber(string phoneNumber);
         Task<List<int>> GetCustomerIdsByCodesAsync(List<string> customerCodes);
         Task<Customer> GetByNameAsync(string customerName);
-            
-            }
+        Task<List<Customer>> GetCustomersByNamesAsync(List<string> customerNames);
+    }
 }
