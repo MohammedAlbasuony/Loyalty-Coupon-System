@@ -30,13 +30,16 @@
                     <th>Name</th>
                     <th>Nickname</th>
                     <th>National ID</th>
-                    <th>Governorate</th>
+                    <th>Phone Number 1</th>
+                    <th>Phone Number 2</th>
+                    <th>Phone Number 3</th>
+                    <th>Customers Details</th>
                     <th>City</th>
-                    <th>Phone Numbers</th>
+                    <th>Representative Details</th>
+                    <th>Governorate</th>
                     <th>Created By/At - Updated By/At</th>
                     <th>Status</th>
                     <th>Actions</th>
-                    <th>Details</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,15 +48,24 @@
                     <tr id="row-@technician.TechnicianID">
                         <td>@technician.Code</td>
                         <td>@technician.Name</td>
-                        <td>@technician.NickName</td>
+                        <td>@(!string.IsNullOrWhiteSpace(technician.NickName) ? technician.NickName : "N/A")</td>
                         <td>@technician.NationalID</td>
-                        <td>@technician.SelectedGovernate</td>
-                        <td>@technician.SelectedCity</td>
+                        <td>@(technician.PhoneNumber1 != 0 ? technician.PhoneNumber1.ToString() : "N/A")</td>
+                        <td>@(technician.PhoneNumber2.HasValue ? technician.PhoneNumber2.ToString() : "N/A")</td>
+                        <td>@(technician.PhoneNumber3.HasValue ? technician.PhoneNumber3.ToString() : "N/A")</td>
+
                         <td>
-                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#phoneNumbersModal-@technician.TechnicianID">
-                                View Phone Numbers
+                            <button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#customersModal-@technician.TechnicianID">
+                                View Customers
                             </button>
                         </td>
+                        <td>@technician.SelectedCity</td>
+                        <td>
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#usersModal-@technician.TechnicianID">
+                                View Representatives
+                            </button>
+                        </td>
+                        <td>@technician.SelectedGovernate</td>
                         <td>
                             <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createdUpdatedModal-@technician.TechnicianID">
                                 View Created/Updated Info
@@ -74,15 +86,6 @@
                             <a href="@Url.Action("UpdateTechnician", "Technician", new { id = technician.TechnicianID })" class="btn btn-outline-primary btn-sm">
                                 Edit
                             </a>
-                        </td>
-
-                        <td>
-                            <button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#customersModal-@technician.TechnicianID">
-                                View Customers
-                            </button>
-                            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#usersModal-@technician.TechnicianID">
-                                View Representatives
-                            </button>
                         </td>
                     </tr>
 
@@ -185,7 +188,6 @@
                             </div>
                         </div>
                     </div>
-
 
 
                     <!-- Modal for Phone Numbers -->
@@ -559,12 +561,12 @@
             text-decoration: line-through; /* Strikethrough for inactive rows */
         }
 
-            .inactive-row td:nth-child(10),
-            .inactive-row td:nth-child(10) *,
-            .inactive-row td:nth-child(11),
-            .inactive-row td:nth-child(11) * {
-                text-decoration: none !important; /* Remove strikethrough for the Actions and Details columns */
+            /* Remove line-through for Actions column */
+            .inactive-row td:last-child,
+            .inactive-row td:last-child * {
+                text-decoration: none !important; /* Remove strikethrough for buttons/links */
             }
+
 
 
 </style>
