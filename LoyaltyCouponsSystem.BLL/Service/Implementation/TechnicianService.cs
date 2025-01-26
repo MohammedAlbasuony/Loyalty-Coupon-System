@@ -434,21 +434,29 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         }
 
         // User Management
-        public async Task AssignUserAsync(int technicianId, string userId)
+        // Assign Representative
+        public async Task AssignRepresentativeAsync(int technicianId, string userId)
         {
-            await _technicianRepo.AssignUserAsync(technicianId, userId);
+            await _technicianRepo.AssignRepresentativeAsync(technicianId, userId);
         }
 
-        public async Task RemoveUserAsync(int technicianId, string userId)
+        // Remove Representative
+        public async Task RemoveRepresentativeAsync(int technicianId, string userId)
         {
-            await _technicianRepo.RemoveUserAsync(technicianId, userId);
+            await _technicianRepo.RemoveRepresentativeAsync(technicianId, userId);
         }
 
+        // Get Active Unassigned Representatives
+        public async Task<List<ApplicationUser>> GetActiveUnassignedRepresentativesAsync()
+        {
+            return await _technicianRepo.GetActiveUnassignedRepresentativesAsync();
+        }
+
+        // Get Users by Role
         public async Task<List<ApplicationUser>> GetUsersByRoleAsync(string roleName)
         {
             return await _technicianRepo.GetUsersByRoleAsync(roleName);
         }
-
 
     }
 }

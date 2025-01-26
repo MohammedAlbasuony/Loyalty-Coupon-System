@@ -128,7 +128,7 @@
                         </div>
                     </div>
 
-                    <!-- Modal for Assigned Representatives -->
+                    <!-- Modal for Assigned Users -->
                     <div class="modal fade" id="usersModal-@technician.TechnicianID" tabindex="-1" aria-labelledby="usersModalLabel-@technician.TechnicianID" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content">
@@ -138,33 +138,46 @@
                                 </div>
                                 <div class="modal-body">
                                     <!-- Dropdown to Add Representatives (Only Active and Unassigned) -->
-                                    <label for="addRepresentativeDropdown" class="form-label">Add Representatives</label>
-                                    <select class="form-select mb-3" id="addRepresentativeDropdown-@technician.TechnicianID">
-                                        <option value="" disabled selected>Select a Representative</option>
-                                        @foreach (var user in ViewBag.AllActiveRepresentatives)
-                                        {
-                                            @* Exclude representatives already assigned to the technician *@
-                                            @if (!technician.Representatives.Any(r => r.Id == user.Id))
+                                    <label for="addUserDropdown-@technician.TechnicianID" class="form-label">Add Representative</label>
+                                    @if (technician.UnassignedActiveUsers != null && technician.UnassignedActiveUsers.Any())
+                                    {
+                                        <select class="form-select mb-3" id="addUserDropdown-@technician.TechnicianID" aria-label="Select a representative to add">
+                                            <option value="" disabled selected>Select a Representative</option>
+                                            @foreach (var user in technician.UnassignedActiveUsers)
                                             {
                                                 <option value="@user.Id">@user.UserName</option>
                                             }
-                                        }
-                                    </select>
-                                    <button class="btn btn-primary mb-3" onclick="addRepresentative('@technician.TechnicianID')">Add Representative</button>
+                                        </select>
+                                        <button class="btn btn-primary mb-3" onclick="addUser('@technician.TechnicianID')">Add Representative</button>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted">No unassigned representatives available.</p>
+                                    }
 
                                     <!-- Searchable List of Assigned Representatives -->
-                                    <input type="text" class="form-control mb-3 modal-search-box" placeholder="Search Assigned Representatives..." onkeyup="filterRepresentativesList(this, '@technician.TechnicianID')">
-                                    <ul class="list-group" id="representativeList-@technician.TechnicianID">
-                                        @foreach (var user in technician.SelectedUserNames)
-                                        {
-                                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                <span>@user</span>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="removeRepresentative('@technician.TechnicianID', '@user')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </li>
-                                        }
-                                    </ul>
+                                    <input type="text" class="form-control mb-3 modal-search-box" placeholder="Search Assigned Representatives..."
+                                           aria-label="Search representatives"
+                                           onkeyup="filterRepresentativesList(this, '@technician.TechnicianID')">
+
+                                    @if (technician.SelectedUserNames != null && technician.SelectedUserNames.Any())
+                                    {
+                                        <ul class="list-group" id="representativeList-@technician.TechnicianID">
+                                            @foreach (var userName in technician.SelectedUserNames)
+                                            {
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <span>@userName</span>
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="removeRepresentative('@technician.TechnicianID', '@userName')" aria-label="Remove representative">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted">No representatives assigned yet.</p>
+                                    }
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -774,62 +787,7 @@
         });
     });
 
-        // Handle delete action for customers
-    $(document).on('click', '.delete-customer', function () {
-        const customerName = $(this).data('customer');
-        const listItem = $(this).closest('.list-group-item');
-
-        // Confirmation dialog
-        Swal.fire({
-            title: `Are you sure you want to delete ${customerName}?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Simulate server request here (add your AJAX/Fetch logic)
-                console.log(`Deleted customer: ${customerName}`);
-
-                // Remove the item from the list
-                listItem.remove();
-
-                // Optionally, display success message
-                Swal.fire('Deleted!', `${customerName} has been removed.`, 'success');
-            }
-        });
-    });
-
-    // Handle delete action for representatives
-    $(document).on('click', '.delete-representative', function () {
-        const representativeName = $(this).data('representative');
-        const listItem = $(this).closest('.list-group-item');
-
-        // Confirmation dialog
-        Swal.fire({
-            title: `Are you sure you want to delete ${representativeName}?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Simulate server request here (add your AJAX/Fetch logic)
-                console.log(`Deleted representative: ${representativeName}`);
-
-                // Remove the item from the list
-                listItem.remove();
-
-                // Optionally, display success message
-                Swal.fire('Deleted!', `${representativeName} has been removed.`, 'success');
-            }
-        });
-    });
-
+     
            // Function to Add a Customer
     function addCustomer(technicianId) {
         const customerId = document.getElementById(`addCustomerDropdown-${technicianId}`).value;
@@ -896,56 +854,95 @@
     }
 
 
-    // Function to Add a Representative
-    function addRepresentative(technicianId) {
-        const representativeId = document.getElementById(`addRepresentativeDropdown-${technicianId}`).value;
+                  function addUser(technicianId) {
+        const dropdown = document.getElementById(`addUserDropdown-${technicianId}`);
+        const selectedUserId = dropdown?.value;
 
-        if (!representativeId) {
-            Swal.fire('Error', 'Please select a representative to add.', 'error');
-            return;
+        console.log(`Technician ID: ${technicianId}`);
+        console.log(`Selected User ID: ${selectedUserId}`);
+
+        if (selectedUserId) {
+            // Confirmation using SweetAlert2
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to assign this representative?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, assign!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Example AJAX (replace with actual AJAX)
+                    $.post(`/Technician/AssignUser`, { technicianId: technicianId, userId: selectedUserId })
+                        .done(() => {
+                            Swal.fire('Assigned!', 'Representative has been successfully assigned.', 'success')
+                                .then(() => {
+                                    // Refresh the page after successful assignment
+                                    location.reload();
+                                });
+                        })
+                        .fail(() => {
+                            Swal.fire('Error!', 'Could not assign representative.', 'error');
+                        });
+                }
+            });
+        } else {
+            // Error notification using SweetAlert2
+            Swal.fire(
+                'No Representative Selected',
+                'Please select a representative to add.',
+                'warning'
+            );
         }
+    }
 
+
+
+            function removeRepresentative(technicianId, userName) {
+        // Confirmation using SweetAlert2
         Swal.fire({
-            title: 'Confirm Addition',
-            text: 'Are you sure you want to assign this representative?',
+            title: 'Are you sure?',
+            text: `Do you want to remove representative ${userName}?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, Add',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, remove!'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Send AJAX request to add representative
-                $.post(`/Technician/AddRepresentative`, { technicianId, representativeId }, function (response) {
-                    Swal.fire('Success', 'Representative added successfully!', 'success').then(() => {
-                        location.reload(); // Reload the page or modal to reflect changes
+                // Example AJAX call (send technicianId and userId to the server)
+                $.post(`/Technician/RemoveUser`, { technicianId: technicianId, userId: userName })
+                    .done(() => {
+                        Swal.fire(
+                            'Removed!',
+                            `Representative ${userName} has been removed.`,
+                            'success'
+                        ).then(() => {
+                            // Refresh the page after successful removal
+                            location.reload();
+                        });
+                    })
+                    .fail(() => {
+                        Swal.fire('Error!', 'Could not remove representative.', 'error');
                     });
-                }).fail(() => {
-                    Swal.fire('Error', 'Failed to add representative. Please try again.', 'error');
-                });
             }
         });
     }
 
-    // Function to Remove a Representative
-    function removeRepresentative(technicianId, representativeName) {
-        Swal.fire({
-            title: 'Confirm Removal',
-            text: `Are you sure you want to remove the representative "${representativeName}"?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Remove',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Send AJAX request to remove representative
-                $.post(`/Technician/RemoveRepresentative`, { technicianId, representativeName }, function (response) {
-                    Swal.fire('Success', 'Representative removed successfully!', 'success').then(() => {
-                        location.reload(); // Reload the page or modal to reflect changes
-                    });
-                }).fail(() => {
-                    Swal.fire('Error', 'Failed to remove representative. Please try again.', 'error');
-                });
-            }
+
+
+    function filterRepresentativesList(input, technicianId) {
+        const filter = input.value.toLowerCase();
+        const list = document.getElementById(`representativeList-${technicianId}`);
+        const items = list?.getElementsByTagName('li') || [];
+
+        Array.from(items).forEach(item => {
+            const text = item.textContent || item.innerText;
+            item.style.display = text.toLowerCase().includes(filter) ? '' : 'none';
         });
     }
+
 
     // Function to Filter Assigned Customers List
     function filterCustomersList(input, technicianId) {
@@ -954,12 +951,7 @@
         filterList(list, filter);
     }
 
-    // Function to Filter Assigned Representatives List
-    function filterRepresentativesList(input, technicianId) {
-        const filter = input.value.toLowerCase();
-        const list = document.getElementById(`representativeList-${technicianId}`);
-        filterList(list, filter);
-    }
+   
 
     // Helper Function to Filter List Items
     function filterList(list, filter) {

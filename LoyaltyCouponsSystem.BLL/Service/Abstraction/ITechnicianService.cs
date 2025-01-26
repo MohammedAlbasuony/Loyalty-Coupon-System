@@ -20,8 +20,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
         Task AssignCustomerAsync(int technicianId, int customerId);
         Task RemoveCustomerByNameAsync(int technicianId, string customerName);
         Task<List<CustomerViewModel>> GetUnassignedActiveCustomersAsync();
-        Task AssignUserAsync(int technicianId, string userId);
-        Task RemoveUserAsync(int technicianId, string userId);
+        Task AssignRepresentativeAsync(int technicianId, string userId);
+        Task RemoveRepresentativeAsync(int technicianId, string userId);
+        Task<List<ApplicationUser>> GetActiveUnassignedRepresentativesAsync();
         Task<List<ApplicationUser>> GetUsersByRoleAsync(string roleName);
     }
 }
