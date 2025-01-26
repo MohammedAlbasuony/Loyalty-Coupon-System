@@ -13,7 +13,7 @@
     <div class="row mb-4 justify-content-center">
         <div class="col-md-10">
             <div class="input-group shadow-sm">
-                <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, Code, Governorate, City, or Phone Number...">
+                <input type="text" id="searchBox" class="form-control" placeholder="Search by Code, Name, NickName, National ID, Governorate, City, or Status...">
                 <a href="@Url.Action("AddTechnician", "Technician")" class="btn btn-add-entity ms-2">
                     <i class="fas fa-plus"></i> Add New Technician
                 </a>
@@ -95,10 +95,16 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <ul>
+                                    <input type="text" class="form-control mb-3 modal-search-box" placeholder="Search Customers...">
+                                    <ul class="list-group">
                                         @foreach (var customer in technician.SelectedCustomerNames)
                                         {
-                                            <li>@customer</li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>@customer</span>
+                                                <button class="btn btn-sm btn-outline-danger delete-customer" data-customer="@customer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </li>
                                         }
                                     </ul>
                                 </div>
@@ -113,14 +119,20 @@
                         <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="usersModalLabel-@technician.TechnicianID">Assigned Users</h5>
+                                    <h5 class="modal-title" id="usersModalLabel-@technician.TechnicianID">Assigned Representatives</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <ul>
+                                    <input type="text" class="form-control mb-3 modal-search-box" placeholder="Search Representatives...">
+                                    <ul class="list-group">
                                         @foreach (var user in technician.SelectedUserNames)
                                         {
-                                            <li>@user</li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>@user</span>
+                                                <button class="btn btn-sm btn-outline-danger delete-representative" data-representative="@user">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </li>
                                         }
                                     </ul>
                                 </div>
@@ -133,46 +145,108 @@
 
                     <!-- Modal for Phone Numbers -->
                     <div class="modal fade" id="phoneNumbersModal-@technician.TechnicianID" tabindex="-1" aria-labelledby="phoneNumbersModalLabel-@technician.TechnicianID" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="phoneNumbersModalLabel-@technician.TechnicianID">Phone Numbers</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="modal-dialog modal-dialog-centered modal-md">
+                            <div class="modal-content shadow-lg rounded-4">
+                                <!-- Modal Header -->
+                                <div class="modal-header bg-gradient-primary text-white rounded-top-4">
+                                    <h5 class="modal-title" id="phoneNumbersModalLabel-@technician.TechnicianID">
+                                        <i class="fas fa-phone-alt me-2"></i> Phone Numbers
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body">
-                                    <ul>
-                                        <li>Phone Number 1: @technician.PhoneNumber1</li>
-                                        <li>Phone Number 2: @technician.PhoneNumber2</li>
-                                        <li>Phone Number 3: @technician.PhoneNumber3</li>
-                                    </ul>
+
+                                <!-- Modal Body -->
+                                <div class="modal-body p-4">
+                                    <div class="list-group">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span><strong>Phone Number 1:</strong></span>
+                                            <span class="text-primary">@technician.PhoneNumber1</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span><strong>Phone Number 2:</strong></span>
+                                            <span class="text-muted">@technician.PhoneNumber2</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span><strong>Phone Number 3:</strong></span>
+                                            <span class="text-muted">@technician.PhoneNumber3</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                                <!-- Modal Footer -->
+                                <div class="modal-footer rounded-bottom-4">
+                                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times"></i> Close
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+
                     <!-- Modal for Created/Updated Info -->
                     <div class="modal fade" id="createdUpdatedModal-@technician.TechnicianID" tabindex="-1" aria-labelledby="createdUpdatedModalLabel-@technician.TechnicianID" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="createdUpdatedModalLabel-@technician.TechnicianID">Created & Updated Information</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <div class="modal-content shadow-lg rounded-4">
+                                <!-- Modal Header -->
+                                <div class="modal-header bg-primary text-white rounded-top-4">
+                                    <h5 class="modal-title" id="createdUpdatedModalLabel-@technician.TechnicianID">
+                                        <i class="fas fa-info-circle me-2"></i> Created & Updated Information
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body">
-                                    <p><strong>Created By:</strong> @technician.CreatedBy</p>
-                                    <p><strong>Created At:</strong> @technician.CreatedAt</p>
-                                    <p><strong>Updated By:</strong> @technician.UpdatedBy</p>
-                                    <p><strong>Updated At:</strong> @technician.UpdatedAt</p>
+
+                                <!-- Modal Body -->
+                                <div class="modal-body p-4">
+                                    <div class="row mb-3">
+                                        <div class="col-6 text-center">
+                                            <div class="card bg-light border-0 shadow-sm rounded-3">
+                                                <div class="card-body">
+                                                    <h6 class="card-title text-primary fw-bold">Created By</h6>
+                                                    <p class="card-text text-muted">@technician.CreatedBy</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <div class="card bg-light border-0 shadow-sm rounded-3">
+                                                <div class="card-body">
+                                                    <h6 class="card-title text-primary fw-bold">Created At</h6>
+                                                    <p class="card-text text-muted">@technician.CreatedAt</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-6 text-center">
+                                            <div class="card bg-light border-0 shadow-sm rounded-3">
+                                                <div class="card-body">
+                                                    <h6 class="card-title text-primary fw-bold">Updated By</h6>
+                                                    <p class="card-text text-muted">@technician.UpdatedBy</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <div class="card bg-light border-0 shadow-sm rounded-3">
+                                                <div class="card-body">
+                                                    <h6 class="card-title text-primary fw-bold">Updated At</h6>
+                                                    <p class="card-text text-muted">@technician.UpdatedAt</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                                <!-- Modal Footer -->
+                                <div class="modal-footer rounded-bottom-4">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times"></i> Close
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 }
             </tbody>
         </table>
@@ -292,173 +366,486 @@
         }
 
     /* Pagination Buttons */
+    /* Pagination Button Styling */
     #paginationContainer .btn {
         font-size: 14px;
         padding: 8px 12px;
         margin: 2px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
     }
 
-    #paginationContainer .btn-primary {
-        background-color: #007bff;
-        color: white;
-    }
-
-    #paginationContainer .btn-outline-primary {
-        border: 1px solid #007bff;
-        color: #007bff;
-        background-color: white;
-    }
-
-    /* Responsive Design */
-    @@media screen and (max-width: 768px) {
-        .table th, .table td
-
-    {
-        font-size: 12px;
-        padding: 6px;
-    }
-
-    .btn {
-        font-size: 12px;
-        padding: 6px 10px;
-    }
-
-    #searchBox {
-        font-size: 14px;
-        padding: 8px 12px;
-    }
-        /* General Styling for Title */
-        h1 {
-            font-family: 'Verdana', sans-serif;
+        #paginationContainer .btn.active {
+            background-color: #007bff; /* Active button color */
+            color: white;
+            border: 1px solid #007bff;
             font-weight: bold;
-            font-size: 24px;
+        }
+
+        #paginationContainer .btn:not(.active):hover {
+            background-color: #e9f5ff;
             color: #007bff;
         }
 
+    /* Responsive Design */
+    @@media screen and (max-width: 768px) {
+        .table th,
+        .table td {
+            font-size: 12px;
+            padding: 6px;
+        }
+
+        .btn {
+            font-size: 12px;
+            padding: 6px 10px;
+        }
+
+        #searchBox {
+            font-size: 14px;
+            padding: 8px 12px;
+        }
+    }
+
+    /* General Styling for Title */
+    h1 {
+        font-family: 'Verdana', sans-serif;
+        font-weight: bold;
+        font-size: 24px;
+        color: #007bff;
+    }
+
+    /* Modal Styling */
+    .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        border-bottom: none;
+        background: linear-gradient(to right, #007bff, #00c6ff);
+        color: white;
+    }
+
+        .modal-header.bg-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .modal-header.bg-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+    .modal-body {
+        font-size: 16px;
+        color: #555;
+        padding: 20px;
+        background-color: #f9f9f9;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 16px;
+        font-size: 15px;
+    }
+
+        .list-group-item:not(:last-child) {
+            border-bottom: 1px solid #ddd;
+        }
+
+    .text-primary {
+        font-weight: bold;
+        color: #007bff !important;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .modal-footer {
+        border-top: none;
+        background-color: #f9f9f9;
+        padding: 15px;
+    }
+
+    .btn-outline-primary {
+        border-color: #007bff;
+        color: #007bff;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+    .table-bordered {
+        width: 100%;
+        margin: 0;
+    }
+
+        .table-bordered th,
+        .table-bordered td {
+            padding: 12px;
+            vertical-align: middle;
+        }
+
+    .btn-close {
+        font-size: 20px;
+        line-height: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        cursor: pointer;
+    }
+
+        .btn-close:hover {
+            color: #fff;
+            opacity: 0.8;
+        }
+
+    /* Inactive Row Styling */
+    .inactive-row {
+        background-color: #f5f5f5; /* Light gray background */
+        color: #6c757d; /* Muted text color */
+    }
+
+        .inactive-row td {
+            text-decoration: line-through; /* Strikethrough for inactive rows */
+        }
+
+            .inactive-row td:nth-child(10),
+            .inactive-row td:nth-child(10) *,
+            .inactive-row td:nth-child(11),
+            .inactive-row td:nth-child(11) * {
+                text-decoration: none !important; /* Remove strikethrough for the Actions and Details columns */
+            }
+
+
 </style>
+
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Bootstrap JS (includes Popper.js for modal handling) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<!--Sweat Alert-->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <script>
-         $(document).ready(function () {
-        // Ensure that the data-is-active attribute is correctly set after page reload
-        $('#technicianTable tbody tr').each(function () {
-            const technicianId = $(this).attr('id').split('-')[1];
-            const statusBadge = $(this).find('.badge');
-            const toggleButton = $(this).find('.toggle-activation');
-            const isActive = toggleButton.data('is-active');
+    $(document).ready(function () {
+        // Initialize the rows on page load
+        updateRows();
 
-            // Update badge and button state according to the technician's active status
-            if (isActive) {
-                statusBadge.text("Active").removeClass("bg-danger").addClass("bg-success");
-                toggleButton.text("Deactivate").removeClass("btn-success").addClass("btn-danger");
-            } else {
-                statusBadge.text("Inactive").removeClass("bg-success").addClass("bg-danger");
-                toggleButton.text("Activate").removeClass("btn-danger").addClass("btn-success");
-            }
-        });
-    });
+        // Handle toggle activation on button click
+        $(document).on('click', '.toggle-activation', function () {
+            const technicianId = $(this).data('technician-id');
+            const isActive = $(this).data('is-active');
+            const action = isActive ? 'Deactivate' : 'Activate';
 
-    // Handle toggle activation on button click
-    $(document).on('click', '.toggle-activation', function () {
-        const technicianId = $(this).data('technician-id');
-        const isActive = $(this).data('is-active');
-        const action = isActive ? 'Deactivate' : 'Activate';
-
-        // Show the confirmation modal with the action text
-        $('#toggleAction').text(action);
-
-        // Store the technicianId and isActive in a global variable
-        $('#confirmToggleButton').off('click').on('click', function () {
-            // Change the UI immediately after confirmation
-            toggleActivation(technicianId, !isActive);
-
-            // Close the modal
-            $('#toggleConfirmationModal').modal('hide');
-        });
-
-        // Show confirmation modal
-        $('#toggleConfirmationModal').modal('show');
-    });
-
-    // Toggle technician activation (send to server)
-    function toggleActivation(technicianId, newIsActive) {
-        console.log("Toggling activation for Technician ID:", technicianId, "New Active Status:", newIsActive);
-
-        // Make a POST request to toggle the technician's activation status
-        fetch(`/Technician/ToggleActivation?technicianId=${technicianId}&isActive=${newIsActive}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Activation status updated successfully');
-
-                // After success, update the button state to match the server's state
-                const row = $(`#row-${technicianId}`);
-                const statusBadge = row.find('.badge');
-                const toggleButton = row.find('.toggle-activation');
-
-                if (newIsActive) {
-                    statusBadge.text("Active").removeClass("bg-danger").addClass("bg-success");
-                    toggleButton.text("Deactivate").removeClass("btn-success").addClass("btn-danger");
-                    toggleButton.data('is-active', true);
-                } else {
-                    statusBadge.text("Inactive").removeClass("bg-success").addClass("bg-danger");
-                    toggleButton.text("Activate").removeClass("btn-danger").addClass("btn-success");
-                    toggleButton.data('is-active', false);
+            // Show SweetAlert confirmation dialog
+            Swal.fire({
+                title: `Are you sure you want to ${action.toLowerCase()} this technician?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: isActive ? '#dc3545' : '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: action,
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    toggleActivation(technicianId, !isActive);
                 }
-            } else {
-                alert('Failed to toggle activation.');
-            }
-        })
-        .catch(error => alert('Error: ' + error));
-    }
+            });
+        });
 
+        // Toggle technician activation (send request to the server)
+        function toggleActivation(technicianId, newIsActive) {
+            console.log(`Toggling activation for Technician ID: ${technicianId}, New Active Status: ${newIsActive}`);
 
+            // Make a POST request to toggle the activation status
+            fetch(`/Technician/ToggleActivation?technicianId=${technicianId}&isActive=${newIsActive}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Activation status updated successfully.');
 
-    // Pagination functionality
-    document.addEventListener("DOMContentLoaded", function () {
-        const rowsPerPage = 10;
-        const tableBody = document.querySelector("#technicianTable tbody");
-        const paginationContainer = document.createElement("div");
-        paginationContainer.id = "paginationContainer";
-        paginationContainer.classList.add("mt-4", "text-center");
-        tableBody.parentElement.parentElement.appendChild(paginationContainer);
+                        // Update the row status in the UI
+                        const row = $(`#row-${technicianId}`);
+                        const statusBadge = row.find('.badge');
+                        const toggleButton = row.find('.toggle-activation');
 
-        function showPage(pageNumber) {
-            const rows = Array.from(tableBody.querySelectorAll("tr"));
+                        if (newIsActive) {
+                            // Update to Active
+                            statusBadge.text("Active").removeClass("bg-danger").addClass("bg-success");
+                            toggleButton.text("Deactivate").removeClass("btn-success").addClass("btn-danger");
+                            toggleButton.data('is-active', true);
+
+                            // Remove line-through styling
+                            row.removeClass('inactive-row');
+                            row.find('td:not(:nth-child(7), :nth-child(8), :nth-child(9), :nth-child(10), :nth-child(11))')
+                                .css('text-decoration', '');
+
+                            // Move the row back to the top of the table
+                            $('#technicianTable tbody').prepend(row);
+                        } else {
+                            // Update to Inactive
+                            statusBadge.text("Inactive").removeClass("bg-success").addClass("bg-danger");
+                            toggleButton.text("Activate").removeClass("btn-danger").addClass("btn-success");
+                            toggleButton.data('is-active', false);
+
+                            // Add line-through styling
+                            row.addClass('inactive-row');
+                            row.find('td:not(:nth-child(7), :nth-child(8), :nth-child(9), :nth-child(10), :nth-child(11))')
+                                .css('text-decoration', 'line-through');
+
+                            // Move the row to the end of the table
+                            $('#technicianTable tbody').append(row);
+                        }
+
+                        // Update pagination after reordering rows
+                        updatePagination();
+                    } else {
+                        Swal.fire('Error', 'Failed to toggle activation status.', 'error');
+                    }
+                })
+                .catch(error => Swal.fire('Error', `Error: ${error}`, 'error'));
+        }
+
+        // Search functionality
+        $("#searchBox").on("input", function () {
+            const searchValue = $(this).val().toLowerCase().trim();
+            const rows = $("#technicianTable tbody tr");
+
+            rows.each(function () {
+                const row = $(this);
+                const code = row.find("td:nth-child(1)").text().toLowerCase();
+                const name = row.find("td:nth-child(2)").text().toLowerCase();
+                const nickname = row.find("td:nth-child(3)").text().toLowerCase();
+                const nationalId = row.find("td:nth-child(4)").text().toLowerCase();
+                const governorate = row.find("td:nth-child(5)").text().toLowerCase();
+                const city = row.find("td:nth-child(6)").text().toLowerCase();
+                const status = row.find("td:nth-child(9) .badge").text().toLowerCase().trim();
+
+                const isStatusMatch =
+                    searchValue === "active" ? status === "active" :
+                    searchValue === "inactive" ? status === "inactive" :
+                    status.includes(searchValue);
+
+                const isOtherMatch =
+                    code.includes(searchValue) ||
+                    name.includes(searchValue) ||
+                    nickname.includes(searchValue) ||
+                    nationalId.includes(searchValue) ||
+                    governorate.includes(searchValue) ||
+                    city.includes(searchValue);
+
+                row.toggle(isStatusMatch || isOtherMatch);
+            });
+        });
+
+        // Update rows' styles and order based on their active/inactive status
+        function updateRows() {
+            $('#technicianTable tbody tr').each(function () {
+                const toggleButton = $(this).find('.toggle-activation');
+                const isActive = toggleButton.data('is-active');
+
+                if (!isActive) {
+                    $(this).addClass('inactive-row');
+                    $(this).find('td:not(:nth-child(7), :nth-child(8), :nth-child(9), :nth-child(10), :nth-child(11))')
+                        .css('text-decoration', 'line-through');
+                } else {
+                    $(this).removeClass('inactive-row');
+                    $(this).find('td').css('text-decoration', '');
+                }
+            });
+
+            reorderRows();
+        }
+
+        // Reorder rows to move inactive rows to the end of the table
+        function reorderRows() {
+            const activeRows = [];
+            const inactiveRows = [];
+
+            $('#technicianTable tbody tr').each(function () {
+                const isActive = $(this).find('.toggle-activation').data('is-active');
+                if (isActive) {
+                    activeRows.push($(this));
+                } else {
+                    inactiveRows.push($(this));
+                }
+            });
+
+            const tbody = $('#technicianTable tbody');
+            tbody.empty();
+            activeRows.forEach(row => tbody.append(row));
+            inactiveRows.forEach(row => tbody.append(row));
+        }
+
+        // Pagination functionality
+        function updatePagination() {
+            const rowsPerPage = 10;
+            const rows = $('#technicianTable tbody tr');
             const totalRows = rows.length;
             const totalPages = Math.ceil(totalRows / rowsPerPage);
 
-            rows.forEach((row, index) => {
-                row.style.display = (index >= (pageNumber - 1) * rowsPerPage && index < pageNumber * rowsPerPage) ? "" : "none";
-            });
+            rows.hide();
+            let currentPage = 1;
 
-            updatePaginationControls(pageNumber, totalPages);
-        }
+            function showPage(pageNumber) {
+                const start = (pageNumber - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
 
-        function updatePaginationControls(currentPage, totalPages) {
-            paginationContainer.innerHTML = "";
-            for (let i = 1; i <= totalPages; i++) {
-                const button = document.createElement("button");
-                button.classList.add("btn", "btn-outline-primary", "me-2");
-                button.textContent = i;
-                button.onclick = () => showPage(i);
-                if (i === currentPage) {
-                    button.classList.add("active");
-                }
-                paginationContainer.appendChild(button);
+                rows.hide();
+                rows.slice(start, end).show();
+
+                updatePaginationControls(pageNumber, totalPages);
             }
+
+            function updatePaginationControls(currentPage, totalPages) {
+                const paginationContainer = $('#paginationContainer');
+                paginationContainer.empty();
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const button = $('<button>')
+                        .addClass(`btn btn-outline-primary me-2 ${i === currentPage ? 'active' : ''}`)
+                        .text(i)
+                        .on('click', () => showPage(i));
+                    paginationContainer.append(button);
+                }
+            }
+
+            showPage(1);
         }
 
-        showPage(1); // Initialize with first page
+        updatePagination();
     });
+
+
+            $(document).on('input', '.modal-search-box', function () {
+        const query = $(this).val().toLowerCase();
+        const listItems = $(this).closest('.modal-body').find('.list-group-item');
+
+        listItems.each(function () {
+            const itemText = $(this).text().toLowerCase();
+            $(this).toggle(itemText.includes(query));
+        });
+    });
+
+        // Handle delete action for customers
+    $(document).on('click', '.delete-customer', function () {
+        const customerName = $(this).data('customer');
+        const listItem = $(this).closest('.list-group-item');
+
+        // Confirmation dialog
+        Swal.fire({
+            title: `Are you sure you want to delete ${customerName}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Simulate server request here (add your AJAX/Fetch logic)
+                console.log(`Deleted customer: ${customerName}`);
+
+                // Remove the item from the list
+                listItem.remove();
+
+                // Optionally, display success message
+                Swal.fire('Deleted!', `${customerName} has been removed.`, 'success');
+            }
+        });
+    });
+
+    // Handle delete action for representatives
+    $(document).on('click', '.delete-representative', function () {
+        const representativeName = $(this).data('representative');
+        const listItem = $(this).closest('.list-group-item');
+
+        // Confirmation dialog
+        Swal.fire({
+            title: `Are you sure you want to delete ${representativeName}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Simulate server request here (add your AJAX/Fetch logic)
+                console.log(`Deleted representative: ${representativeName}`);
+
+                // Remove the item from the list
+                listItem.remove();
+
+                // Optionally, display success message
+                Swal.fire('Deleted!', `${representativeName} has been removed.`, 'success');
+            }
+        });
+    });
+
+
+
+        $(document).on('click', '.delete-customer, .delete-representative', function () {
+        const isCustomer = $(this).hasClass('delete-customer');
+        const entityName = isCustomer ? 'customer' : 'representative';
+        const entityId = isCustomer ? $(this).data('customer') : $(this).data('representative');
+        const listItem = $(this).closest('.list-group-item');
+
+        // Confirmation dialog
+        Swal.fire({
+            title: `Are you sure you want to delete this ${entityName}?`,
+            text: `${entityName === 'customer' ? entityId : ''}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Make an AJAX call to delete the entity
+                const deleteUrl = isCustomer
+                    ? `/Technician/DeleteCustomer?customerName=${entityId}`
+                    : `/Technician/DeleteRepresentative?representativeName=${entityId}`;
+
+                $.ajax({
+                    url: deleteUrl,
+                    method: 'POST',
+                    success: function (response) {
+                        if (response.success) {
+                            // Remove the item from the list
+                            listItem.remove();
+
+                            // Optionally, display success message
+                            Swal.fire('Deleted!', `${entityName} has been removed successfully.`, 'success');
+                        } else {
+                            Swal.fire('Error!', response.message || `Failed to delete ${entityName}.`, 'error');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire('Error!', `Failed to delete ${entityName}: ${error}`, 'error');
+                    }
+                });
+            }
+        });
+    });
+
+
 </script>
+
+
+

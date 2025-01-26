@@ -4,6 +4,7 @@
     ViewData["Title"] = "Assign QR Codes";
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
 }
+
 <br />
 <div class="container mt-5">
     <div class="text-center mb-4">
@@ -17,18 +18,26 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="CustomerCodeOrName" class="form-label"><b>Select Customer</b></label>
-                <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-control select2" multiple required>
-                    <option></option>
+                <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-control select2" required>
+                    <option value="" disabled selected>Select Customer</option>
+                    @foreach (var customer in Model.Customers)
+                    {
+                        <option value="@customer.Value">@customer.Text</option>
+                    }
                 </select>
             </div>
+
             <div class="col-md-6">
                 <label for="TechnicianCodeOrName" class="form-label"><b>Select Technician</b></label>
-                <select asp-for="SelectedTechnicianCode" asp-items="Model.Technicians" class="form-control select2" multiple required>
-                    <option></option>
+                <select asp-for="SelectedTechnicianCode" asp-items="Model.Technicians" class="form-control select2" required>
+                    <option value="" disabled selected>Select Technician</option>
+                    @foreach (var technician in Model.Technicians)
+                    {
+                        <option value="@technician.Value">@technician.Text</option>
+                    }
                 </select>
             </div>
         </div>
-
         <div class="row g-3 mt-3">
             <div class="col-md-6">
                 <label for="Governate" class="form-label"><b>Select Governate</b></label>
@@ -245,6 +254,13 @@
         });
 
 
+                    $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: "Select an option", // Placeholder text
+                allowClear: true,               // Allow clearing selected value
+                width: '100%'                   // Ensure dropdown is responsive
+            });
+        });
 
     </script>
 
@@ -253,17 +269,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/additional-methods.min.js"></script>
 
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
-    <script>
-        // Initialize Select2 on the Customer dropdown
-        $(document).ready(function () {
-            $('.select2').select2({
-                placeholder: 'Select Customer',
 
-                allowClear: true
-            });
-        });
-    </script>
 
     <!-- Include Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
@@ -383,4 +393,3 @@
 
     
 </style>
-

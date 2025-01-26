@@ -6,6 +6,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,12 +17,14 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         private readonly IDistributorService _distributorService;
         private readonly ICustomerService _customerService;
         private readonly ApplicationDbContext _DBcontext;
+        private readonly ILogger<DistributorController> _logger;
 
-        public DistributorController(ApplicationDbContext context, IDistributorService distributorService, ICustomerService customerService)
+        public DistributorController(ApplicationDbContext context, IDistributorService distributorService, ICustomerService customerService, ILogger<DistributorController> logger)
         {
             _DBcontext = context;
             _distributorService = distributorService;
             _customerService = customerService;
+            _logger = logger;
         }
 
         public IActionResult Index()
@@ -40,10 +43,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     .Where(c => c.IsActive) // Only include active customers
                     .Select(c => new SelectListItem
                     {
-                        Value = c.Code.ToString(),
+                        Value = c.CustomerID.ToString(),
                         Text = $"{c.Name} - {c.Code}"
                     })
-                    .ToList()
+                    .ToList(),
+                SelectedCustomerNames = new List<string>()  // Ensure initialization to avoid null
             };
 
             return View(viewModel);
@@ -75,6 +79,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     Text = $"{c.Name} - {c.Code}"
                 })
                 .ToList();
+            model.SelectedCustomerNames ??= new List<string>();  // Ensure it's initialized if null
 
             return View(model);
         }
@@ -104,6 +109,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     Text = $"{c.Name} ({c.Code})"
                 })
                 .ToList();
+            distributorViewModel.SelectedCustomerNames ??= new List<string>();  // Ensure it's initialized
 
             return View(distributorViewModel); // Return populated ViewModel to the view
         }
@@ -132,6 +138,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     Text = $"{c.Name} ({c.Code})"
                 })
                 .ToList();
+            distributorViewModel.SelectedCustomerNames ??= new List<string>();  // Ensure it's initialized
 
             return View(distributorViewModel);
         }
@@ -177,7 +184,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return Json(new { success = true, isActive = distributor.IsActive });
         }
 
-
+        // Import Distributors from Excel
         [HttpPost]
         public async Task<IActionResult> UploadExcel(IFormFile file)
         {
@@ -197,11 +204,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
                 if (result)
                 {
-                    TempData["SuccessMessage"] = "Distibutor imported successfully!";
+                    TempData["SuccessMessage"] = "Distributor imported successfully!";
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Failed to import Distibutor. Please check the file format.";
+                    TempData["ErrorMessage"] = "Failed to import Distributor. Please check the file format.";
                 }
             }
             catch (Exception ex)
@@ -212,6 +219,32 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return RedirectToAction("GetAllDistributors");
         }
 
+        // Add Customer to Distributor
+        [HttpPost]
+        public async Task<IActionResult> AddCustomer(int distributorId, int customerId)
+        {
+            var success = await _distributorService.AddCustomerToDistributorAsync(distributorId, customerId);
+
+            if (success)
+            {
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveCustomer(int distributorId, string name)
+        {
+            // Call the service method using the distributor ID and customer name
+            var success = await _distributorService.RemoveCustomerFromDistributorByNameAsync(distributorId, name);
+
+            // Return the result as JSON
+            return Json(new { success });
+        }
+
+
     }
 }
-

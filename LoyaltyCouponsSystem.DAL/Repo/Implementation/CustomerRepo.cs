@@ -172,5 +172,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 return false;
             }
         }
+
+        public async Task<Customer> GetByNameAsync(string customerName)
+        {
+            return await _DBcontext.Customers
+                .FirstOrDefaultAsync(c => c.Name.Equals(customerName, StringComparison.OrdinalIgnoreCase));
+        }
+
     }
 }

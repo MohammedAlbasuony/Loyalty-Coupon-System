@@ -291,6 +291,55 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return RedirectToAction("GetAllTechnicians");
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteCustomer(string customerName)
+        {
+            if (string.IsNullOrEmpty(customerName))
+            {
+                return Json(new { success = false, message = "Customer name is required." });
+            }
+
+            try
+            {
+                var result = await _technicianService.DeleteCustomerAsync(customerName);
+                if (result)
+                {
+                    return Json(new { success = true });
+                }
+
+                return Json(new { success = false, message = "Failed to delete customer." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteRepresentative(string representativeName)
+        {
+            if (string.IsNullOrEmpty(representativeName))
+            {
+                return Json(new { success = false, message = "Representative name is required." });
+            }
+
+            try
+            {
+                var result = await _technicianService.DeleteRepresentativeAsync(representativeName);
+                if (result)
+                {
+                    return Json(new { success = true });
+                }
+
+                return Json(new { success = false, message = "Failed to delete representative." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
     }
 }
 
