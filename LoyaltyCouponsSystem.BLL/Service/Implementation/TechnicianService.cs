@@ -321,76 +321,73 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 var rowCount = worksheet.Dimension.Rows;
                 var technicians = new List<Technician>();
 
-                for (int row = 2; row <= rowCount; row++) // Assuming first row contains headers
+                for (int row = 2; row <= rowCount; row++) // Assuming the first row contains headers
                 {
-                    var name = worksheet.Cells[row, 1].Text; // Column 1: Technician Name
-                    var code = worksheet.Cells[row, 2].Text; // Column 2: Technician Code
+                    // Read the data from the Excel file
+                    var code = worksheet.Cells[row, 1].Text; // Column 1: Code
+                    var name = worksheet.Cells[row, 2].Text; // Column 2: Name
                     var nickName = worksheet.Cells[row, 3].Text; // Column 3: Nickname
                     var nationalID = worksheet.Cells[row, 4].Text; // Column 4: National ID
                     var phoneNumberText = worksheet.Cells[row, 5].Text; // Column 5: Phone Numbers (comma-separated)
-                    var governate = worksheet.Cells[row, 6].Text; // Column 6: Governate
-                    var city = worksheet.Cells[row, 7].Text; // Column 7: City
-                    var selectedCustomerCodes = worksheet.Cells[row, 8].Text; // Column 8: Customer Codes (comma-separated)
-                    var selectedUsernames = worksheet.Cells[row, 9].Text; // Column 9: Usernames (comma-separated)
+                    var phoneNumber2Text = worksheet.Cells[row, 6].Text; // Column 6: Phone Number 2
+                    var phoneNumber3Text = worksheet.Cells[row, 7].Text; // Column 7: Phone Number 3
+                    var city = worksheet.Cells[row, 8].Text; // Column 8: City
+                    var governate = worksheet.Cells[row, 9].Text; // Column 9: Governorate
+                    var customerCodes = worksheet.Cells[row, 10].Text; // Column 10: Customer Codes (comma-separated)
+                    var usernames = worksheet.Cells[row, 11].Text; // Column 11: Representative Usernames (comma-separated)
 
-                    if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(code) && !string.IsNullOrWhiteSpace(phoneNumberText))
+                    // Validate mandatory fields
+                    if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(phoneNumberText))
+                        continue;
+
+                    // Parse phone numbers
+                    int.TryParse(phoneNumberText, out var phoneNumber1);
+                    int.TryParse(phoneNumber2Text, out var phoneNumber2);
+                    int.TryParse(phoneNumber3Text, out var phoneNumber3);
+
+                    // Create a new technician
+                    var technician = new Technician
                     {
-                        // Split the phone numbers
-                        var phoneNumbers = phoneNumberText.Split(',')
-                                                           .Select(p => p.Trim())
-                                                           .ToList();
+                        Code = code,
+                        Name = name,
+                        NickName = string.IsNullOrWhiteSpace(nickName) ? "N/A" : nickName,
+                        NationalID = nationalID,
+                        PhoneNumber1 = phoneNumber1,
+                        PhoneNumber2 = phoneNumber2 == 0 ? (int?)null : phoneNumber2,
+                        PhoneNumber3 = phoneNumber3 == 0 ? (int?)null : phoneNumber3,
+                        City = city,
+                        Governate = governate,
+                        IsActive = true,
+                        CreatedAt = DateTime.Now
+                    };
 
-                        // Initialize phone number variables with default values
-                        int phoneNumber1 = 0;
-                        int? phoneNumber2 = null;
-                        int? phoneNumber3 = null;
-
-                        // Try parsing phone numbers to integers
-                        if (phoneNumbers.Count > 0 && int.TryParse(phoneNumbers[0], out var parsedPhone1))
-                            phoneNumber1 = parsedPhone1;
-
-                        if (phoneNumbers.Count > 1 && int.TryParse(phoneNumbers[1], out var parsedPhone2))
-                            phoneNumber2 = parsedPhone2;
-
-                        if (phoneNumbers.Count > 2 && int.TryParse(phoneNumbers[2], out var parsedPhone3))
-                            phoneNumber3 = parsedPhone3;
-
-                        var technician = new Technician
-                        {
-                            Name = name,
-                            Code = code,
-                            NickName = nickName,
-                            NationalID = nationalID,
-                            PhoneNumber1 = phoneNumber1, // Assign first phone number
-                            PhoneNumber2 = phoneNumber2, // Assign second phone number if available
-                            PhoneNumber3 = phoneNumber3, // Assign third phone number if available
-                            Governate = governate,
-                            City = city,
-                            IsActive = true,
-                            CreatedAt = DateTime.Now,
-                        };
-
-                        // Split the customer codes and get customer IDs from the repository
-                        var customerCodes = selectedCustomerCodes.Split(',').Select(c => c.Trim()).ToList();
-                        var customerIds = await _customerRepo.GetCustomerIdsByCodesAsync(customerCodes);
-
-                        // Add customers to the technician
+                    // Process customers
+                    if (!string.IsNullOrWhiteSpace(customerCodes))
+                    {
+                        var customerCodeList = customerCodes.Split(',')
+                                                            .Select(c => c.Trim())
+                                                            .ToList();
+                        var customerIds = await _customerRepo.GetCustomerIdsByCodesAsync(customerCodeList);
                         technician.Customers = await _customerRepo.GetCustomersByIdsAsync(customerIds);
-
-                        // Split the usernames and get user IDs from the UserManager
-                        var usernames = selectedUsernames.Split(',').Select(c => c.Trim()).ToList();
-                        var users = await _userManager.Users
-                            .Where(u => usernames.Contains(u.UserName))
-                            .ToListAsync();
-
-                        // Assign users to the technician
-                        technician.Users = users;
-
-                        technicians.Add(technician);
                     }
+
+                    // Process representatives
+                    if (!string.IsNullOrWhiteSpace(usernames))
+                    {
+                        var usernameList = usernames.Split(',')
+                                                    .Select(u => u.Trim())
+                                                    .ToList();
+                        var users = await _userManager.Users
+                                                     .Where(u => usernameList.Contains(u.UserName))
+                                                     .ToListAsync();
+                        technician.Users = users;
+                    }
+
+                    // Add technician to the list
+                    technicians.Add(technician);
                 }
 
-                // Save technicians to the database
+                // Save technicians to the database one by one
                 foreach (var technician in technicians)
                 {
                     await _technicianRepo.AddAsync(technician);
@@ -400,11 +397,13 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             }
             catch (Exception ex)
             {
-                // Log the exception for debugging (optional)
+                // Log the exception for debugging
                 Console.WriteLine(ex.Message);
                 return false;
             }
         }
+
+
 
 
         // Customer Management
