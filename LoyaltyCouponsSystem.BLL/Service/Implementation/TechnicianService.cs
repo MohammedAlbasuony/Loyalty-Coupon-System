@@ -331,10 +331,10 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     var phoneNumberText = worksheet.Cells[row, 5].Text; // Column 5: Phone Numbers (comma-separated)
                     var phoneNumber2Text = worksheet.Cells[row, 6].Text; // Column 6: Phone Number 2
                     var phoneNumber3Text = worksheet.Cells[row, 7].Text; // Column 7: Phone Number 3
-                    var city = worksheet.Cells[row, 8].Text; // Column 8: City
-                    var governate = worksheet.Cells[row, 9].Text; // Column 9: Governorate
-                    var customerCodes = worksheet.Cells[row, 10].Text; // Column 10: Customer Codes (comma-separated)
-                    var usernames = worksheet.Cells[row, 11].Text; // Column 11: Representative Usernames (comma-separated)
+                    var customerNames = worksheet.Cells[row, 8].Text; // Column 8: Customer Names (comma-separated)
+                    var city = worksheet.Cells[row, 9].Text; // Column 9: City
+                    var usernames = worksheet.Cells[row, 10].Text; // Column 10: Representative Usernames (comma-separated)
+                    var governate = worksheet.Cells[row, 11].Text; // Column 11: Governorate
 
                     // Validate mandatory fields
                     if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(phoneNumberText))
@@ -361,14 +361,14 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         CreatedAt = DateTime.Now
                     };
 
-                    // Process customers
-                    if (!string.IsNullOrWhiteSpace(customerCodes))
+                    // Process customers by names
+                    if (!string.IsNullOrWhiteSpace(customerNames))
                     {
-                        var customerCodeList = customerCodes.Split(',')
+                        var customerNameList = customerNames.Split(',')
                                                             .Select(c => c.Trim())
                                                             .ToList();
-                        var customerIds = await _customerRepo.GetCustomerIdsByCodesAsync(customerCodeList);
-                        technician.Customers = await _customerRepo.GetCustomersByIdsAsync(customerIds);
+                        var customers = await _customerRepo.GetCustomersByNamesAsync(customerNameList); // Fetch customers by names
+                        technician.Customers = customers;
                     }
 
                     // Process representatives

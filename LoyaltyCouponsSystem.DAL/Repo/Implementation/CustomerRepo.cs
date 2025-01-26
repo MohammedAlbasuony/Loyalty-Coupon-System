@@ -117,7 +117,12 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 .ToListAsync();
         }
 
-
+        public async Task<List<Customer>> GetCustomersByNamesAsync(List<string> customerNames)
+        {
+            return await _DBcontext.Customers
+                .Where(c => customerNames.Contains(c.Name))
+                .ToListAsync();
+        }
         public async Task<List<Customer>> GetCustomersByIdsAsync(List<int> customerIds)
         {
             if (customerIds == null || customerIds.Count == 0)
