@@ -1,4 +1,7 @@
-﻿using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
+﻿using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
+using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
+using LoyaltyCouponsSystem.DAL.DB;
+using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
@@ -14,7 +17,11 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
         Task<List<SelectListItem>> GetUsersForDropdownAsync();
         Task<bool> ToggleActivationAsync(int distributorId);
         Task<bool> ImportTechniciansFromExcelAsync(Stream stream);
-        Task<bool> DeleteCustomerAsync(string customerName);
-        Task<bool> DeleteRepresentativeAsync(string representativeName);
+        Task AssignCustomerAsync(int technicianId, int customerId);
+        Task RemoveCustomerByNameAsync(int technicianId, string customerName);
+        Task<List<CustomerViewModel>> GetUnassignedActiveCustomersAsync();
+        Task AssignUserAsync(int technicianId, string userId);
+        Task RemoveUserAsync(int technicianId, string userId);
+        Task<List<ApplicationUser>> GetUsersByRoleAsync(string roleName);
     }
 }

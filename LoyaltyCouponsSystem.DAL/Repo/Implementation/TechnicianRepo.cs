@@ -218,15 +218,97 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             }
         }
 
-        public async Task<bool> DeleteCustomerAsync(int customerId)
+        public async Task AssignCustomerAsync(int technicianId, int customerId)
         {
-            var customer = await _DBcontext.Customers.FindAsync(customerId);
-            if (customer == null)
-                return false;
+            var technician = await _DBcontext.Technicians
+                .Include(t => t.Customers)
+                .FirstOrDefaultAsync(t => t.TechnicianID == technicianId);
 
-            _DBcontext.Customers.Remove(customer);
-            await _DBcontext.SaveChangesAsync();
-            return true;
+            if (technician != null && !technician.Customers.Any(c => c.CustomerID == customerId))
+            {
+                var customer = await _DBcontext.Customers.FindAsync(customerId);
+                if (customer != null)
+                {
+                    technician.Customers.Add(customer);
+                    await _DBcontext.SaveChangesAsync();
+                }
+            }
+        }
+
+        // Remove Customer
+        public async Task RemoveCustomerByNameAsync(int technicianId, string customerName)
+        {
+            var technician = await _DBcontext.Technicians
+                .Include(t => t.Customers)
+                .FirstOrDefaultAsync(t => t.TechnicianID == technicianId);
+
+            if (technician != null)
+            {
+                // Find the customer by name
+                var customer = technician.Customers.FirstOrDefault(c => c.Name == customerName);
+
+                if (customer != null)
+                {
+                    // Remove the customer by its ID
+                    technician.Customers.Remove(customer);
+                    await _DBcontext.SaveChangesAsync();
+                }
+            }
+        }
+
+
+        // Get All Active Customers
+        public async Task<List<Customer>> GetActiveUnassignedCustomersAsync()
+        {
+            return await _DBcontext.Customers
+                .Where(c => c.IsActive && !c.TechnicianId.HasValue) // Only active customers with no assigned technician
+                .ToListAsync();
+        }
+
+
+
+
+        // Assign User with Role "Representative"
+        public async Task AssignUserAsync(int technicianId, string userId)
+        {
+            var technician = await _DBcontext.Technicians
+                .Include(t => t.Users)
+                .FirstOrDefaultAsync(t => t.TechnicianID == technicianId);
+
+            if (technician != null && !technician.Users.Any(u => u.Id == userId))
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user != null)
+                {
+                    technician.Users.Add(user);
+                    await _DBcontext.SaveChangesAsync();
+                }
+            }
+        }
+
+        // Remove User
+        public async Task RemoveUserAsync(int technicianId, string userId)
+        {
+            var technician = await _DBcontext.Technicians
+                .Include(t => t.Users)
+                .FirstOrDefaultAsync(t => t.TechnicianID == technicianId);
+
+            if (technician != null)
+            {
+                var user = technician.Users.FirstOrDefault(u => u.Id == userId);
+                if (user != null)
+                {
+                    technician.Users.Remove(user);
+                    await _DBcontext.SaveChangesAsync();
+                }
+            }
+        }
+
+        // Get All Users with Role "Representative"
+        public async Task<List<ApplicationUser>> GetUsersByRoleAsync(string roleName)
+        {
+            var users = await _userManager.GetUsersInRoleAsync(roleName);
+            return users.ToList();
         }
 
     }

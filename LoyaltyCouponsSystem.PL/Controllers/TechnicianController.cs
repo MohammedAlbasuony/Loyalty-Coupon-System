@@ -1,25 +1,31 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.Service.Implementation;
+using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NPOI.SS.Formula.Functions;
 using ZXing;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
 {
     public class TechnicianController : Controller
     {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ICustomerService _customerService;
         private readonly ITechnicianService _technicianService;
         private readonly ApplicationDbContext _DBcontext;
 
-        public TechnicianController(ApplicationDbContext context, ITechnicianService technicianService)
+        public TechnicianController(ApplicationDbContext context, ITechnicianService technicianService, ICustomerService customerService, UserManager<ApplicationUser> userManager)
         {
             _DBcontext = context;
             _technicianService = technicianService;
+            _customerService = customerService;
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -29,24 +35,55 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
         public async Task<IActionResult> GetAllTechnicians()
         {
-            // Fetch all technicians along with associated users and customers
             var technicians = await _technicianService.GetAllAsync();
 
             foreach (var technician in technicians)
             {
-                // Ensure IsActive state is fetched correctly
-                var dbTechnician = await _DBcontext.Technicians.FindAsync(technician.TechnicianID);
+                var dbTechnician = await _DBcontext.Technicians
+                    .Include(t => t.Customers)
+                    .FirstOrDefaultAsync(t => t.TechnicianID == technician.TechnicianID);
+
                 if (dbTechnician != null)
                 {
                     technician.IsActive = dbTechnician.IsActive;
+
+                    technician.ActiveCustomers = dbTechnician.Customers?
+                        .Select(c => new CustomerViewModel
+                        {
+                            CustomerID = c.CustomerID,
+                            Name = c.Name,
+                            IsActive = c.IsActive
+                        })
+                        .ToList() ?? new List<CustomerViewModel>();
+
+                    technician.SelectedCustomerNames = technician.ActiveCustomers
+                        .Select(c => c.Name)
+                        .Distinct()
+                        .ToList() ?? new List<string>();
                 }
 
-                technician.SelectedUserNames = technician.SelectedUserNames.Distinct().ToList();
-                technician.SelectedCustomerNames = technician.SelectedCustomerNames.Distinct().ToList();
+                technician.Representatives = await _technicianService.GetUsersByRoleAsync("Representative");
+
+                technician.SelectedUserNames = technician.Representatives?
+                    .Select(r => r.UserName)
+                    .Distinct()
+                    .ToList() ?? new List<string>();
+
+                // Get unassigned customers for the technician
+                technician.UnassignedActiveCustomers = await _technicianService.GetUnassignedActiveCustomersAsync();
             }
+
+            ViewBag.AllActiveRepresentatives = await _userManager.Users
+                .Where(u => u.IsActive)
+                .ToListAsync();
 
             return View(technicians);
         }
+
+       
+
+
+
 
 
 
@@ -292,52 +329,55 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> DeleteCustomer(string customerName)
-        {
-            if (string.IsNullOrEmpty(customerName))
-            {
-                return Json(new { success = false, message = "Customer name is required." });
-            }
 
+
+        [HttpPost]
+        public async Task<IActionResult> AssignCustomer(int technicianId, int customerId)
+        {
             try
             {
-                var result = await _technicianService.DeleteCustomerAsync(customerName);
-                if (result)
-                {
-                    return Json(new { success = true });
-                }
-
-                return Json(new { success = false, message = "Failed to delete customer." });
+                await _technicianService.AssignCustomerAsync(technicianId, customerId);
+                return Json(new { success = true, message = "Customer assigned successfully." });
             }
             catch (Exception ex)
             {
+                // Log exception if needed
                 return Json(new { success = false, message = ex.Message });
             }
         }
 
+
+        // Remove Customer
         [HttpPost]
-        public async Task<IActionResult> DeleteRepresentative(string representativeName)
+        public async Task<IActionResult> RemoveCustomer(int technicianId, string customerName)
         {
-            if (string.IsNullOrEmpty(representativeName))
-            {
-                return Json(new { success = false, message = "Representative name is required." });
-            }
+            await _technicianService.RemoveCustomerByNameAsync(technicianId, customerName);
+            return Json(new { success = true, message = "Customer removed successfully." });
+        }
 
-            try
-            {
-                var result = await _technicianService.DeleteRepresentativeAsync(representativeName);
-                if (result)
-                {
-                    return Json(new { success = true });
-                }
 
-                return Json(new { success = false, message = "Failed to delete representative." });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
+        // Get Users by Role "Representative"
+        [HttpGet]
+        public async Task<IActionResult> GetRepresentatives()
+        {
+            var representatives = await _technicianService.GetUsersByRoleAsync("Representative");
+            return Json(representatives.Select(u => new { u.Id, u.UserName }));
+        }
+
+        // Assign User
+        [HttpPost]
+        public async Task<IActionResult> AssignUser(int technicianId, string userId)
+        {
+            await _technicianService.AssignUserAsync(technicianId, userId);
+            return Json(new { success = true, message = "User assigned successfully." });
+        }
+
+        // Remove User
+        [HttpPost]
+        public async Task<IActionResult> RemoveUser(int technicianId, string userId)
+        {
+            await _technicianService.RemoveUserAsync(technicianId, userId);
+            return Json(new { success = true, message = "User removed successfully." });
         }
 
     }

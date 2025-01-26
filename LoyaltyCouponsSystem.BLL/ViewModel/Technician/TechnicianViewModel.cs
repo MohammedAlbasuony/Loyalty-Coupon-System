@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
+using LoyaltyCouponsSystem.DAL.DB;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
@@ -46,5 +48,9 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public bool IsActive { get; set; } = true;
+        public List<CustomerViewModel> ActiveCustomers { get; set; } = new List<CustomerViewModel>();
+        public List<ApplicationUser> Representatives { get; set; }
+        public List<CustomerViewModel> UnassignedActiveCustomers { get; set; } = new List<CustomerViewModel>();  // New property
+
     }
 }
