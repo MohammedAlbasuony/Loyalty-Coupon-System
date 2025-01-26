@@ -89,11 +89,11 @@
                 </div>
                 <div class="col-md-3">
                     <label for="StartSequenceNumber" class="form-label"><b>Start Sequence Number</b></label>
-                    <input type="number" name="Transactions[0].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required min="1" />
+                    <input type="number" name="Transactions[0].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
                 </div>
                 <div class="col-md-3">
                     <label for="EndSequenceNumber" class="form-label"><b>End Sequence Number</b></label>
-                    <input type="number" name="Transactions[0].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required min="1" />
+                    <input type="number" name="Transactions[0].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
                     <button type="button" class="btn btn-danger removeFieldsButton">Remove</button>
@@ -122,6 +122,112 @@
 
 @section Scripts {
     <script>
+        //Validate on start and end of the sequence number is unique
+                document.getElementById("assignForm").addEventListener("submit", async function (event) {
+            const sequenceFields = document.querySelectorAll(".couponFields"); // Select all sequence field groups
+            let isValid = true;
+
+            for (const field of sequenceFields) {
+                const startInput = field.querySelector('[name$="StartSequenceNumber"]'); // Find the Start Sequence input
+                const endInput = field.querySelector('[name$="EndSequenceNumber"]'); // Find the End Sequence input
+                const startValue = parseInt(startInput.value, 10); // Parse Start Sequence value
+                const endValue = parseInt(endInput.value, 10); // Parse End Sequence value
+
+                // Check if error message already exists
+                let errorMessage = field.querySelector(".sequence-error");
+                if (!errorMessage) {
+                    errorMessage = document.createElement("div"); // Create error message container if not exists
+                    errorMessage.classList.add("sequence-error");
+                    endInput.parentNode.appendChild(errorMessage); // Append the error message after the End Sequence input
+                }
+
+                // Validation: Ensure Start Sequence is strictly less than End Sequence
+                if (startValue >= endValue) {
+                    isValid = false;
+                    errorMessage.textContent = "End Sequence Number must be strictly greater than Start Sequence Number.";
+                    errorMessage.style.display = "block";
+
+                    startInput.classList.add("is-invalid");
+                    endInput.classList.add("is-invalid");
+                } else {
+                    // Perform AJAX call to check if sequence range has already been used
+                    const response = await fetch("/ExchangeOrder/CheckSequenceAvailability", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ startSequence: startValue, endSequence: endValue }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!data.isAvailable) {
+                        isValid = false;
+                        errorMessage.textContent = "The sequence range is already used. Please choose a different range.";
+                        errorMessage.style.display = "block";
+
+                        startInput.classList.add("is-invalid");
+                        endInput.classList.add("is-invalid");
+                    } else {
+                        // If no issues, clear errors
+                        errorMessage.style.display = "none";
+                        startInput.classList.remove("is-invalid");
+                        endInput.classList.remove("is-invalid");
+                    }
+                }
+            }
+
+            if (!isValid) {
+                event.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
+
+
+
+        //check validation for start and end number sequence
+                                document.getElementById('assignForm').addEventListener('submit', function (event) {
+            const sequenceFields = document.querySelectorAll('.couponFields'); // Select all sequence field groups
+            let isValid = true;
+
+            sequenceFields.forEach((field) => {
+                const startInput = field.querySelector('[name$="StartSequenceNumber"]'); // Find the Start Sequence input
+                const endInput = field.querySelector('[name$="EndSequenceNumber"]'); // Find the End Sequence input
+                const startValue = parseInt(startInput.value, 10); // Parse Start Sequence value
+                const endValue = parseInt(endInput.value, 10); // Parse End Sequence value
+
+                // Check if error message already exists
+                let errorMessage = field.querySelector('.sequence-error');
+                if (!errorMessage) {
+                    errorMessage = document.createElement('div'); // Create error message container if not exists
+                    errorMessage.classList.add('sequence-error');
+                    endInput.parentNode.appendChild(errorMessage); // Append the error message after the End Sequence input
+                }
+
+                // Validation: Ensure Start Sequence is strictly less than End Sequence
+                if (startValue >= endValue) {
+                    isValid = false;
+
+                    errorMessage.textContent = 'End Sequence Number must be strictly greater than Start Sequence Number.'; // Set error message text
+                    errorMessage.style.display = 'block'; // Show the error message
+
+                    startInput.classList.add('is-invalid'); // Highlight Start Sequence input as invalid
+                    endInput.classList.add('is-invalid'); // Highlight End Sequence input as invalid
+                } else {
+                    errorMessage.style.display = 'none'; // Hide error message if values are valid
+                    startInput.classList.remove('is-invalid'); // Remove invalid class from Start Sequence input
+                    endInput.classList.remove('is-invalid'); // Remove invalid class from End Sequence input
+                }
+            });
+
+            if (!isValid) {
+                event.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
+
+
+
+
+
 
         let index = 1; // Initialize index for dynamic rows
 
@@ -390,6 +496,14 @@
         margin-top: 20px;
         margin-bottom: 20px;
     }
+
+    .sequence-error {
+        margin-top: 5px; 
+        font-size: 0.875em; 
+        color: #dc3545;
+        position: relative; 
+    }
+
 
     
 </style>
