@@ -24,7 +24,6 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
         public async Task<bool> AddAsync(DistributorViewModel distributorViewModel)
         {
-
             if (distributorViewModel == null)
                 return false;
 
@@ -43,19 +42,26 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 DistributorCustomers = new List<DistributorCustomer>()
             };
 
-            // Fetch Customer IDs from the repository based on selected customer codes
-            var customerIds = await _customerRepo.GetCustomerIdsByCodesAsync(distributorViewModel.SelectedCustomerCodes);
+            // Fetch Customer IDs by their IDs (not codes)
+            var customerIds = distributorViewModel.SelectedCustomerCodes
+        .Where(code => int.TryParse(code, out _)) // Only keep valid integer codes
+        .Select(code => int.Parse(code))
+        .ToList();
+
+            // Fetch the actual Customer objects from the repository (optional, if needed to access full customer data)
+            var customers = await _customerRepo.GetCustomersByIdsAsync(customerIds);
 
             // Create DistributorCustomer mappings
-            distributor.DistributorCustomers = customerIds
-                .Select(customerId => new DistributorCustomer
+            distributor.DistributorCustomers = customers
+                .Select(customer => new DistributorCustomer
                 {
-                    CustomerID = customerId
+                    CustomerID = customer.CustomerID
                 })
                 .ToList();
 
             return await _distributorRepo.AddAsync(distributor);
         }
+
 
 
 

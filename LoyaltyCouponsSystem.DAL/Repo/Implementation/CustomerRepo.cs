@@ -106,11 +106,17 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
         }
         public async Task<List<int>> GetCustomerIdsByCodesAsync(List<string> customerCodes)
         {
+            if (customerCodes == null || !customerCodes.Any())
+            {
+                return new List<int>(); // Return empty list if no codes are provided
+            }
+
             return await _DBcontext.Customers
                 .Where(c => customerCodes.Contains(c.Code))
                 .Select(c => c.CustomerID)
                 .ToListAsync();
         }
+
 
         public async Task<List<Customer>> GetCustomersByIdsAsync(List<int> customerIds)
         {
