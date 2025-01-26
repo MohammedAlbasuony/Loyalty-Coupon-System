@@ -269,25 +269,7 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
 
 
         // Assign User with Role "Representative"
-        public async Task AssignUserAsync(int technicianId, string userId)
-        {
-            var technician = await _DBcontext.Technicians
-                .Include(t => t.Users)
-                .FirstOrDefaultAsync(t => t.TechnicianID == technicianId);
-
-            if (technician != null && !technician.Users.Any(u => u.Id == userId))
-            {
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user != null)
-                {
-                    technician.Users.Add(user);
-                    await _DBcontext.SaveChangesAsync();
-                }
-            }
-        }
-
-        // Remove User
-        public async Task RemoveUserAsync(int technicianId, string userId)
+        public async Task AssignRepresentativeAsync(int technicianId, string userId)
         {
             var technician = await _DBcontext.Technicians
                 .Include(t => t.Users)
@@ -295,20 +277,57 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
 
             if (technician != null)
             {
-                var user = technician.Users.FirstOrDefault(u => u.Id == userId);
+                var user = await _userManager.FindByIdAsync(userId);
+
+                if (user != null && await _userManager.IsInRoleAsync(user, "Representative"))
+                {
+                    if (!technician.Users.Any(u => u.Id == userId))
+                    {
+                        technician.Users.Add(user);
+                        await _DBcontext.SaveChangesAsync();
+                    }
+                }
+            }
+        }
+
+        // Remove User
+        public async Task RemoveRepresentativeAsync(int technicianId, string userName)
+        {
+            // Find the technician with the given ID
+            var technician = await _DBcontext.Technicians
+                .Include(t => t.Users)  // Include the users (representatives) associated with the technician
+                .FirstOrDefaultAsync(t => t.TechnicianID == technicianId);
+
+            if (technician != null)
+            {
+                // Find the user by their username
+                var user = technician.Users.FirstOrDefault(u => u.UserName == userName);
+
                 if (user != null)
                 {
+                    // Remove the user from the technician's users (representatives)
                     technician.Users.Remove(user);
                     await _DBcontext.SaveChangesAsync();
                 }
             }
         }
 
-        // Get All Users with Role "Representative"
+
+        // Get Active Unassigned Users with Role "Representative"
+        public async Task<List<ApplicationUser>> GetActiveUnassignedRepresentativesAsync()
+        {
+            var representatives = await _userManager.GetUsersInRoleAsync("Representative");
+
+            return representatives
+                .Where(u => u.IsActive && !_DBcontext.Technicians.Any(t => t.Users.Any(ut => ut.Id == u.Id)))
+                .ToList();
+        }
+
+        // Get Users by Role
         public async Task<List<ApplicationUser>> GetUsersByRoleAsync(string roleName)
         {
-            var users = await _userManager.GetUsersInRoleAsync(roleName);
-            return users.ToList();
+            var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
+            return usersInRole.Where(u => u.IsActive).ToList();
         }
 
     }

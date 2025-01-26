@@ -41,13 +41,17 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             {
                 var dbTechnician = await _DBcontext.Technicians
                     .Include(t => t.Customers)
+                    .Include(t => t.Users) // Include Users (Representatives)
                     .FirstOrDefaultAsync(t => t.TechnicianID == technician.TechnicianID);
 
                 if (dbTechnician != null)
                 {
+                    // Set Technician Status
                     technician.IsActive = dbTechnician.IsActive;
 
+                    // Map Active Customers
                     technician.ActiveCustomers = dbTechnician.Customers?
+                        .Where(c => c.IsActive)
                         .Select(c => new CustomerViewModel
                         {
                             CustomerID = c.CustomerID,
@@ -60,19 +64,26 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                         .Select(c => c.Name)
                         .Distinct()
                         .ToList() ?? new List<string>();
+
+                    // Assign Representatives (Directly use ApplicationUser for Representatives)
+                    technician.AssignedRepresentatives = dbTechnician.Users?
+                        .Where(u => u.IsActive)
+                        .ToList() ?? new List<ApplicationUser>();
+
+                    technician.SelectedUserNames = technician.AssignedRepresentatives
+                        .Select(r => r.UserName)
+                        .Distinct()
+                        .ToList() ?? new List<string>();
                 }
 
-                technician.Representatives = await _technicianService.GetUsersByRoleAsync("Representative");
-
-                technician.SelectedUserNames = technician.Representatives?
-                    .Select(r => r.UserName)
-                    .Distinct()
-                    .ToList() ?? new List<string>();
-
-                // Get unassigned customers for the technician
+                // Get unassigned customers
                 technician.UnassignedActiveCustomers = await _technicianService.GetUnassignedActiveCustomersAsync();
+
+                // Get active unassigned representatives
+                technician.UnassignedActiveUsers = await _technicianService.GetActiveUnassignedRepresentativesAsync();
             }
 
+            // Get all active representatives
             ViewBag.AllActiveRepresentatives = await _userManager.Users
                 .Where(u => u.IsActive)
                 .ToListAsync();
@@ -80,7 +91,8 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             return View(technicians);
         }
 
-       
+
+
 
 
 
@@ -356,29 +368,33 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
 
 
-        // Get Users by Role "Representative"
-        [HttpGet]
-        public async Task<IActionResult> GetRepresentatives()
-        {
-            var representatives = await _technicianService.GetUsersByRoleAsync("Representative");
-            return Json(representatives.Select(u => new { u.Id, u.UserName }));
-        }
 
-        // Assign User
+
         [HttpPost]
         public async Task<IActionResult> AssignUser(int technicianId, string userId)
         {
-            await _technicianService.AssignUserAsync(technicianId, userId);
-            return Json(new { success = true, message = "User assigned successfully." });
+            try
+            {
+                await _technicianService.AssignRepresentativeAsync(technicianId, userId);
+                return Json(new { success = true, message = "User assigned successfully." });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if needed
+                return Json(new { success = false, message = ex.Message });
+            }
         }
+
 
         // Remove User
         [HttpPost]
         public async Task<IActionResult> RemoveUser(int technicianId, string userId)
         {
-            await _technicianService.RemoveUserAsync(technicianId, userId);
+            // Remove the representative (assuming you have the RemoveRepresentativeAsync method)
+            await _technicianService.RemoveRepresentativeAsync(technicianId, userId);
             return Json(new { success = true, message = "User removed successfully." });
         }
+
 
     }
 }

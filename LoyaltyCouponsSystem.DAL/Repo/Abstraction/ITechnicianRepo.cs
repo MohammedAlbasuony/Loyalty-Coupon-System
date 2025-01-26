@@ -17,8 +17,9 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Abstraction
         Task AssignCustomerAsync(int technicianId, int customerId);
         Task RemoveCustomerByNameAsync(int technicianId, string customerName);
         Task<List<Customer>> GetActiveUnassignedCustomersAsync();
-        Task AssignUserAsync(int technicianId, string userId);
-        Task RemoveUserAsync(int technicianId, string userId);
+        Task AssignRepresentativeAsync(int technicianId, string userId);
+        Task RemoveRepresentativeAsync(int technicianId, string userName);
+        Task<List<ApplicationUser>> GetActiveUnassignedRepresentativesAsync();
         Task<List<ApplicationUser>> GetUsersByRoleAsync(string roleName);
     }
 }

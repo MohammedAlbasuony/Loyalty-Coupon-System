@@ -49,8 +49,9 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
         public DateTime? UpdatedAt { get; set; }
         public bool IsActive { get; set; } = true;
         public List<CustomerViewModel> ActiveCustomers { get; set; } = new List<CustomerViewModel>();
-        public List<ApplicationUser> Representatives { get; set; }
+        public List<ApplicationUser> AssignedRepresentatives { get; set; } = new();
         public List<CustomerViewModel> UnassignedActiveCustomers { get; set; } = new List<CustomerViewModel>();  // New property
+        public List<ApplicationUser> UnassignedActiveUsers { get; set; } = new List<ApplicationUser>();  // New property
 
     }
 }
