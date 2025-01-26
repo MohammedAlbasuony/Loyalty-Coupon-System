@@ -32,5 +32,19 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Customer
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public bool IsActive { get; set; } = true;
+        // Override Equals and GetHashCode to allow proper comparison
+        public override bool Equals(object obj)
+        {
+            if (obj == null || obj.GetType() != this.GetType())
+                return false;
+
+            var other = (CustomerViewModel)obj;
+            return this.CustomerID == other.CustomerID; // Compare by CustomerID or other unique properties
+        }
+
+        public override int GetHashCode()
+        {
+            return CustomerID.GetHashCode(); // Ensure GetHashCode is consistent with Equals
+        }
     }
 }

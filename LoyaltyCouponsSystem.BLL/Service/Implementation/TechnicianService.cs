@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using LoyaltyCouponsSystem.DAL.DB;
@@ -406,54 +407,47 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         }
 
 
-        public async Task<bool> DeleteCustomerAsync(string customerName)
-{
-    if (string.IsNullOrEmpty(customerName))
-        return false;
+        // Customer Management
+        public async Task AssignCustomerAsync(int technicianId, int customerId)
+        {
+            await _technicianRepo.AssignCustomerAsync(technicianId, customerId);
+        }
 
-    try
-    {
-        // Retrieve the customer entity by name
-        var customer = await _customerRepo.GetByNameAsync(customerName);
-        if (customer == null)
-            return false;
+        public async Task RemoveCustomerByNameAsync(int technicianId, string customerName)
+        {
+            await _technicianRepo.RemoveCustomerByNameAsync(technicianId, customerName);
+        }
 
-        // Remove the customer entity from the database
-        return await _customerRepo.DeleteAsync(customer.CustomerID);
-    }
-    catch (Exception ex)
-    {
-        // Log the exception (if necessary)
-        Console.WriteLine(ex.Message);
-        return false;
-    }
-}
 
-public async Task<bool> DeleteRepresentativeAsync(string representativeName)
-{
-    if (string.IsNullOrEmpty(representativeName))
-        return false;
+        public async Task<List<CustomerViewModel>> GetUnassignedActiveCustomersAsync()
+        {
+            var unassignedCustomers = await _technicianRepo.GetActiveUnassignedCustomersAsync();
 
-    try
-    {
-        // Retrieve the user entity by username
-        var representative = await _userManager.Users
-            .FirstOrDefaultAsync(u => u.UserName == representativeName);
-        if (representative == null)
-            return false;
+            return unassignedCustomers
+                .Select(c => new CustomerViewModel
+                {
+                    CustomerID = c.CustomerID,
+                    Name = c.Name,
+                    IsActive = c.IsActive
+                })
+                .ToList();
+        }
 
-        // Remove the representative from the database
-        // (Assuming your UserManager supports deletion)
-        var result = await _userManager.DeleteAsync(representative);
-        return result.Succeeded;
-    }
-    catch (Exception ex)
-    {
-        // Log the exception (if necessary)
-        Console.WriteLine(ex.Message);
-        return false;
-    }
-}
+        // User Management
+        public async Task AssignUserAsync(int technicianId, string userId)
+        {
+            await _technicianRepo.AssignUserAsync(technicianId, userId);
+        }
+
+        public async Task RemoveUserAsync(int technicianId, string userId)
+        {
+            await _technicianRepo.RemoveUserAsync(technicianId, userId);
+        }
+
+        public async Task<List<ApplicationUser>> GetUsersByRoleAsync(string roleName)
+        {
+            return await _technicianRepo.GetUsersByRoleAsync(roleName);
+        }
 
 
     }
