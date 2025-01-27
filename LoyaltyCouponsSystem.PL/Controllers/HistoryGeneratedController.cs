@@ -148,6 +148,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
             if (!string.IsNullOrEmpty(typeOfCoupon))
             {
+              
                 query = query.Where(c => c.TypeOfCoupone.Contains(typeOfCoupon));
             }
             if (!string.IsNullOrEmpty(governorate))

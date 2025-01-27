@@ -131,10 +131,10 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetMaxSerialNumber()
+        public async Task<IActionResult> GetMaxSerialNumber(int typeOfCoupon)
         {
             var serviceToMangeCounters = new ServiceToMangeCounters(_context);
-            var maxSerialNumber = await serviceToMangeCounters.GetNextSerialNumInYearAsync();
+            var maxSerialNumber = await serviceToMangeCounters.GetNextSerialNumInYearAsync(typeOfCoupon.ToString());
 
             return Json(maxSerialNumber);
         }
@@ -203,10 +203,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user
                 ServiceToSetSerialNumber serialNumber = new ServiceToSetSerialNumber();
                 var numInYear = await serviceToMangeCounters.GetNextNumInYearAsync();
-                var SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber, 0);
+                var SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber, detailsVM.TypeOfCoupon,0);
                 var SerialNumberAsLong=long.Parse(SerialNumber);
                 var CreatedBy = currentUser?.UserName;
-                var TypeOfCoupone = detailsVM.TypeOfCoupon;
+                ServiseToMangeType type = new ServiseToMangeType();
+                var TypeOfCouponeee = type.TypeOfCoupoun(detailsVM.TypeOfCoupon);
                 var Value = detailsVM.Value;
                 var GovernorateId = detailsVM.GovernorateId;
                 var AreaId = detailsVM.AreaId;
@@ -217,7 +218,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                        var couponDetails = new Coupon
                        {
 
-                           TypeOfCoupone = TypeOfCoupone,
+                           TypeOfCoupone = TypeOfCouponeee,
                            Value = Value,
                            GovernorateId = GovernorateId,
                            AreaId = AreaId,
@@ -235,11 +236,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             QRCodeTransactionGenerated qRCodeTransactionGenerated =new()
                {
                 NumberOfCoupones = qrCodesList.Count,
-                FromSerialNumber= serialNumber.GetSerialNumber(detailsVM.SerialNumber, 0),
-                ToSerialNumber=serialNumber.GetSerialNumber(detailsVM.SerialNumber, qrCodesList.Count),
+                FromSerialNumber= serialNumber.GetSerialNumber(detailsVM.SerialNumber, detailsVM.TypeOfCoupon, 0),
+                ToSerialNumber=serialNumber.GetSerialNumber(detailsVM.SerialNumber, detailsVM.TypeOfCoupon, qrCodesList.Count),
                 GeneratedBy= currentUser?.UserName,
                 Value=detailsVM.Value,
-                TypeOfCoupone= detailsVM.TypeOfCoupon,
+                TypeOfCoupone= TypeOfCouponeee,
                 GovernorateID = detailsVM.GovernorateId,
                 AreaId = detailsVM.AreaId,
                 CreationDateTime=DateTime.Now
@@ -251,7 +252,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 await _context.SaveChangesAsync();
 
 
-            await serviceToMangeCounters.UpdateMaxSerialNumAsync(detailsVM.SerialNumber, detailsVM.Count);
+            await serviceToMangeCounters.UpdateMaxSerialNumAsync(detailsVM.SerialNumber, detailsVM.TypeOfCoupon, detailsVM.Count);
 
                 //// إنشاء QR Codes
                 //var generateListOfCoupons = new GenerateListOfCoupons();
