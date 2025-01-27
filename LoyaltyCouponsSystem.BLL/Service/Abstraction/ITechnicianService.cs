@@ -19,10 +19,10 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
         Task<bool> ImportTechniciansFromExcelAsync(Stream stream);
         Task AssignCustomerAsync(int technicianId, int customerId);
         Task RemoveCustomerByNameAsync(int technicianId, string customerName);
-        Task<List<CustomerViewModel>> GetUnassignedActiveCustomersAsync();
+        Task<List<CustomerViewModel>> GetUnassignedActiveCustomersAsync(int technicianId);
         Task AssignRepresentativeAsync(int technicianId, string userId);
         Task RemoveRepresentativeAsync(int technicianId, string userId);
-        Task<List<ApplicationUser>> GetActiveUnassignedRepresentativesAsync();
+        Task<List<ApplicationUser>> GetActiveUnassignedRepresentativesAsync(int technicianId);
         Task<List<ApplicationUser>> GetUsersByRoleAsync(string roleName);
     }
 }

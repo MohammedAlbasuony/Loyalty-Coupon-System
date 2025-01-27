@@ -4,10 +4,9 @@ namespace LoyaltyCouponsSystem.DAL.Entity
 {
     public class Technician
     {
-        
         public int TechnicianID { get; set; }
         public string Name { get; set; }
-        public string? NickName { get; set; }       
+        public string? NickName { get; set; }
         public string NationalID { get; set; }
         public int PhoneNumber1 { get; set; }
         public int? PhoneNumber2 { get; set; }
@@ -22,11 +21,12 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public DateTime? UpdatedAt { get; set; }
         public Technician()
         {
-            Customers = new List<Customer>();
-            Users = new List<ApplicationUser>();
+            TechnicianCustomers = new List<TechnicianCustomer>();
+            TechnicianUsers = new List<TechnicianUser>();
         }
-        public ICollection<Customer> Customers { get; set; }
-        public ICollection<ApplicationUser> Users { get; set; }
+        public ICollection<TechnicianCustomer> TechnicianCustomers { get; set; }
+        public ICollection<TechnicianUser> TechnicianUsers { get; set; }
         public bool IsActive { get; set; } = true;
     }
+
 }

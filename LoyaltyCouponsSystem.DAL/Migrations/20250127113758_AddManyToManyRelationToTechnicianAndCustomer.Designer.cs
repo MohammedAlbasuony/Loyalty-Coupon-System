@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250127113758_AddManyToManyRelationToTechnicianAndCustomer")]
+    partial class AddManyToManyRelationToTechnicianAndCustomer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -455,22 +458,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<long>("MaXNumberInYear")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("MaxSerialNumber1")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("MaxSerialNumber2")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("MaxSerialNumber3")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("MaxSerialNumber4")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("MaxSerialNumber5")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("MaxSerialNumber6")
+                    b.Property<long>("MaxSerialNumber")
                         .HasColumnType("bigint");
 
                     b.Property<int>("YearNotId")
@@ -809,7 +797,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("TechnicianCustomers");
+                    b.ToTable("TechnicianCustomer");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.TechnicianUser", b =>
@@ -824,7 +812,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TechnicianUsers");
+                    b.ToTable("TechnicianUser");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Transaction", b =>

@@ -28,7 +28,6 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     Governate = customerViewModel.Governate,
                     City = customerViewModel.City,
                     PhoneNumber = customerViewModel.PhoneNumber,
-                    TechnicianId = customerViewModel.TechnicianID,
                     IsActive = customerViewModel.IsActive
                 };
                 return await _customerRepo.AddAsync(customer);
@@ -84,7 +83,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         Governate = customer.Governate,
                         City = customer.City,
                         PhoneNumber = customer.PhoneNumber,
-                        TechnicianID = customer.TechnicianId,
+                        //TechnicianID = customer.TechnicianId,
                         IsActive = customer.IsActive
                     };
                 }
@@ -107,7 +106,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     existingCustomer.Governate = updateCustomerViewModel.Governate;
                     existingCustomer.City = updateCustomerViewModel.City;
                     existingCustomer.PhoneNumber = updateCustomerViewModel.PhoneNumber;
-                    existingCustomer.TechnicianId = updateCustomerViewModel.TechnicianID;
+                    //existingCustomer.TechnicianId = updateCustomerViewModel.TechnicianID;
                     existingCustomer.UpdatedAt = DateTime.Now;
                     existingCustomer.UpdatedBy = updateCustomerViewModel.UpdatedBy;
                     existingCustomer.IsActive = updateCustomerViewModel.IsActive;
@@ -148,7 +147,6 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     var governate = worksheet.Cells[row, 3].Text;
                     var city = worksheet.Cells[row, 4].Text;
                     var phoneNumber = worksheet.Cells[row, 5].Text;
-                    var technicianId = worksheet.Cells[row, 6].Text;
 
                     if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(phoneNumber))
                     {
@@ -159,7 +157,6 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                             Governate = governate,
                             City = city,
                             PhoneNumber = phoneNumber,
-                            TechnicianId = string.IsNullOrWhiteSpace(technicianId) ? null : int.Parse(technicianId),
                             IsActive = true,
                             CreatedAt = DateTime.Now,                        
                         });
