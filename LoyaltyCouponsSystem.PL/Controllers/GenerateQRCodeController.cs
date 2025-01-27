@@ -206,7 +206,8 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 var SerialNumber = serialNumber.GetSerialNumber(detailsVM.SerialNumber, detailsVM.TypeOfCoupon,0);
                 var SerialNumberAsLong=long.Parse(SerialNumber);
                 var CreatedBy = currentUser?.UserName;
-                var TypeOfCoupone = detailsVM.TypeOfCoupon;
+                ServiseToMangeType type = new ServiseToMangeType();
+                var TypeOfCouponeee = type.TypeOfCoupoun(detailsVM.TypeOfCoupon);
                 var Value = detailsVM.Value;
                 var GovernorateId = detailsVM.GovernorateId;
                 var AreaId = detailsVM.AreaId;
@@ -217,7 +218,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                        var couponDetails = new Coupon
                        {
 
-                           TypeOfCoupone = TypeOfCoupone,
+                           TypeOfCoupone = TypeOfCouponeee,
                            Value = Value,
                            GovernorateId = GovernorateId,
                            AreaId = AreaId,
@@ -239,7 +240,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 ToSerialNumber=serialNumber.GetSerialNumber(detailsVM.SerialNumber, detailsVM.TypeOfCoupon, qrCodesList.Count),
                 GeneratedBy= currentUser?.UserName,
                 Value=detailsVM.Value,
-                TypeOfCoupone= detailsVM.TypeOfCoupon,
+                TypeOfCoupone= TypeOfCouponeee,
                 GovernorateID = detailsVM.GovernorateId,
                 AreaId = detailsVM.AreaId,
                 CreationDateTime=DateTime.Now

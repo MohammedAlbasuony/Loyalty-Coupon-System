@@ -147,6 +147,8 @@
                                     <form asp-action="GetAllCoupons" method="get" style="display:inline;">
                                         <input type="hidden" name="fromSequence" value="@item.FromSerialNumber" />
                                         <input type="hidden" name="toSequence" value="@item.ToSerialNumber" />
+                                        <input type="hidden" name="typeOfCoupon" value="@item.TypeOfCoupone" />
+
                                         <button type="submit" class="btn btn-primary">Details</button>
                                     </form>
                                 </td>
