@@ -244,11 +244,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 TypeOfCoupone= TypeOfCouponeee,
                 GovernorateID = detailsVM.GovernorateId,
                 AreaId = detailsVM.AreaId,
-                CreationDateTime=DateTime.Now
+                CreationDateTime = DateTime.UtcNow
 
 
 
-               };
+            };
                 await _context.qRCodeTransactionGenerateds.AddAsync(qRCodeTransactionGenerated);
                 await _context.SaveChangesAsync();
 

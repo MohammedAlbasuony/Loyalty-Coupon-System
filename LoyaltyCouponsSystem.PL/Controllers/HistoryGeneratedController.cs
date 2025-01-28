@@ -40,7 +40,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var query = _context.qRCodeTransactionGenerateds
                     .Include(c => c.Governorates) // ربط المحافظات
                     .Include(c => c.Areas)        // ربط المناطق
-                    .OrderBy(c => c.CreationDateTime) // ترتيب حسب Serial Number
+                    .OrderByDescending(c => c.CreationDateTime) // ترتيب حسب Serial Number
                     .AsQueryable();
 
             if (!string.IsNullOrEmpty(fromSequence) && !string.IsNullOrEmpty(toSequence))
@@ -80,8 +80,9 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     GeneratedBy = c.GeneratedBy
                     ,NumberOfCoupones=c.NumberOfCoupones
                 })
-                .OrderByDescending(c => c.CreationDateTime)
-                .ToList();
+                
+                .ToList().OrderByDescending(c=>c.CreationDateTime);
+            
 
             // تمرير بيانات الصفحة
             ViewBag.CurrentPage = page;
