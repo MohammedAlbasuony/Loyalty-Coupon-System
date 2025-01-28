@@ -112,15 +112,25 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             foreach (var transaction in transactions)
             {
+                var couponIdentifier = GetCouponIdentifier(transaction.SelectedCouponType);
+
+                if (!transaction.SequenceStart.StartsWith(couponIdentifier) || !transaction.SequenceEnd.StartsWith(couponIdentifier))
+                {
+                    throw new ArgumentException($"Start and End Sequences must start with '{couponIdentifier}' for the selected coupon type.");
+                }
+
                 if (await IsExchangePermissionDuplicateAsync(transaction.ExchangePermission))
                 {
                     throw new InvalidOperationException($"Exchange Permission Number {transaction.ExchangePermission} is already used.");
                 }
 
-                if (transaction.StartSequenceNumber > transaction.EndSequenceNumber)
-                    throw new ArgumentException("Start sequence number cannot be greater than end sequence number.");
+                long startSeq = long.Parse(transaction.SequenceStart);
+                long endSeq = long.Parse(transaction.SequenceEnd);
 
-                for (long seqNum = transaction.StartSequenceNumber; seqNum <= transaction.EndSequenceNumber; seqNum++)
+                if (startSeq > endSeq)
+                    throw new ArgumentException("Start sequence cannot be greater than end sequence.");
+
+                for (long seqNum = startSeq; seqNum <= endSeq; seqNum++)
                 {
                     var exists = await _repository.TransactionExistsAsync(exchangePermissionNum, seqNum);
                     if (exists)
@@ -138,8 +148,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         SequenceNumber = seqNum,
                         ExchangePermission = exchangePermissionNum,
                         CreatedBy = transaction.CreatedBy,
-                        SequenceStart = transaction.StartSequenceNumber.ToString(),
-                        SequenceEnd = transaction.EndSequenceNumber.ToString(),
+                        SequenceStart = transaction.SequenceStart,
+                        SequenceEnd = transaction.SequenceEnd,
                     };
 
                     await _repository.AddTransactionAsync(newTransaction);
@@ -148,6 +158,21 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             await _repository.SaveChangesAsync();
         }
+
+        private string GetCouponIdentifier(string couponType)
+        {
+            return couponType switch
+            {
+                "راك ثيرم" => "1",
+                "صرف جي تكس" => "2",
+                "اقطار كبيرة وهودذا" => "3",
+                "كعب راك ثيرم" => "4",
+                "كعب صرف جي تكس" => "5",
+                "كعب اقطار كبيرة وهودذا" => "6",
+                _ => throw new ArgumentException("Invalid coupon type"),
+            };
+        }
+
 
         public async Task<bool> IsExchangePermissionDuplicateAsync(string exchangePermission)
         {

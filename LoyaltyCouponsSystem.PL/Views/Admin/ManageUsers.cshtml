@@ -137,6 +137,18 @@
                                 </form>
                             </td>
                             <td>
+                                @if (user.IsActive)
+                                {
+                                    <button type="button" class="btn btn-info btn-sm shadow set-permission-btn" data-userid="@user.Id">
+                                        Set Permissions
+                                    </button>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not Available</span>
+                                }
+                            </td>
+                            <td>
                                 <form asp-action="ConfirmAccount" asp-controller="Admin" method="post" class="action-form">
                                     <input type="hidden" name="userId" value="@user.Id" />
                                     <button type="button" class="btn btn-warning btn-sm shadow confirm-btn" onclick="confirmAccount('@user.UserName', this.form)">

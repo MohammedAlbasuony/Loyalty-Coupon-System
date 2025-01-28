@@ -88,12 +88,12 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="StartSequenceNumber" class="form-label"><b>Start Sequence Number</b></label>
-                    <input type="number" name="Transactions[0].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
+                    <label for="SequenceStart" class="form-label"><b>Start Sequence</b></label>
+                    <input type="text" name="Transactions[0].SequenceStart" class="form-control sequence-start" placeholder="Enter start sequence" required />
                 </div>
                 <div class="col-md-3">
-                    <label for="EndSequenceNumber" class="form-label"><b>End Sequence Number</b></label>
-                    <input type="number" name="Transactions[0].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
+                    <label for="SequenceEnd" class="form-label"><b>End Sequence</b></label>
+                    <input type="text" name="Transactions[0].SequenceEnd" class="form-control sequence-end" placeholder="Enter end sequence" required />
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
                     <button type="button" class="btn btn-danger removeFieldsButton">Remove</button>
@@ -122,14 +122,68 @@
 
 @section Scripts {
     <script>
+                // Set dynamically the first digit of SequenceStart and validate both fields based on CouponType
+                        document.addEventListener("DOMContentLoaded", function () {
+            // Map coupon types to their respective prefixes
+            const couponIdentifier = {
+                "راك ثيرم": "1",
+                "صرف جي تكس": "2",
+                "اقطار كبيرة وهودذا": "3",
+                "كعب راك ثيرم": "4",
+                "كعب صرف جي تكس": "5",
+                "كعب اقطار كبيرة وهودذا": "6"
+            };
+
+            // Update the first digit of SequenceStart and SequenceEnd based on CouponType
+            document.querySelectorAll('[name$="SelectedCouponType"]').forEach(function (couponTypeDropdown) {
+                couponTypeDropdown.addEventListener("change", function () {
+                    const couponType = this.value;
+                    const fieldGroup = this.closest(".couponFields");
+                    const sequenceStartField = fieldGroup.querySelector(".sequence-start");
+                    const sequenceEndField = fieldGroup.querySelector(".sequence-end");
+
+                    if (couponIdentifier[couponType]) {
+                        // Set the prefix for SequenceStart and SequenceEnd
+                        sequenceStartField.value = couponIdentifier[couponType];
+                        sequenceStartField.dataset.prefix = couponIdentifier[couponType];
+                        sequenceEndField.value = couponIdentifier[couponType];
+                        sequenceEndField.dataset.prefix = couponIdentifier[couponType];
+
+                        // Enable user input after the fixed digit
+                        sequenceStartField.setAttribute("maxlength", 10); // Adjust max length as needed
+                        sequenceStartField.addEventListener("input", function () {
+                            if (!this.value.startsWith(couponIdentifier[couponType])) {
+                                this.value = couponIdentifier[couponType];
+                            }
+                        });
+
+                        sequenceEndField.setAttribute("maxlength", 10);
+                        sequenceEndField.addEventListener("input", function () {
+                            if (!this.value.startsWith(couponIdentifier[couponType])) {
+                                this.value = couponIdentifier[couponType];
+                            }
+                        });
+                    } else {
+                        // Clear fields if no coupon type selected
+                        sequenceStartField.value = "";
+                        sequenceEndField.value = "";
+                        delete sequenceStartField.dataset.prefix;
+                        delete sequenceEndField.dataset.prefix;
+                    }
+                });
+            });
+        });
+
+
+
         //Validate on start and end of the sequence number is unique
                 document.getElementById("assignForm").addEventListener("submit", async function (event) {
             const sequenceFields = document.querySelectorAll(".couponFields"); // Select all sequence field groups
             let isValid = true;
 
             for (const field of sequenceFields) {
-                const startInput = field.querySelector('[name$="StartSequenceNumber"]'); // Find the Start Sequence input
-                const endInput = field.querySelector('[name$="EndSequenceNumber"]'); // Find the End Sequence input
+                const startInput = field.querySelector('[name$="SequenceStart"]'); // Find the Start Sequence input
+                const endInput = field.querySelector('[name$="SequenceEnd"]'); // Find the End Sequence input
                 const startValue = parseInt(startInput.value, 10); // Parse Start Sequence value
                 const endValue = parseInt(endInput.value, 10); // Parse End Sequence value
 
@@ -229,69 +283,158 @@
 
 
 
-        let index = 1; // Initialize index for dynamic rows
 
         // Add new row
-        document.getElementById("addFieldsButton").addEventListener("click", function () {
-            const container = document.getElementById("couponFieldsContainer");
-            const newFields = document.createElement("div");
-            newFields.classList.add("row", "g-3", "align-items-center", "couponFields", "mt-2");
-            newFields.innerHTML = `
-                <div class="col-md-3">
-                    <label for="CouponSort" class="form-label fw-bold">Coupon Sort</label>
-                    <select name="Transactions[${index}].SelectedCouponSort" class="form-select" required>
-                        <option value="">Select Coupon Sort</option>
-        @foreach (var sort in Model.CouponSorts)
-        {
-                                <option value="@sort.Value">@sort.Text</option>
-        }
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label for="CouponType" class="form-label fw-bold">Coupon Type</label>
-                    <select name="Transactions[${index}].SelectedCouponType" class="form-select" required>
-                        <option value="">Select Coupon Type</option>
-        @foreach (var type in Model.CouponTypes)
-        {
-                                <option value="@type.Value">@type.Text</option>
-        }
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label for="StartSequenceNumber" class="form-label fw-bold">Start Sequence Number</label>
-                    <input type="number" name="Transactions[${index}].StartSequenceNumber" class="form-control" placeholder="Enter start sequence number" required />
-                </div>
-                <div class="col-md-3">
-                    <label for="EndSequenceNumber" class="form-label fw-bold">End Sequence Number</label>
-                    <input type="number" name="Transactions[${index}].EndSequenceNumber" class="form-control" placeholder="Enter end sequence number" required />
-                </div>
-                <div class="col-md-1 d-flex align-items-end">
-                    <button type="button" class="btn btn-danger removeFieldsButton">Remove</button>
-                </div>
-            `;
-            container.appendChild(newFields);
+                        document.addEventListener("DOMContentLoaded", function () {
+            const couponIdentifier = {
+                "راك ثيرم": "1",
+                "صرف جي تكس": "2",
+                "اقطار كبيرة وهودذا": "3",
+                "كعب راك ثيرم": "4",
+                "كعب صرف جي تكس": "5",
+                "كعب اقطار كبيرة وهودذا": "6"
+            };
 
-            index++;
-        });
+            // Initialize dynamic row index
+            let index = 1;
 
-        // Remove row
-        document.addEventListener("click", function (event) {
-            if (event.target.classList.contains("removeFieldsButton")) {
-                const fieldGroup = event.target.closest(".couponFields");
-                fieldGroup.remove();
-            }
-        });
-
-        // Hide "Remove" button for the first row initially
-        document.addEventListener("DOMContentLoaded", function () {
+            // Hide "Remove" button for the first row initially
             const firstFieldGroup = document.querySelector(".couponFields");
             if (firstFieldGroup) {
                 const firstRemoveButton = firstFieldGroup.querySelector(".removeFieldsButton");
                 if (firstRemoveButton) {
-                    firstRemoveButton.style.display = "none"; // Hide remove button for the first row
+                    firstRemoveButton.style.display = "none";
                 }
             }
+
+            // Add new row
+            document.getElementById("addFieldsButton").addEventListener("click", function () {
+                const container = document.getElementById("couponFieldsContainer");
+                const newFields = document.createElement("div");
+                newFields.classList.add("row", "g-3", "align-items-center", "couponFields", "mt-2");
+
+                newFields.innerHTML = `
+                    <div class="col-md-3">
+                        <label for="CouponSort" class="form-label fw-bold">Coupon Sort</label>
+                        <select name="Transactions[${index}].SelectedCouponSort" class="form-select" required>
+                            <option value="">Select Coupon Sort</option>
+        @foreach (var sort in Model.CouponSorts)
+        {
+                                <option value="@sort.Value">@sort.Text</option>
+        }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="CouponType" class="form-label fw-bold">Coupon Type</label>
+                        <select name="Transactions[${index}].SelectedCouponType" class="form-select coupon-type" required>
+                            <option value="">Select Coupon Type</option>
+        @foreach (var type in Model.CouponTypes)
+        {
+                                <option value="@type.Value">@type.Text</option>
+        }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="SequenceStart" class="form-label fw-bold">Start Sequence</label>
+                        <input type="text" name="Transactions[${index}].SequenceStart" class="form-control sequence-start" placeholder="Enter start sequence" required />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="SequenceEnd" class="form-label fw-bold">End Sequence</label>
+                        <input type="text" name="Transactions[${index}].SequenceEnd" class="form-control sequence-end" placeholder="Enter end sequence" required />
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger removeFieldsButton">Remove</button>
+                    </div>
+                `;
+
+                container.appendChild(newFields);
+
+                // Attach event listener to the newly added CouponType dropdown
+                const couponTypeDropdown = newFields.querySelector(".coupon-type");
+                const sequenceStartField = newFields.querySelector(".sequence-start");
+                const sequenceEndField = newFields.querySelector(".sequence-end");
+
+                couponTypeDropdown.addEventListener("change", function () {
+                    const couponType = this.value;
+                    const prefix = couponIdentifier[couponType];
+
+                    if (prefix) {
+                        sequenceStartField.value = prefix;
+                        sequenceStartField.dataset.prefix = prefix;
+                        sequenceEndField.value = prefix;
+                        sequenceEndField.dataset.prefix = prefix;
+
+                        sequenceStartField.setAttribute("maxlength", 10);
+                        sequenceStartField.addEventListener("input", function () {
+                            if (!this.value.startsWith(prefix)) {
+                                this.value = prefix;
+                            }
+                        });
+
+                        sequenceEndField.setAttribute("maxlength", 10);
+                        sequenceEndField.addEventListener("input", function () {
+                            if (!this.value.startsWith(prefix)) {
+                                this.value = prefix;
+                            }
+                        });
+                    } else {
+                        sequenceStartField.value = "";
+                        sequenceEndField.value = "";
+                        delete sequenceStartField.dataset.prefix;
+                        delete sequenceEndField.dataset.prefix;
+                    }
+                });
+
+                index++; // Increment index for next dynamic row
+            });
+
+            // Remove row
+            document.addEventListener("click", function (event) {
+                if (event.target.classList.contains("removeFieldsButton")) {
+                    const fieldGroup = event.target.closest(".couponFields");
+                    fieldGroup.remove();
+
+                    // Ensure at least one row remains
+                    const rows = document.querySelectorAll(".couponFields");
+                    if (rows.length === 1) {
+                        const firstRemoveButton = rows[0].querySelector(".removeFieldsButton");
+                        if (firstRemoveButton) {
+                            firstRemoveButton.style.display = "none";
+                        }
+                    }
+                }
+            });
+
+            // Set initial validation for existing coupon type dropdowns
+            document.querySelectorAll(".coupon-type").forEach(function (dropdown) {
+                dropdown.addEventListener("change", function () {
+                    const fieldGroup = this.closest(".couponFields");
+                    const sequenceStartField = fieldGroup.querySelector(".sequence-start");
+                    const sequenceEndField = fieldGroup.querySelector(".sequence-end");
+                    const couponType = this.value;
+                    const prefix = couponIdentifier[couponType];
+
+                    if (prefix) {
+                        sequenceStartField.value = prefix;
+                        sequenceEndField.value = prefix;
+                        sequenceStartField.setAttribute("maxlength", 10);
+                        sequenceStartField.addEventListener("input", function () {
+                            if (!this.value.startsWith(prefix)) {
+                                this.value = prefix;
+                            }
+                        });
+                        sequenceEndField.setAttribute("maxlength", 10);
+                        sequenceEndField.addEventListener("input", function () {
+                            if (!this.value.startsWith(prefix)) {
+                                this.value = prefix;
+                            }
+                        });
+                    }
+                });
+            });
         });
+
+
 
 
 
