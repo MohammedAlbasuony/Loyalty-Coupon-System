@@ -28,22 +28,19 @@ public class AssignmentViewModel
     [Required(ErrorMessage = "City is required.")]
     public string SelectedCity { get; set; }
 
-    [Required(ErrorMessage = "Start sequence number is required.")]
-    [Range(1, int.MaxValue, ErrorMessage = "Start sequence number must be a positive number.")]
-    [ValidStartSequence]  // Custom validation for start sequence
-    public int StartSequenceNumber { get; set; }
+    [Required(ErrorMessage = "SequenceStart is required.")]
+    [RegularExpression(@"^[1-6]\d*$", ErrorMessage = "SequenceStart must start with a valid prefix (1-6).")]
+    public string SequenceStart { get; set; }  // Add this property
 
-    [Required(ErrorMessage = "End sequence number is required.")]
-    [Range(1, int.MaxValue, ErrorMessage = "End sequence number must be a positive number.")]
-    [ValidEndSequence]  // Custom validation for end sequence
-    public int EndSequenceNumber { get; set; }
-    
+    [Required(ErrorMessage = "SequenceEnd is required.")]
+    [RegularExpression(@"^[1-6]\d*$", ErrorMessage = "SequenceEnd must start with a valid prefix (1-6).")]
+    public string SequenceEnd { get; set; }  // Add this property
+
     [Required(ErrorMessage = "Exchange permission is required.")]
     [StringLength(50, ErrorMessage = "Exchange permission cannot exceed 50 characters.")]
-    [UniqueExchangePermission(ErrorMessage = "Exchange permission must be unique.")]
     public string ExchangePermission { get; set; }
+
     public string CustomerDetails { get; set; }
     public string TechnicianDetails { get; set; }
     public string? CreatedBy { get; set; }
-    public List<AssignmentViewModel> Transactions { get; set; }
 }
