@@ -33,17 +33,42 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
             return await _context.Technicians
                 .FirstOrDefaultAsync(t => t.Code == technicianCodeOrName || t.Name == technicianCodeOrName);
         }
+        public async Task<Distributor> GetDistributorByCodeOrNameAsync(string technicianCodeOrName)
+        {
+            return await _context.Distributors
+                .FirstOrDefaultAsync(at => at.Code == technicianCodeOrName || at.Name == technicianCodeOrName);
+        }
 
         public async Task<List<Customer>> GetAllCustomersAsync()
         {
-            return await _context.Customers.ToListAsync();
+            return await _context.Customers
+                         .Where(c => c.IsActive) 
+                         .GroupBy(c => new {
+                             Name = c.Name.Trim().ToLower(),
+                             Code = c.Code.Trim().ToLower() 
+                         })
+                         .Select(g => g.First()) 
+                         .ToListAsync();
         }
+
+        public async Task<List<Distributor>> GetAllDistributorsAsync()
+        {
+            return await _context.Distributors
+                         .Where(d => d.IsActive) 
+                         .GroupBy(d => new {
+                             Name = d.Name.Trim().ToLower(),
+                             Code = d.Code.Trim().ToLower() 
+                         })
+                         .Select(g => g.First()) 
+                         .ToListAsync();
+        }
+
+
 
         public async Task<List<Technician>> GetAllTechniciansAsync()
         {
             return await _context.Technicians.ToListAsync();
         }
-
         public async Task AddTransactionAsync(Transaction transaction)
         {
             var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);  // Access logged-in user

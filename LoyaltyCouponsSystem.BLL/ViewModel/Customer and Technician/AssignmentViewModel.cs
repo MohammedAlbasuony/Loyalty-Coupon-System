@@ -4,7 +4,8 @@ using System.ComponentModel.DataAnnotations;
 public class AssignmentViewModel
 {
     public List<SelectListItem> Customers { get; set; } = new List<SelectListItem>();
-    public List<SelectListItem> Technicians { get; set; } = new List<SelectListItem>();
+    
+    public List<SelectListItem> Distributors { get; set; } = new List<SelectListItem>();
     public List<SelectListItem> Governates { get; set; } = new List<SelectListItem>();
     public List<SelectListItem> Cities { get; set; } = new List<SelectListItem>();
     public List<SelectListItem> CouponSorts { get; set; } = new List<SelectListItem>();
@@ -13,8 +14,9 @@ public class AssignmentViewModel
     [Required(ErrorMessage = "Customer is required.")]
     public string SelectedCustomerCode { get; set; }
 
-    [Required(ErrorMessage = "Technician is required.")]
-    public string SelectedTechnicianCode { get; set; }
+    
+    [Required(ErrorMessage = "Distributor is required.")]
+    public string SelectedDistributorCode { get; set; }
 
     [Required(ErrorMessage = "Coupon sort is required.")]
     public string SelectedCouponSort { get; set; }

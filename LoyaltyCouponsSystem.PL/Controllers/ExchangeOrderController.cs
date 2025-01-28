@@ -27,6 +27,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var model = await _service.GetTechnicianDetailsAsync(technicianCodeOrName);
             return PartialView("_TechnicianDetails", model);
         }
+        public async Task<IActionResult> GetDistributorDetails(string technicianCodeOrName)
+        {
+            var model = await _service.GetDistributorDetailsAsync(technicianCodeOrName);
+            return PartialView("_DistributorDetails", model);
+        }
 
         [HttpGet]
         public async Task<IActionResult> AssignQRCode()
@@ -36,7 +41,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AssignQRCode(string selectedCustomerCode, string selectedTechnicianCode, string selectedGovernate, string selectedCity, List<AssignmentViewModel> transactions)
+        public async Task<IActionResult> AssignQRCode(string selectedCustomerCode, string selectedDistributorCode, string selectedGovernate, string selectedCity, List<AssignmentViewModel> transactions)
         {
             foreach (var transaction in transactions)
             {
@@ -67,7 +72,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             }
 
 
-            await _service.AssignQRCodeAsync(selectedCustomerCode, selectedTechnicianCode, selectedGovernate, selectedCity, transactions);
+            await _service.AssignQRCodeAsync(selectedCustomerCode, selectedDistributorCode, selectedGovernate, selectedCity, transactions);
             TempData["SuccessMessage"] = "All assignments saved successfully.";
 
             //if (!ModelState.IsValid)
