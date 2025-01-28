@@ -16,7 +16,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         {
             var transactions = await _context.Transactions
                 .Include(t => t.Customer)
-                .Include(t => t.Technician)
+                .Include(t => t.Distributor)
                 .ToListAsync();
 
             var distinctTransactions = transactions
@@ -25,7 +25,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     a.ExchangePermission,
                     a.SequenceStart, // These are strings
                     a.SequenceEnd,   // These are strings
-                    a.TechnicianID,
+                    a.DistributorID,
                     a.CustomerID,
                     a.CouponSort,
                     a.CouponType

@@ -147,7 +147,7 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.HasKey(e => e.TransactionID);
 
                 // Ensure unique sequences within the same ExchangePermission
-                entity.HasIndex(t => new { t.ExchangePermission, t.SequenceStart, t.SequenceEnd }).IsUnique();
+                // entity.HasIndex(t => new { t.ExchangePermission, t.SequenceStart, t.SequenceEnd }).IsUnique();
 
                 entity.Property(e => e.TransactionType)
                     .HasMaxLength(50);
