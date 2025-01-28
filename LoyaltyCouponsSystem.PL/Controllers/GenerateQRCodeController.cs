@@ -121,7 +121,8 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 byte[] excelData = await generateExcelWithCoupons.GenerateExcelWithCouponsAsync(
                     coupons);
 
-                return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Coupons.xlsx");
+                return  File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Coupons.xlsx");
+
             }
             catch (Exception ex)
             {

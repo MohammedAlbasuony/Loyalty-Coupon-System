@@ -80,6 +80,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     GeneratedBy = c.GeneratedBy
                     ,NumberOfCoupones=c.NumberOfCoupones
                 })
+                .OrderByDescending(c => c.CreationDateTime)
                 .ToList();
 
             // تمرير بيانات الصفحة
