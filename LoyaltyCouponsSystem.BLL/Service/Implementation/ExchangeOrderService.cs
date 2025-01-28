@@ -1,5 +1,7 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
+using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
@@ -46,26 +48,58 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 Code = technician.Code,
                 Name = technician.Name
             };
+        }public async Task<DistributorViewModel> GetDistributorDetailsAsync(string technicianCodeOrName)
+        {
+            var technician = await _repository.GetTechnicianByCodeOrNameAsync(technicianCodeOrName);
+
+            if (technician == null)
+                return null;
+
+            return new DistributorViewModel
+            {
+                Code = technician.Code,
+                Name = technician.Name
+            };
         }
 
         public async Task<AssignmentViewModel> GetAssignmentDetailsAsync()
         {
             var customers = await _repository.GetAllCustomersAsync();
             var technicians = await _repository.GetAllTechniciansAsync();
+            var distributor = await _repository.GetAllDistributorsAsync();
+
 
             return new AssignmentViewModel
             {
-                Customers = customers.Select(c => new SelectListItem
+                Customers = customers
+                .Where(c => c.IsActive) 
+                .GroupBy(c => new {
+                    Name = c.Name.Trim().ToLower(), 
+                    Code = c.Code.Trim().ToLower()  
+                })
+                .Select(g => g.First()) 
+                .Select(c => new SelectListItem
                 {
                     Value = c.Code,
                     Text = $"{c.Name} ({c.Code})"
-                }).ToList(),
+                })
+                .ToList(),
 
-                Technicians = technicians.Select(t => new SelectListItem
+                            Distributors = distributor
+                .Where(d => d.IsActive) 
+                .GroupBy(d => new {
+                    Name = d.Name.Trim().ToLower(), 
+                    Code = d.Code.Trim().ToLower()  
+                })
+                .Select(g => g.First()) 
+                .Select(d => new SelectListItem
                 {
-                    Value = t.Code,
-                    Text = $"{t.Name} ({t.Code})"
-                }).ToList(),
+                    Value = d.Code,
+                    Text = $"{d.Name} ({d.Code})"
+                })
+                .ToList(),
+
+
 
                 Governates = new List<SelectListItem>
                 {
@@ -94,18 +128,18 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             };
         }
 
-        public async Task AssignQRCodeAsync(string selectedCustomerCode, string selectedTechnicianCode, string selectedGovernate, string selectedCity, List<AssignmentViewModel> transactions)
+        public async Task AssignQRCodeAsync(string selectedCustomerCode, string selectedDistributorCode, string selectedGovernate, string selectedCity, List<AssignmentViewModel> transactions)
         {
             if (transactions == null || !transactions.Any())
                 throw new ArgumentException("Transactions cannot be null or empty.");
 
             var customer = await _repository.GetCustomerByCodeOrNameAsync(selectedCustomerCode);
-            var technician = await _repository.GetTechnicianByCodeOrNameAsync(selectedTechnicianCode);
+            var distributor = await _repository.GetDistributorByCodeOrNameAsync(selectedDistributorCode);
 
             if (customer == null)
                 throw new ArgumentException("Invalid customer code.");
 
-            if (technician == null)
+            if (distributor == null)
                 throw new ArgumentException("Invalid technician code.");
 
             string exchangePermissionNum = transactions[0].ExchangePermission;
@@ -139,7 +173,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     var newTransaction = new Transaction
                     {
                         CustomerID = customer.CustomerID,
-                        TechnicianID = technician.TechnicianID,
+                        DistributorID = distributor.DistributorID,
                         Governate = selectedGovernate,
                         City = selectedCity,
                         Timestamp = DateTime.Now,

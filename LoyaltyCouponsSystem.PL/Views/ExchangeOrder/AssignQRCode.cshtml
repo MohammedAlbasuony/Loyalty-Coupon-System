@@ -18,9 +18,11 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="CustomerCodeOrName" class="form-label"><b>Select Customer</b></label>
-                <select asp-for="SelectedCustomerCode" asp-items="Model.Customers" class="form-control select2" required>
+                <select asp-for="SelectedCustomerCode" class="form-control select2" required>
                     <option value="" disabled selected>Select Customer</option>
-                    @foreach (var customer in Model.Customers)
+                    @foreach (var customer in Model.Customers
+                    .GroupBy(c => new { c.Text, c.Value }) // Group by Text and Value
+                    .Select(g => g.First())) // Take the first record per group
                     {
                         <option value="@customer.Value">@customer.Text</option>
                     }
@@ -28,15 +30,18 @@
             </div>
 
             <div class="col-md-6">
-                <label for="TechnicianCodeOrName" class="form-label"><b>Select Technician</b></label>
-                <select asp-for="SelectedTechnicianCode" asp-items="Model.Technicians" class="form-control select2" required>
-                    <option value="" disabled selected>Select Technician</option>
-                    @foreach (var technician in Model.Technicians)
+                <label for="DistributorCodeOrName" class="form-label"><b>Select Distributor</b></label>
+                <select asp-for="SelectedDistributorCode" class="form-control select2" required>
+                    <option value="" disabled selected>Select Distributor</option>
+                    @foreach (var distributor in Model.Distributors
+                    .GroupBy(d => new { d.Text, d.Value }) // Group by Text and Value
+                    .Select(g => g.First())) // Take the first record per group
                     {
-                        <option value="@technician.Value">@technician.Text</option>
+                        <option value="@distributor.Value">@distributor.Text</option>
                     }
                 </select>
             </div>
+
         </div>
         <div class="row g-3 mt-3">
             <div class="col-md-6">

@@ -16,6 +16,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public string Code { get; set; }
         public bool IsDeleted { get; set; }
         public ICollection<DistributorCustomer> DistributorCustomers { get; set; }
+        public ICollection<Transaction> Transactions { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string? UpdatedBy { get; set; }

@@ -158,6 +158,9 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.HasOne(e => e.Customer)
                     .WithMany(c => c.Transactions)
                     .HasForeignKey(e => e.CustomerID);
+                entity.HasOne(e => e.Distributor)
+                    .WithMany(c => c.Transactions)
+                    .HasForeignKey(e => e.DistributorID);
             });
 
 
