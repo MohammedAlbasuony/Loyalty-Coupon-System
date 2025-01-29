@@ -28,8 +28,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public ICollection<DistributorCustomer> DistributorCustomers { get; set; }
-        public int? TechnicianId { get; set; }
-        public Technician Technician { get; set; }
+        public ICollection<TechnicianCustomer> TechnicianCustomers { get; set; }
         public bool IsActive { get; set; } = true;
     }
 }

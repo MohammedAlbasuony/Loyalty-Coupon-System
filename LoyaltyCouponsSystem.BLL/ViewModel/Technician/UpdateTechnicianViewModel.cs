@@ -34,7 +34,7 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Technician
         [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits.")]
         [Display(Name = "Tertiary Phone Number")]
         public int? PhoneNumber3 { get; set; }
-        public List<string>? SelectedCustomerCodes { get; set; }
+        public List<int>? SelectedCustomerIds { get; set; }
         public List<string>? SelectedCustomerNames { get; set; }
         public List<SelectListItem>? Customers { get; set; } = new List<SelectListItem>();
         public List<SelectListItem>? Users { get; set; } = new List<SelectListItem>();

@@ -7,6 +7,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
 using LoyaltyCouponsSystem.DAL.Repo.Implementation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -16,20 +17,23 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 {
     public class TechnicianService : ITechnicianService
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ITechnicianRepo _technicianRepo;
         private readonly ICustomerRepo _customerRepo;
         private readonly UserManager<ApplicationUser> _userManager;
-        public TechnicianService(ITechnicianRepo technicianRepo, ICustomerRepo customerRepo, UserManager<ApplicationUser> userManager)
+        public TechnicianService(ITechnicianRepo technicianRepo, ICustomerRepo customerRepo, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
             _technicianRepo = technicianRepo;
             _customerRepo = customerRepo;
             _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<bool> AddAsync(TechnicianViewModel technicianViewModel)
         {
-            if (technicianViewModel != null)
+            try
             {
+                // Map TechnicianViewModel to Technician entity
                 var technician = new Technician
                 {
                     Code = technicianViewModel.Code,
@@ -41,73 +45,20 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     PhoneNumber3 = technicianViewModel.PhoneNumber3,
                     Governate = technicianViewModel.SelectedGovernate,
                     City = technicianViewModel.SelectedCity,
-                    CreatedAt = technicianViewModel?.CreatedAt,
-                    CreatedBy = technicianViewModel?.CreatedBy,
-                    IsActive = technicianViewModel.IsActive,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = (await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User))?.UserName,
+                    IsActive = technicianViewModel.IsActive
                 };
 
-                // Fetch customer IDs by selected codes
-                var customerIds = await _customerRepo.GetCustomerIdsByCodesAsync(technicianViewModel.SelectedCustomerCodes);
-                var customers = await _customerRepo.GetCustomersByIdsAsync(customerIds);
-
-                if (customerIds == null || !customerIds.Any())
-                {
-                    // Handle the case when no customer IDs are found
-                    return false;
-                }
-
-                if (customers == null || !customers.Any())
-                {
-                    // Handle the case when no customers are found
-                    return false;
-                }
-
-                // Manually add each customer to the technician's Customers collection
-                foreach (var customer in customers)
-                {
-                    if (customer != null)
-                    {
-                        technician.Customers.Add(customer);
-                    }
-                }
-
-                var allUsers = await _userManager.Users.Where(u => technicianViewModel.SelectedUserCodes.Contains(u.Id))
-                    .ToListAsync();
-
-                // Filter the users asynchronously based on their role
-                var users = new List<ApplicationUser>();
-                foreach (var user in allUsers)
-                {
-                    if (await _userManager.IsInRoleAsync(user, "Representative"))
-                    {
-                        users.Add(user);
-                    }
-                }
-                
-
-                if (users == null || !users.Any())
-                {
-                    // Handle the case when no users are found
-                    return false;
-                }
-
-                // Manually add each user to the technician's Users collection
-                foreach (var user in users)
-                {
-                    if (user != null) // Ensure the user is not null before adding
-                    {
-                        technician.Users.Add(user);
-                    }
-                }
-
-                // Save technician to the database
-                return await _technicianRepo.AddAsync(technician);
+                // Pass customer IDs and user IDs to the repository for processing
+                return await _technicianRepo.AddAsync(technician, technicianViewModel.SelectedCustomerId, technicianViewModel.SelectedUserCodes);
             }
-
-            return false;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding technician: {ex.Message}");
+                return false;
+            }
         }
-
-
 
 
         public async Task<bool> DeleteAsync(int id)
@@ -123,10 +74,11 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         {
             var technicians = await _technicianRepo.GetAllAsync();
 
-            // Fetch all Users and Customers
+            // Get all active customers and users (you can decide to optimize this depending on your use case)
+            var customers = await _customerRepo.GetAllAsync();
             var users = await _userManager.Users.ToListAsync();
-            var customers = await _customerRepo.GetAllAsync(); // Assuming you have a method to get all customers
 
+            // Transform technicians into TechnicianViewModels
             var technicianViewModels = technicians.Select(technician => new TechnicianViewModel
             {
                 TechnicianID = technician.TechnicianID,
@@ -144,27 +96,14 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 UpdatedBy = technician.UpdatedBy,
                 UpdatedAt = technician.UpdatedAt,
                 IsActive = technician.IsActive,
-                SelectedCustomerNames = technician.Customers?.Select(c => c.Name).ToList(),
-                SelectedUserNames = technician.Users?.Select(u => u.UserName).ToList(),
+                // Selecting associated customer and user names
+                SelectedCustomerNames = technician.TechnicianCustomers.Select(tc => tc.Customer.Name).ToList(),
+                SelectedUserNames = technician.TechnicianUsers.Select(tu => tu.User.UserName).ToList(),
             }).ToList();
 
-            // Iterate through each Technician to assign the User and Customer names
+            // Populate dropdowns if needed (e.g., active customers, active users)
             foreach (var technicianViewModel in technicianViewModels)
             {
-                // Assuming each technician has a list of associated users
-                var associatedUsers = users.Where(u => technicianViewModel.TechnicianID == u.TechnicianId).ToList();
-                foreach (var user in associatedUsers)
-                {
-                    technicianViewModel.SelectedUserNames.Add(user.UserName); // Add UserName to the list
-                }
-
-                // Assuming each technician has associated customers via their codes
-                var associatedCustomers = customers.Where(c => technicianViewModel.TechnicianID == c.TechnicianId).ToList();
-                foreach (var customer in associatedCustomers)
-                {
-                    technicianViewModel.SelectedCustomerNames.Add(customer.Name); // Add Customer Name to the list
-                }
-
                 PopulateDropdowns(technicianViewModel);
             }
 
@@ -176,10 +115,12 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         {
             if (id != 0)
             {
+                // Fetch the technician by ID from the repository
                 var technician = await _technicianRepo.GetByIdAsync(id);
 
                 if (technician != null)
                 {
+                    // Create the UpdateTechnicianViewModel based on the technician data
                     var updateTechnicianViewModel = new UpdateTechnicianViewModel
                     {
                         TechnicianID = technician.TechnicianID,
@@ -193,8 +134,19 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         SelectedGovernate = technician.Governate,
                         SelectedCity = technician.City,
                         IsActive = technician.IsActive,
-                        Customers = await GetCustomersForDropdownAsync(),
-                        Users = await GetUsersForDropdownAsync(),
+                        // Use the repository methods to fetch customers and users for the dropdowns
+                        Customers = (await _technicianRepo.GetCustomersForDropdownAsync())
+                                    .Select(c => new SelectListItem
+                                    {
+                                        Value = c.Code,
+                                        Text = $"{c.Code} - {c.Name}"
+                                    }).ToList(),
+                        Users = (await _technicianRepo.GetUsersForDropdownAsync())
+                                .Select(u => new SelectListItem
+                                {
+                                    Value = u.Id,
+                                    Text = $"{u.UserName}"
+                                }).ToList()
                     };
 
                     return updateTechnicianViewModel;
@@ -202,6 +154,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             }
             return null;
         }
+
 
         public async Task<bool> UpdateAsync(UpdateTechnicianViewModel technicianViewModel)
         {
@@ -214,7 +167,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     return false; // Technician not found
                 }
 
-                // Update the fields
+                // Update the basic fields
                 existingTechnician.TechnicianID = technicianViewModel.TechnicianID;
                 existingTechnician.Code = technicianViewModel.Code;
                 existingTechnician.Name = technicianViewModel.Name;
@@ -228,11 +181,44 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 existingTechnician.UpdatedAt = DateTime.Now;
                 existingTechnician.UpdatedBy = technicianViewModel.UpdatedBy;
                 existingTechnician.IsActive = technicianViewModel.IsActive;
-                // Save the updated entity
-                return await _technicianRepo.UpdateAsync(existingTechnician);
+
+                // Add new customers to the technician, if not already associated
+                var customerIds = new List<int>();
+                if (technicianViewModel.SelectedCustomerIds != null)
+                {
+                    foreach (var customerId in technicianViewModel.SelectedCustomerIds)
+                    {
+                        var customer = await _customerRepo.GetByIdAsync(customerId);
+                        if (customer != null && !existingTechnician.TechnicianCustomers.Any(tc => tc.CustomerId == customerId))
+                        {
+                            existingTechnician.TechnicianCustomers.Add(new TechnicianCustomer { CustomerId = customerId });
+                        }
+                        customerIds.Add(customerId);
+                    }
+                }
+
+                // Add new users to the technician, if not already associated
+                var userIds = new List<string>();
+                if (technicianViewModel.SelectedUserCodes != null)
+                {
+                    foreach (var userId in technicianViewModel.SelectedUserCodes)
+                    {
+                        var user = await _userManager.FindByIdAsync(userId); // Use _userManager instead of _userRepo
+                        if (user != null && !existingTechnician.TechnicianUsers.Any(tu => tu.UserId == userId))
+                        {
+                            existingTechnician.TechnicianUsers.Add(new TechnicianUser { UserId = userId });
+                        }
+                        userIds.Add(userId);
+                    }
+                }
+
+                // Save the updated technician
+                return await _technicianRepo.UpdateAsync(existingTechnician, customerIds, userIds);
             }
             return false;
         }
+
+
 
 
         public async Task<List<SelectListItem>> GetCustomersForDropdownAsync()
@@ -305,13 +291,16 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             technician.IsActive = !technician.IsActive;
             technician.UpdatedAt = DateTime.Now;
 
-            return await _technicianRepo.UpdateAsync(technician);
+            // Pass empty lists for customerIds and userIds as they are not needed for this update
+            return await _technicianRepo.UpdateAsync(technician, new List<int>(), new List<string>());
         }
+
 
         public async Task<bool> ImportTechniciansFromExcelAsync(Stream stream)
         {
             try
             {
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Set the license context
                 using var package = new ExcelPackage(stream);
                 var worksheet = package.Workbook.Worksheets.FirstOrDefault();
 
@@ -358,39 +347,61 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         City = city,
                         Governate = governate,
                         IsActive = true,
-                        CreatedAt = DateTime.Now
+                        CreatedAt = DateTime.Now,
+                        TechnicianCustomers = new List<TechnicianCustomer>() // Initialize TechnicianCustomers list
                     };
 
-                    // Process customers by names
-                    if (!string.IsNullOrWhiteSpace(customerNames))
+                    // Process customers by names and link them through the relationship table
+                    var customerNamesList = string.IsNullOrWhiteSpace(customerNames) ? new List<string>() : customerNames.Split(',').Select(c => c.Trim()).ToList();
+                    var customerIds = new List<int>();
+                    var customerCodes = new List<string>();
+
+                    if (customerNamesList.Any())
                     {
-                        var customerNameList = customerNames.Split(',')
-                                                            .Select(c => c.Trim())
-                                                            .ToList();
-                        var customers = await _customerRepo.GetCustomersByNamesAsync(customerNameList); // Fetch customers by names
-                        technician.Customers = customers;
+                        // Fetch customers by names
+                        var customers = await _customerRepo.GetCustomersByNamesAsync(customerNamesList); // Fetch customers by names
+
+                        if (!customers.Any())
+                        {
+                            Console.WriteLine($"No customers found for technician {name} with names: {string.Join(", ", customerNamesList)}");
+                        }
+
+                        // Add the customers to the technician's relationship table
+                        foreach (var customer in customers)
+                        {
+                            technician.TechnicianCustomers.Add(new TechnicianCustomer { CustomerId = customer.CustomerID }); // Adding customer to the technician's relationship
+                            customerIds.Add(customer.CustomerID);
+                            customerCodes.Add(customer.Code); // Collect customer codes
+                        }
                     }
 
-                    // Process representatives
+                    // Process representatives and link them through the relationship table
+                    var userIds = new List<string>();
                     if (!string.IsNullOrWhiteSpace(usernames))
                     {
-                        var usernameList = usernames.Split(',')
-                                                    .Select(u => u.Trim())
-                                                    .ToList();
+                        var usernameList = usernames.Split(',').Select(u => u.Trim()).ToList();
                         var users = await _userManager.Users
-                                                     .Where(u => usernameList.Contains(u.UserName))
-                                                     .ToListAsync();
-                        technician.Users = users;
+                                                      .Where(u => usernameList.Contains(u.UserName))
+                                                      .ToListAsync();
+
+                        foreach (var user in users)
+                        {
+                            technician.TechnicianUsers.Add(new TechnicianUser { UserId = user.Id }); // Adding user to the technician's relationship
+                            userIds.Add(user.Id);
+                        }
                     }
 
                     // Add technician to the list
                     technicians.Add(technician);
-                }
 
-                // Save technicians to the database one by one
-                foreach (var technician in technicians)
-                {
-                    await _technicianRepo.AddAsync(technician);
+                    // Save technician to the database
+                    await _technicianRepo.AddAsync(technician, customerCodes.ToList(), userIds);
+
+                    // Debug: Log customer codes associated with the technician
+                    if (customerCodes.Any())
+                    {
+                        Console.WriteLine($"Technician {name} linked to customer codes: {string.Join(", ", customerCodes)}");
+                    }
                 }
 
                 return true;
@@ -402,6 +413,10 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 return false;
             }
         }
+
+
+
+
 
 
 
@@ -418,9 +433,9 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         }
 
 
-        public async Task<List<CustomerViewModel>> GetUnassignedActiveCustomersAsync()
+        public async Task<List<CustomerViewModel>> GetUnassignedActiveCustomersAsync(int technicianId)
         {
-            var unassignedCustomers = await _technicianRepo.GetActiveUnassignedCustomersAsync();
+            var unassignedCustomers = await _technicianRepo.GetActiveUnassignedCustomersAsync(technicianId);
 
             return unassignedCustomers
                 .Select(c => new CustomerViewModel
@@ -436,19 +451,19 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
         // Assign Representative
         public async Task AssignRepresentativeAsync(int technicianId, string userId)
         {
-            await _technicianRepo.AssignRepresentativeAsync(technicianId, userId);
+            await _technicianRepo.AssignUserAsync(technicianId, userId);
         }
 
         // Remove Representative
         public async Task RemoveRepresentativeAsync(int technicianId, string userId)
         {
-            await _technicianRepo.RemoveRepresentativeAsync(technicianId, userId);
+            await _technicianRepo.RemoveUserByNameAsync(technicianId, userId);
         }
 
-        // Get Active Unassigned Representatives
-        public async Task<List<ApplicationUser>> GetActiveUnassignedRepresentativesAsync()
+        //Get Active Unassigned Representatives
+        public async Task<List<ApplicationUser>> GetActiveUnassignedRepresentativesAsync(int technicianId)
         {
-            return await _technicianRepo.GetActiveUnassignedRepresentativesAsync();
+            return await _technicianRepo.GetActiveUnassignedRepresentativesAsync(technicianId);
         }
 
         // Get Users by Role

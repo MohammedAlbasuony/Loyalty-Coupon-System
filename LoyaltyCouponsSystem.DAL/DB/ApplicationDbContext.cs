@@ -22,6 +22,8 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public DbSet<Admin> Admins { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<Representative> Representatives { get; set; }
+        public DbSet<TechnicianUser> TechnicianUsers { get; set; }
+        public DbSet<TechnicianCustomer> TechnicianCustomers { get; set; }
 
         public DbSet<Governorate> Governorates { get; set; }
 
@@ -146,12 +148,24 @@ namespace LoyaltyCouponsSystem.DAL.DB
             modelBuilder.Entity<Transaction>(entity =>
             {
                 entity.HasKey(e => e.TransactionID);
-                entity.Property(e => e.TransactionType).HasMaxLength(50);
-                entity.Property(e => e.PurchaseAmount).HasColumnType("decimal(18,2)");
+
+                // Ensure unique sequences within the same ExchangePermission
+                // entity.HasIndex(t => new { t.ExchangePermission, t.SequenceStart, t.SequenceEnd }).IsUnique();
+
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.PurchaseAmount)
+                    .HasColumnType("decimal(18,2)");
+
                 entity.HasOne(e => e.Customer)
                     .WithMany(c => c.Transactions)
                     .HasForeignKey(e => e.CustomerID);
+                entity.HasOne(e => e.Distributor)
+                    .WithMany(c => c.Transactions)
+                    .HasForeignKey(e => e.DistributorID);
             });
+
 
 
             modelBuilder.Entity<GlobalCounter>(entity =>
@@ -173,24 +187,35 @@ namespace LoyaltyCouponsSystem.DAL.DB
                 entity.Property(e => e.NameAttribute).IsRequired().HasMaxLength(100);
             });
 
+            // Technician-Customer many-to-many
+            modelBuilder.Entity<TechnicianCustomer>()
+                .HasKey(tc => new { tc.TechnicianId, tc.CustomerId });
 
-            modelBuilder.Entity<ApplicationUser>()
-           .HasOne(u => u.Technician) 
-           .WithMany(t => t.Users) 
-           .HasForeignKey(u => u.TechnicianId) 
-           .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<TechnicianCustomer>()
+                .HasOne(tc => tc.Technician)
+                .WithMany(t => t.TechnicianCustomers)
+                .HasForeignKey(tc => tc.TechnicianId);
 
-            modelBuilder.Entity<Customer>()
-                .HasOne(c => c.Technician)
-                .WithMany(t => t.Customers)
-                .HasForeignKey(c => c.TechnicianId);
+            modelBuilder.Entity<TechnicianCustomer>()
+                .HasOne(tc => tc.Customer)
+                .WithMany(c => c.TechnicianCustomers)
+                .HasForeignKey(tc => tc.CustomerId);
+
+            // Technician-User many-to-many
+            modelBuilder.Entity<TechnicianUser>()
+                .HasKey(tu => new { tu.TechnicianId, tu.UserId });
+
+            modelBuilder.Entity<TechnicianUser>()
+                .HasOne(tu => tu.Technician)
+                .WithMany(t => t.TechnicianUsers)
+                .HasForeignKey(tu => tu.TechnicianId);
+
+            modelBuilder.Entity<TechnicianUser>()
+                .HasOne(tu => tu.User)
+                .WithMany(u => u.TechnicianUsers)
+                .HasForeignKey(tu => tu.UserId);
 
 
-            modelBuilder.Entity<Technician>()
-                .HasMany(t => t.Customers)
-                .WithOne(c => c.Technician)
-                .HasForeignKey(c => c.TechnicianId);
-              
 
 
             modelBuilder.Entity<Employee>(entity =>

@@ -156,7 +156,6 @@ namespace LoyaltyCouponsSystem.DAL.Repo.Implementation
                 existingCustomer.Governate = customer.Governate;
                 existingCustomer.City = customer.City;
                 existingCustomer.PhoneNumber = customer.PhoneNumber;
-                existingCustomer.TechnicianId = customer.TechnicianId;
                 existingCustomer.UpdatedAt = DateTime.Now;
                 existingCustomer.UpdatedBy = currentUser?.UserName;
                 await _DBcontext.SaveChangesAsync();

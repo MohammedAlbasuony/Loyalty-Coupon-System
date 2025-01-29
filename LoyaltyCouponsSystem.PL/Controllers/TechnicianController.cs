@@ -40,8 +40,10 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             foreach (var technician in technicians)
             {
                 var dbTechnician = await _DBcontext.Technicians
-                    .Include(t => t.Customers)
-                    .Include(t => t.Users) // Include Users (Representatives)
+                    .Include(t => t.TechnicianCustomers) 
+                    .ThenInclude(tc => tc.Customer)
+                    .Include(t => t.TechnicianUsers)     
+                    .ThenInclude(tu => tu.User)          
                     .FirstOrDefaultAsync(t => t.TechnicianID == technician.TechnicianID);
 
                 if (dbTechnician != null)
@@ -49,14 +51,14 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     // Set Technician Status
                     technician.IsActive = dbTechnician.IsActive;
 
-                    // Map Active Customers
-                    technician.ActiveCustomers = dbTechnician.Customers?
-                        .Where(c => c.IsActive)
-                        .Select(c => new CustomerViewModel
+                    // Map Active Customers through TechnicianCustomers relation
+                    technician.ActiveCustomers = dbTechnician.TechnicianCustomers?
+                        .Where(tc => tc.Customer.IsActive)  // Filter only active customers
+                        .Select(tc => new CustomerViewModel
                         {
-                            CustomerID = c.CustomerID,
-                            Name = c.Name,
-                            IsActive = c.IsActive
+                            CustomerID = tc.Customer.CustomerID,
+                            Name = tc.Customer.Name,
+                            IsActive = tc.Customer.IsActive
                         })
                         .ToList() ?? new List<CustomerViewModel>();
 
@@ -65,9 +67,10 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                         .Distinct()
                         .ToList() ?? new List<string>();
 
-                    // Assign Representatives (Directly use ApplicationUser for Representatives)
-                    technician.AssignedRepresentatives = dbTechnician.Users?
-                        .Where(u => u.IsActive)
+                    // Assign Representatives through TechnicianUsers relation
+                    technician.AssignedRepresentatives = dbTechnician.TechnicianUsers?
+                        .Where(tu => tu.User.IsActive)  // Filter only active users (representatives)
+                        .Select(tu => tu.User)
                         .ToList() ?? new List<ApplicationUser>();
 
                     technician.SelectedUserNames = technician.AssignedRepresentatives
@@ -77,10 +80,10 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 }
 
                 // Get unassigned customers
-                technician.UnassignedActiveCustomers = await _technicianService.GetUnassignedActiveCustomersAsync();
+                technician.UnassignedActiveCustomers = await _technicianService.GetUnassignedActiveCustomersAsync(technician.TechnicianID);
 
                 // Get active unassigned representatives
-                technician.UnassignedActiveUsers = await _technicianService.GetActiveUnassignedRepresentativesAsync();
+                technician.UnassignedActiveUsers = await _technicianService.GetActiveUnassignedRepresentativesAsync(technician.TechnicianID);
             }
 
             // Get all active representatives
@@ -90,6 +93,8 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             return View(technicians);
         }
+
+
 
 
 

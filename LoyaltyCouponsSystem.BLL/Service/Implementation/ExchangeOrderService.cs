@@ -1,5 +1,7 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
+using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
@@ -46,26 +48,58 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                 Code = technician.Code,
                 Name = technician.Name
             };
+        }public async Task<DistributorViewModel> GetDistributorDetailsAsync(string technicianCodeOrName)
+        {
+            var technician = await _repository.GetTechnicianByCodeOrNameAsync(technicianCodeOrName);
+
+            if (technician == null)
+                return null;
+
+            return new DistributorViewModel
+            {
+                Code = technician.Code,
+                Name = technician.Name
+            };
         }
 
         public async Task<AssignmentViewModel> GetAssignmentDetailsAsync()
         {
             var customers = await _repository.GetAllCustomersAsync();
             var technicians = await _repository.GetAllTechniciansAsync();
+            var distributor = await _repository.GetAllDistributorsAsync();
+
 
             return new AssignmentViewModel
             {
-                Customers = customers.Select(c => new SelectListItem
+                Customers = customers
+                .Where(c => c.IsActive) 
+                .GroupBy(c => new {
+                    Name = c.Name.Trim().ToLower(), 
+                    Code = c.Code.Trim().ToLower()  
+                })
+                .Select(g => g.First()) 
+                .Select(c => new SelectListItem
                 {
                     Value = c.Code,
                     Text = $"{c.Name} ({c.Code})"
-                }).ToList(),
+                })
+                .ToList(),
 
-                Technicians = technicians.Select(t => new SelectListItem
+                            Distributors = distributor
+                .Where(d => d.IsActive) 
+                .GroupBy(d => new {
+                    Name = d.Name.Trim().ToLower(), 
+                    Code = d.Code.Trim().ToLower()  
+                })
+                .Select(g => g.First()) 
+                .Select(d => new SelectListItem
                 {
-                    Value = t.Code,
-                    Text = $"{t.Name} ({t.Code})"
-                }).ToList(),
+                    Value = d.Code,
+                    Text = $"{d.Name} ({d.Code})"
+                })
+                .ToList(),
+
+
 
                 Governates = new List<SelectListItem>
                 {
@@ -94,33 +128,43 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
             };
         }
 
-        public async Task AssignQRCodeAsync(string selectedCustomerCode, string selectedTechnicianCode, string selectedGovernate, string selectedCity, List<AssignmentViewModel> transactions)
+        public async Task AssignQRCodeAsync(string selectedCustomerCode, string selectedDistributorCode, string selectedGovernate, string selectedCity, List<AssignmentViewModel> transactions)
         {
             if (transactions == null || !transactions.Any())
                 throw new ArgumentException("Transactions cannot be null or empty.");
 
             var customer = await _repository.GetCustomerByCodeOrNameAsync(selectedCustomerCode);
-            var technician = await _repository.GetTechnicianByCodeOrNameAsync(selectedTechnicianCode);
+            var distributor = await _repository.GetDistributorByCodeOrNameAsync(selectedDistributorCode);
 
             if (customer == null)
                 throw new ArgumentException("Invalid customer code.");
 
-            if (technician == null)
+            if (distributor == null)
                 throw new ArgumentException("Invalid technician code.");
 
             string exchangePermissionNum = transactions[0].ExchangePermission;
 
             foreach (var transaction in transactions)
             {
+                var couponIdentifier = GetCouponIdentifier(transaction.SelectedCouponType);
+
+                if (!transaction.SequenceStart.StartsWith(couponIdentifier) || !transaction.SequenceEnd.StartsWith(couponIdentifier))
+                {
+                    throw new ArgumentException($"Start and End Sequences must start with '{couponIdentifier}' for the selected coupon type.");
+                }
+
                 if (await IsExchangePermissionDuplicateAsync(transaction.ExchangePermission))
                 {
                     throw new InvalidOperationException($"Exchange Permission Number {transaction.ExchangePermission} is already used.");
                 }
 
-                if (transaction.StartSequenceNumber > transaction.EndSequenceNumber)
-                    throw new ArgumentException("Start sequence number cannot be greater than end sequence number.");
+                long startSeq = long.Parse(transaction.SequenceStart);
+                long endSeq = long.Parse(transaction.SequenceEnd);
 
-                for (long seqNum = transaction.StartSequenceNumber; seqNum <= transaction.EndSequenceNumber; seqNum++)
+                if (startSeq > endSeq)
+                    throw new ArgumentException("Start sequence cannot be greater than end sequence.");
+
+                for (long seqNum = startSeq; seqNum <= endSeq; seqNum++)
                 {
                     var exists = await _repository.TransactionExistsAsync(exchangePermissionNum, seqNum);
                     if (exists)
@@ -129,7 +173,7 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                     var newTransaction = new Transaction
                     {
                         CustomerID = customer.CustomerID,
-                        TechnicianID = technician.TechnicianID,
+                        DistributorID = distributor.DistributorID,
                         Governate = selectedGovernate,
                         City = selectedCity,
                         Timestamp = DateTime.Now,
@@ -138,8 +182,8 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
                         SequenceNumber = seqNum,
                         ExchangePermission = exchangePermissionNum,
                         CreatedBy = transaction.CreatedBy,
-                        SequenceStart = transaction.StartSequenceNumber.ToString(),
-                        SequenceEnd = transaction.EndSequenceNumber.ToString(),
+                        SequenceStart = transaction.SequenceStart,
+                        SequenceEnd = transaction.SequenceEnd,
                     };
 
                     await _repository.AddTransactionAsync(newTransaction);
@@ -148,6 +192,21 @@ namespace LoyaltyCouponsSystem.BLL.Service.Implementation
 
             await _repository.SaveChangesAsync();
         }
+
+        private string GetCouponIdentifier(string couponType)
+        {
+            return couponType switch
+            {
+                "راك ثيرم" => "1",
+                "صرف جي تكس" => "2",
+                "اقطار كبيرة وهودذا" => "3",
+                "كعب راك ثيرم" => "4",
+                "كعب صرف جي تكس" => "5",
+                "كعب اقطار كبيرة وهودذا" => "6",
+                _ => throw new ArgumentException("Invalid coupon type"),
+            };
+        }
+
 
         public async Task<bool> IsExchangePermissionDuplicateAsync(string exchangePermission)
         {

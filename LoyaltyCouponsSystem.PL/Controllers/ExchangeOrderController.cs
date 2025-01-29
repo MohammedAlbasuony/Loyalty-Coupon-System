@@ -1,4 +1,6 @@
-﻿using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+﻿using DocumentFormat.OpenXml.InkML;
+using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
@@ -6,10 +8,12 @@ namespace LoyaltyCouponsSystem.PL.Controllers
     public class ExchangeOrderController : Controller
     {
         private readonly IExchangeOrderService _service;
+        private readonly ApplicationDbContext _context; 
 
-        public ExchangeOrderController(IExchangeOrderService service)
+        public ExchangeOrderController(IExchangeOrderService service, ApplicationDbContext context)
         {
             _service = service;
+            _context = context;
         }
 
         public async Task<IActionResult> GetCustomerDetails(string customerCodeOrName)
@@ -23,6 +27,11 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             var model = await _service.GetTechnicianDetailsAsync(technicianCodeOrName);
             return PartialView("_TechnicianDetails", model);
         }
+        public async Task<IActionResult> GetDistributorDetails(string technicianCodeOrName)
+        {
+            var model = await _service.GetDistributorDetailsAsync(technicianCodeOrName);
+            return PartialView("_DistributorDetails", model);
+        }
 
         [HttpGet]
         public async Task<IActionResult> AssignQRCode()
@@ -32,24 +41,64 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AssignQRCode(string selectedCustomerCode, string selectedTechnicianCode, string selectedGovernate, string selectedCity, List<AssignmentViewModel> transactions)
+        public async Task<IActionResult> AssignQRCode(string selectedCustomerCode, string selectedDistributorCode, string selectedGovernate, string selectedCity, List<AssignmentViewModel> transactions)
         {
-            // Server-side validation for Exchange Permission Number uniqueness
             foreach (var transaction in transactions)
             {
+                var couponIdentifier = GetCouponIdentifier(transaction.SelectedCouponType);
+
+                // Validate that SequenceStart and SequenceEnd start with the correct prefix
+                if (!transaction.SequenceStart.StartsWith(couponIdentifier) || !transaction.SequenceEnd.StartsWith(couponIdentifier))
+                {
+                    ModelState.AddModelError(string.Empty, $"Start and End Sequences must start with '{couponIdentifier}' for the selected coupon type.");
+                }
+
+                // Ensure unique sequence range
+                var isDuplicate = _context.Transactions.Any(t =>
+                    t.CouponType == transaction.SelectedCouponType &&
+                    string.Compare(t.SequenceStart, transaction.SequenceEnd) <= 0 &&
+                    string.Compare(t.SequenceEnd, transaction.SequenceStart) >= 0);
+
+                if (isDuplicate)
+                {
+                    ModelState.AddModelError(string.Empty, $"The sequence range {transaction.SequenceStart}-{transaction.SequenceEnd} is already used.");
+                }
+
+                // Check for duplicate Exchange Permission
                 if (await _service.IsExchangePermissionDuplicateAsync(transaction.ExchangePermission))
                 {
                     ModelState.AddModelError("ExchangePermission", $"Exchange Permission Number {transaction.ExchangePermission} is already used.");
-                    var model = await _service.GetAssignmentDetailsAsync(); // Reload the model in case of validation errors
-                    return View(model);
                 }
             }
 
-            // Proceed with saving if validation passes
-            await _service.AssignQRCodeAsync(selectedCustomerCode, selectedTechnicianCode, selectedGovernate, selectedCity, transactions);
+
+            await _service.AssignQRCodeAsync(selectedCustomerCode, selectedDistributorCode, selectedGovernate, selectedCity, transactions);
             TempData["SuccessMessage"] = "All assignments saved successfully.";
+
+            //if (!ModelState.IsValid)
+            //{
+            //    var model = await _service.GetAssignmentDetailsAsync();
+            //    return View(model);
+            //}
+
             return RedirectToAction("AllTransactions", "Transaction");
         }
+
+        // Helper method to map CouponType to the identifier
+        private string GetCouponIdentifier(string couponType)
+        {
+            return couponType switch
+            {
+                "راك ثيرم" => "1",
+                "صرف جي تكس" => "2",
+                "اقطار كبيرة وهودذا" => "3",
+                "كعب راك ثيرم" => "4",
+                "كعب صرف جي تكس" => "5",
+                "كعب اقطار كبيرة وهودذا" => "6",
+                _ => throw new ArgumentException("Invalid coupon type"),
+            };
+        }
+
 
         // New action for AJAX validation
         [Route("ExchangeOrder/CheckExchangePermission")]
