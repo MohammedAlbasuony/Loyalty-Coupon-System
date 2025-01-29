@@ -41,6 +41,8 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public Governorate? Governorates { get; set; }
         public Area? Areas { get; set; }
 
+        public bool? FlagToPrint { get; set; }=true;
+
 
 
 

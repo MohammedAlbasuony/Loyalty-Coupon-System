@@ -153,13 +153,18 @@
                                     </form>
                                 </td>
                                 <td>
-                                    <form asp-controller="GenerateQRCode" asp-action="PrintingExistingCoupones" method="get" style="display:inline;">
-                                        <input type="hidden" name="FromSerialNum" value="@item.FromSerialNumber" />
-                                        <input type="hidden" name="ToSerialNum" value="@item.ToSerialNumber" />
-
-                                      
-                                        <button type="submit" class="btn btn-primary">Printing</button>
-                                    </form>
+                                    @if (item.FlagToPrint)
+                                    {
+                                        <form asp-controller="GenerateQRCode" asp-action="PrintingExistingCoupones" method="get" style="display:inline;">
+                                            <input type="hidden" name="FromSerialNum" value="@item.FromSerialNumber" />
+                                            <input type="hidden" name="ToSerialNum" value="@item.ToSerialNumber" />
+                                            <button type="submit" class="btn btn-primary">Printing</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: red;">Printing Not Allowed</span>
+                                    }
                                 </td>
 
                             </tr>

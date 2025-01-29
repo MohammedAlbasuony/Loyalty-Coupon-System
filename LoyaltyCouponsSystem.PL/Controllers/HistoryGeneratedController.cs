@@ -2,6 +2,7 @@
 using Autofac.Core;
 using DocumentFormat.OpenXml.Wordprocessing;
 using iTextSharp.text;
+using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.BLL.ViewModel.QRCode;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
@@ -25,6 +26,8 @@ namespace LoyaltyCouponsSystem.PL.Controllers
       
        
 
+
+
         public async Task< IActionResult> TransactionHistory(
           
     string fromSequence = "",
@@ -36,11 +39,12 @@ namespace LoyaltyCouponsSystem.PL.Controllers
     int page = 1,
     int pageSize = 100)
         {
+            ServiceToManageStatues serviceToManageStatues = new ServiceToManageStatues(_context);
 
             var query = _context.qRCodeTransactionGenerateds
                     .Include(c => c.Governorates) // ربط المحافظات
                     .Include(c => c.Areas)        // ربط المناطق
-                    .OrderBy(c => c.CreationDateTime) // ترتيب حسب Serial Number
+                    .OrderByDescending(c => c.CreationDateTime) // ترتيب حسب Serial Number
                     .AsQueryable();
 
             if (!string.IsNullOrEmpty(fromSequence) && !string.IsNullOrEmpty(toSequence))
@@ -78,9 +82,13 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     Value = c.Value,
                     CreationDateTime = c.CreationDateTime,
                     GeneratedBy = c.GeneratedBy
-                    ,NumberOfCoupones=c.NumberOfCoupones
+                    ,NumberOfCoupones=c.NumberOfCoupones,
+                    FlagToPrint = serviceToManageStatues.DecideToPrintOrNo(c.FromSerialNumber,c.ToSerialNumber)
+
                 })
-                .ToList();
+                
+                .ToList().OrderByDescending(c=>c.CreationDateTime);
+            
 
             // تمرير بيانات الصفحة
             ViewBag.CurrentPage = page;
@@ -181,7 +189,13 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     NumInYear = c.NumInYear,
                     Status = c.Status,
                     CreationDateTime = c.CreationDateTime,
-                    CreatedBy=c.CreatedBy
+                    CreatedBy=c.CreatedBy,
+                   
+                    CustomerCode = c.CustomerCode,
+                    DistubuterCode=c.DistributorCode,
+                    RepresentativeCode = c.RepresentativeCode
+
+
                 })
                 .ToList();
 

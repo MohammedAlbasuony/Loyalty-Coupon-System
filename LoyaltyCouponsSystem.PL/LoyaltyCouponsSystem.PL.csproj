@@ -38,4 +38,8 @@
     <ProjectReference Include="..\LoyaltyCouponsSystem.BLL\LoyaltyCouponsSystem.BLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
+
 </Project>

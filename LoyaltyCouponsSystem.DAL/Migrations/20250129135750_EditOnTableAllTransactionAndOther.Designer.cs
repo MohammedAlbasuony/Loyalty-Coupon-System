@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250129135750_EditOnTableAllTransactionAndOther")]
+    partial class EditOnTableAllTransactionAndOther
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -251,10 +254,11 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<DateTime>("CreationDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CustomerCode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("DistributorCode")
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("FlagToPrint")
@@ -266,7 +270,11 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<long>("NumInYear")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("RepresentativeCode")
+                    b.Property<int?>("RepresentativeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RepresentativeName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SerialNumber")
@@ -278,10 +286,18 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("StoreKeeperCode")
+                    b.Property<string>("StoreKeeperName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TechnicianCode")
+                    b.Property<int?>("StorekeeperID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TechnicianId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TechnicianName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TypeOfCoupone")
@@ -440,9 +456,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CouponeId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -478,8 +491,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     b.HasIndex("Code")
                         .IsUnique();
-
-                    b.HasIndex("CouponeId");
 
                     b.HasIndex("CustomerID");
 
@@ -669,7 +680,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<DateTime>("CreationDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool?>("FlagToPrint")
+                    b.Property<bool>("FlagToPrint")
                         .HasColumnType("bit");
 
                     b.Property<string>("FromSerialNumber")
@@ -1251,10 +1262,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Distributor", b =>
                 {
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Coupon", null)
-                        .WithMany("Distributors")
-                        .HasForeignKey("CouponeId");
-
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Customer", null)
                         .WithMany("Distributors")
                         .HasForeignKey("CustomerID");
@@ -1480,8 +1487,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Coupon", b =>
                 {
                     b.Navigation("Customers");
-
-                    b.Navigation("Distributors");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Customer", b =>

@@ -74,6 +74,14 @@
                             <th>Status</th>
                             <th>Creation Date</th>
                             <th>Created By</th>
+                            <th>Represintitive</th>
+                            <th>Receive Customer</th>
+                            <th>Deliver Customer</th>
+                            @* <th>Technition</th> *@
+                            @* <th>Distributer</th> *@
+
+
+
                             <th>Scaned By</th>
                         </tr>
                     </thead>
@@ -90,6 +98,15 @@
                                 <td>@item.Status</td>
                                 <td>@item.CreationDateTime?.ToString("yyyy-MM-dd")</td>
                                 <td>@item.CreatedBy</td>
+                                <td>@* @item.RepresentativeCode *@N/A</td>
+                                <td>@item.CustomerCode</td>
+                                <td>N/A</td>
+
+                                @* <td>@item.TechnicianName</td> *@
+                                @* <td>@item.DistubuterCode</td> *@
+
+
+
                                 <td>
                                     <form asp-action="GetAllCoupons" method="get" style="display:inline;">
                                         @* <input type="hidden" name="fromSequence" value="@item.FromSerialNumber" />

@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250129152630_UpdatePrinting")]
+    partial class UpdatePrinting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -252,9 +255,11 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CustomerCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DistributorCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("FlagToPrint")
@@ -267,6 +272,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("RepresentativeCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SerialNumber")
@@ -279,9 +285,11 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("StoreKeeperCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TechnicianCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TypeOfCoupone")
@@ -669,7 +677,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<DateTime>("CreationDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool?>("FlagToPrint")
+                    b.Property<bool>("FlagToPrint")
                         .HasColumnType("bit");
 
                     b.Property<string>("FromSerialNumber")

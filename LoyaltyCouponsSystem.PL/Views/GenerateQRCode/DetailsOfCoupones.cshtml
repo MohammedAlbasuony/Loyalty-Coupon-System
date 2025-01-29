@@ -12,19 +12,19 @@
     </div>
 
     <form asp-controller="GenerateQRCode" asp-action="DetailsOfCoupones" method="post">
-        <div class="container">
+        <div class="container" >
             <div class="row g-3" style="direction: rtl; text-align: right;">
                 <!-- نوع الكوبون -->
                 <div class="col-md-6">
                     <label for="typeOfCoupon" class="form-label">اختر نوع الكوبون:</label>
                     <select id="typeOfCoupon" asp-for="TypeOfCoupon" class="form-select" aria-label="Default select example" required>
                         <option disabled selected value="">اختر نوع الكوبون</option>
-                        <option value="1" >راك ثيرم</option>
-                        <option value="2" >صرف جي تكس</option>
+                        <option value="1">راك ثيرم</option>
+                        <option value="2">صرف جي تكس</option>
                         <option value="3">اقطار كبيرة وهودذا</option>
-                        <option value="4" >كعب راك ثيرم</option>
-                        <option value="5" >كعب صرف جي تكس</option>
-                        <option value="6" >كعب اقطار كبيرة وهودذا</option>
+                        <option value="4">كعب راك ثيرم</option>
+                        <option value="5">كعب صرف جي تكس</option>
+                        <option value="6">كعب اقطار كبيرة وهودذا</option>
                     </select>
                     <span asp-validation-for="TypeOfCoupon" class="text-danger"></span>
                 </div>
@@ -83,7 +83,8 @@
     </form>
 
 </div>
-@section Scripts {
+
+@* @section Scripts {
     <script>
         $(document).ready(function () {
                 let maxSerialNumber = 0;
@@ -182,7 +183,7 @@
             const year = new Date().getFullYear() % 100; // آخر رقمين من السنة
 
             // Listen for changes in the coupon type dropdown
-            
+
             const currentYearSpan = document.getElementById('currentYear');
 
             couponSelect.addEventListener('change', () => {
@@ -199,4 +200,226 @@
             currentYearSpan.innerText = year;
         });
     </script>
+} *@
+
+@*  @section Scripts {
+    <script>
+        $(document).ready(function () {
+            let maxSerialNumber = 0;
+            const couponSelect = document.getElementById('typeOfCoupon');
+            const serialNumberInput = $("#SerialNumber");
+            const submitButton = $("#submitButton");
+
+            // جلب الرقم التسلسلي الأعلى عند تغيير نوع الكوبون
+            couponSelect.addEventListener('change', function () {
+                const selectedValue = couponSelect.value;
+
+                if (selectedValue) {
+                    // جلب الرقم التسلسلي بناءً على نوع الكوبون
+                    $.get(`/GenerateQRCode/GetMaxSerialNumber?typeOfCoupon=${selectedValue}`, function (data) {
+                        maxSerialNumber = parseInt(data) || 0; // إذا لم تكن هناك بيانات، يتم ضبط القيمة على 0
+                    }).fail(function () {
+                        alert("حدث خطأ أثناء جلب الرقم التسلسلي.");
+                    });
+                } else {
+                    maxSerialNumber = 0; // إعادة التعيين إذا لم يتم اختيار نوع الكوبون
+                }
+            });
+
+            // تحقق من الرقم المدخل عند فقدان التركيز
+            serialNumberInput.on("blur", function () {
+                const enteredSerial = parseInt(serialNumberInput.val());
+                const formattedMaxSerial = maxSerialNumber.toString().padStart(7, '0'); // Format the max serial number
+
+                // إزالة رسالة الخطأ السابقة (إن وجدت)
+                $("#serialNumberError").remove();
+
+                if (isNaN(enteredSerial) || enteredSerial <= maxSerialNumber) {
+                    // عرض رسالة خطأ إذا كانت المدخلات غير صالحة
+                    serialNumberInput.after(
+                        '<span id="serialNumberError" style="color: red;">الرقم المدخل أقل من أعلى رقم مسلسل (' + formattedMaxSerial + '). يرجى إدخال رقم أكبر.</span>'
+                    );
+                }
+            });
+
+            // منع إرسال النموذج إذا كانت الفاليديشن غير صحيحة
+            $("form").on("submit", function (e) {
+                const enteredSerial = parseInt(serialNumberInput.val());
+
+                // تحقق من الرقم التسلسلي
+                if (isNaN(enteredSerial) || enteredSerial <= maxSerialNumber) {
+                    e.preventDefault(); // منع الإرسال
+                    alert("الرجاء التأكد من صحة الرقم التسلسلي.");
+                    return false;
+                }
+
+                // تعطيل الزر لمنع الإرسال المتكرر
+                submitButton.prop("disabled", true).text("جاري الإرسال...");
+
+                return true; // السماح بالإرسال
+            });
+
+
+            // Handle governorate and area changes
+            $('#GovernorateId').change(function () {
+                var GovernorateId = $(this).val();
+                var AreaList = $('#AreaId');
+
+                AreaList.empty();
+                AreaList.append('<option>اختر المنطقة</option>');
+                if (GovernorateId !== '') {
+                    $.ajax({
+                        url: '/GenerateQRCode/GetAreas?GovernorateId=' + GovernorateId,
+                        success: function (areas) {
+                            $.each(areas, function (i, area) {
+                                AreaList.append($('<option></option>').attr('value', area.id).text(area.name));
+                            });
+                        },
+                        error: function () {
+                            alert('حدث خطأ أثناء تحميل المناطق.');
+                        }
+                    });
+                }
+            });
+
+            // Script to set the current year in the input group
+            const year = new Date().getFullYear() % 100; // آخر رقمين من السنة
+            const currentYearSpan = document.getElementById('currentYear');
+
+            couponSelect.addEventListener('change', () => {
+                const selectedValue = parseInt(couponSelect.value); // القيمة المختارة من الكوبون
+                if (!isNaN(selectedValue)) {
+                    const result = selectedValue * 100 + year; // دمج السنة مع نوع الكوبون
+                    currentYearSpan.innerText = result; // عرض الناتج
+                } else {
+                    currentYearSpan.innerText = year; // لو مفيش اختيار
+                }
+            });
+
+            // Initialize with the current year if needed
+            currentYearSpan.innerText = year;
+        });
+    </script>
+} 
+
+ *@
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let maxSerialNumber = 0;
+            const couponSelect = document.getElementById('typeOfCoupon');
+            const serialNumberInput = $("#SerialNumber");
+            const submitButton = $("#submitButton");
+
+            // جلب الرقم التسلسلي الأعلى عند تغيير نوع الكوبون
+            couponSelect.addEventListener('change', function () {
+                const selectedValue = couponSelect.value;
+
+                if (selectedValue) {
+                    // جلب الرقم التسلسلي بناءً على نوع الكوبون
+                    $.get(`/GenerateQRCode/GetMaxSerialNumber?typeOfCoupon=${selectedValue}`, function (data) {
+                        maxSerialNumber = parseInt(data) || 0; // إذا لم تكن هناك بيانات، يتم ضبط القيمة على 0
+                    }).fail(function () {
+                        alert("حدث خطأ أثناء جلب الرقم التسلسلي.");
+                    });
+                } else {
+                    maxSerialNumber = 0; // إعادة التعيين إذا لم يتم اختيار نوع الكوبون
+                }
+            });
+
+            // تحقق من الرقم المدخل عند فقدان التركيز
+            serialNumberInput.on("blur", function () {
+                const enteredSerial = parseInt(serialNumberInput.val());
+                const formattedMaxSerial = maxSerialNumber.toString().padStart(7, '0'); // Format the max serial number
+
+                // إزالة رسالة الخطأ السابقة (إن وجدت)
+                $("#serialNumberError").remove();
+
+                if (isNaN(enteredSerial) || enteredSerial <= maxSerialNumber) {
+                    // عرض رسالة خطأ إذا كانت المدخلات غير صالحة
+                    serialNumberInput.after(
+                        '<span id="serialNumberError" style="color: red;">الرقم المدخل أقل من أعلى رقم مسلسل (' + formattedMaxSerial + '). يرجى إدخال رقم أكبر.</span>'
+                    );
+                }
+            });
+
+            // منع إرسال النموذج إذا كانت الفاليديشن غير صحيحة
+            $("form").on("submit", function (e) {
+                const enteredSerial = parseInt(serialNumberInput.val());
+
+                // تحقق من الرقم التسلسلي
+                if (isNaN(enteredSerial) || enteredSerial <= maxSerialNumber) {
+                    e.preventDefault(); // منع الإرسال
+                    alert("الرجاء التأكد من صحة الرقم التسلسلي.");
+                    return false;
+                }
+
+                // تعطيل الزر لمنع الإرسال المتكرر
+                submitButton.prop("disabled", true).text("جاري الإرسال...");
+
+                // إرسال الطلب
+                $.post($(this).attr('action'), $(this).serialize())
+                    .done(function () {
+                        alert("تم إنشاء الكوبونات بنجاح!");
+                        location.reload(); // تحديث الصفحة
+                    })
+                    .fail(function () {
+                        alert("حدث خطأ أثناء إنشاء الكوبونات.");
+                        submitButton.prop("disabled", false).text("إنشاء الكوبونات"); // إعادة تمكين الزر
+                    });
+
+                return false; // منع الإرسال الافتراضي للنموذج
+            });
+
+
+
+            // باقي الأكواد...
+
+
+
+             // Handle governorate and area changes
+            $('#GovernorateId').change(function () {
+                var GovernorateId = $(this).val();
+                var AreaList = $('#AreaId');
+
+                AreaList.empty();
+                AreaList.append('<option>اختر المنطقة</option>');
+                if (GovernorateId !== '') {
+                    $.ajax({
+                        url: '/GenerateQRCode/GetAreas?GovernorateId=' + GovernorateId,
+                        success: function (areas) {
+                            $.each(areas, function (i, area) {
+                                AreaList.append($('<option></option>').attr('value', area.id).text(area.name));
+                            });
+                        },
+                        error: function () {
+                            alert('حدث خطأ أثناء تحميل المناطق.');
+                        }
+                    });
+                }
+            });
+
+
+
+
+            const year = new Date().getFullYear() % 100; // آخر رقمين من السنة
+            const currentYearSpan = document.getElementById('currentYear');
+
+            couponSelect.addEventListener('change', () => {
+                const selectedValue = parseInt(couponSelect.value); // القيمة المختارة من الكوبون
+                if (!isNaN(selectedValue)) {
+                    const result = selectedValue * 100 + year; // دمج السنة مع نوع الكوبون
+                    currentYearSpan.innerText = result; // عرض الناتج
+                } else {
+                    currentYearSpan.innerText = year; // لو مفيش اختيار
+                }
+            });
+
+            currentYearSpan.innerText = year;
+        });
+    </script>
 }
+
+
+
