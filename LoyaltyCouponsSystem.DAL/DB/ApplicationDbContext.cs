@@ -33,6 +33,9 @@ namespace LoyaltyCouponsSystem.DAL.DB
 
         public DbSet<QRCodeTransactionGenerated> qRCodeTransactionGenerateds { get; set; }
 
+        public DbSet<DeliverFromRepToCoust> DeliverFromRepToCousts { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder); // Always call base first for Identity configuration
