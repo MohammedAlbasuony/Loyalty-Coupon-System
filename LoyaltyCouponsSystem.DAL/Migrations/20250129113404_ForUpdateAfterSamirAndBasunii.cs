@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class DileverFromRepToCoust : Migration
+    public partial class ForUpdateAfterSamirAndBasunii : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

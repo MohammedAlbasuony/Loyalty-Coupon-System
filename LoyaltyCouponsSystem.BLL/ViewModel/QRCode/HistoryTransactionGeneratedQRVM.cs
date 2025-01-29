@@ -35,6 +35,8 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.QRCode
         public string  Governorate { get; set; }
 
         public string Area{ get; set; }
-        public object CreatedBy { get; set; }
+
+
+        public bool FlagToPrint { get; set; } = true;
     }
 }

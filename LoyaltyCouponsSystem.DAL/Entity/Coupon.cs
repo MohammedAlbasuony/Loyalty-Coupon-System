@@ -21,13 +21,26 @@ namespace LoyaltyCouponsSystem.DAL.Entity
        
       
         public DateTime? ClosureDate { get; set; }
-        public ICollection<Representative> Representatives { get; set; } 
-        public int? RepresentativeId { get; set; }
-        public ICollection<Technician> Technicians { get; set; }
-        public int? TechnicianId { get; set; }
-        public ICollection<StoreKeeper> StoreKeepers { get; set; }
+        public ICollection<Representative> ?Representatives { get; set; } 
         
-        public int ?StorekeeperID { get; set; }
+        public string? RepresentativeCode { get; set; }
+
+        public ICollection<Customer>? Customers { get; set; }
+       
+        public string? CustomerCode { get; set; }
+
+
+        public ICollection<Distributor>? Distributors { get; set; }
+
+        public string? DistributorCode { get; set; }
+
+        public ICollection<Technician>? Technicians { get; set; }
+        
+        public string? TechnicianCode { get; set; }
+        public ICollection<StoreKeeper>? StoreKeepers { get; set; }
+        public string? StoreKeeperCode { get; set; }
+
+       
 
         public string? CreatedBy { get; set; }
 
@@ -38,6 +51,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public Area? Areas { get; set; }
         public int? AreaId { get; set; }
         public long NumInYear { get; set; }
+        public bool FlagToPrint { get; set; } = true;
 
        
 

@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.InkML;
 using LoyaltyCouponsSystem.BLL.Service.Abstraction;
+using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,8 +44,13 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [HttpPost]
         public async Task<IActionResult> AssignQRCode(string selectedCustomerCode, string selectedDistributorCode, string selectedGovernate, string selectedCity, List<AssignmentViewModel> transactions)
         {
+            ServiceToManageStatues serviceToManageStatues=new ServiceToManageStatues(_context);
             foreach (var transaction in transactions)
             {
+
+                // Update Statues , Represintitive, Customer
+                serviceToManageStatues.ManageStatuesEcxhangeOrder(transaction.SequenceStart, transaction.SequenceEnd, selectedCustomerCode, selectedDistributorCode); 
+
                 var couponIdentifier = GetCouponIdentifier(transaction.SelectedCouponType);
 
                 // Validate that SequenceStart and SequenceEnd start with the correct prefix
