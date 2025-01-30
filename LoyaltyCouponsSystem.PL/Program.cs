@@ -2,10 +2,13 @@ using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.BLL.Service.Implementation.GenerateQR;
 using LoyaltyCouponsSystem.DAL.DB;
+using LoyaltyCouponsSystem.DAL.Entity.Permission;
 using LoyaltyCouponsSystem.DAL.Repo.Abstraction;
 using LoyaltyCouponsSystem.DAL.Repo.Implementation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static LoyaltyCouponsSystem.PL.Controllers.AdminController;
 
 namespace LoyaltyCouponsSystem.PL
 {
@@ -57,7 +60,7 @@ namespace LoyaltyCouponsSystem.PL
             builder.Services.AddScoped<IDistributorService, DistributorService>();
             builder.Services.AddScoped<IDistributorRepo, DistributorRepo>();
 
-            // Add service make QRCode to the container
+            // Add service to generate QR codes
             builder.Services.AddScoped<IQRCodeGeneratorHelper, QRCodeGeneratorHelper>();
 
             builder.Services.ConfigureApplicationCookie(options =>
@@ -66,6 +69,19 @@ namespace LoyaltyCouponsSystem.PL
                 options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect to access denied page
             });
 
+            // Add authorization policies
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Manage Customers", policy => policy.Requirements.Add(new PermissionRequirement("Manage Customers")));
+                options.AddPolicy("Manage Users", policy => policy.Requirements.Add(new PermissionRequirement("Manage Users")));
+                options.AddPolicy("Exchange Permissions", policy => policy.Requirements.Add(new PermissionRequirement("Exchange Permissions")));
+                options.AddPolicy("Generate QR Codes", policy => policy.Requirements.Add(new PermissionRequirement("Generate QR Codes")));
+                options.AddPolicy("Scan QR Codes", policy => policy.Requirements.Add(new PermissionRequirement("Scan QR Codes")));
+                options.AddPolicy("Deliver From Representative to Customer", policy => policy.Requirements.Add(new PermissionRequirement("Deliver From Representative to Customer")));
+                options.AddPolicy("Generate QR Codes", policy => policy.Requirements.Add(new PermissionRequirement("Generate QR Codes")));
+            });
+
+            builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -86,22 +102,27 @@ namespace LoyaltyCouponsSystem.PL
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
-            // Ensure roles and the initial SuperAdmin user exist at startup
+            // Ensure roles, the initial SuperAdmin user, and permissions exist at startup
             using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
                 await CreateRolesAndSuperAdminAsync(roleManager, userManager);
+                await SeedPermissionsAsync(roleManager, context); // Seed Permissions to Roles
+                await AssignPermissionsToRolesAsync(roleManager, context); // Assign Permissions to Roles
+                await AssignPermissionsToUsersWithRoleAsync( roleManager,userManager,context); // Assign Permissions to Roles
+            
             }
 
             app.Run();
         }
 
         private static async Task CreateRolesAndSuperAdminAsync(
-    RoleManager<IdentityRole> roleManager,
-    UserManager<ApplicationUser> userManager)
+            RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUser> userManager)
         {
-            // Roles to ensure exist
             string[] roleNames = { "Admin", "HR", "Representative", "Storekeeper", "Accountant", "SuperAdmin" };
 
             foreach (var roleName in roleNames)
@@ -112,20 +133,20 @@ namespace LoyaltyCouponsSystem.PL
                 }
             }
 
-            // Create the initial SuperAdmin user if not already present
             var superAdminEmail = "superadmin@example.com";
             var superAdminUserName = "superadmin";
             var superAdminPassword = "SuperAdmin@Password_2025!";
 
             var superAdmin = await userManager.FindByEmailAsync(superAdminEmail);
+
             if (superAdmin == null)
             {
                 var newSuperAdmin = new ApplicationUser
                 {
                     UserName = superAdminUserName,
                     Email = superAdminEmail,
-                    EmailConfirmed = true, // Skip email confirmation for the initial user
-                    FullName = "Super Admin" // Provide a default FullName value
+                    EmailConfirmed = true,
+                    FullName = "Super Admin"
                 };
 
                 var createResult = await userManager.CreateAsync(newSuperAdmin, superAdminPassword);
@@ -148,6 +169,126 @@ namespace LoyaltyCouponsSystem.PL
                 Console.WriteLine("SuperAdmin user already exists.");
             }
         }
+
+        private static async Task SeedPermissionsAsync(
+            RoleManager<IdentityRole> roleManager,
+            ApplicationDbContext context)
+        {
+            var permissions = new List<string>
+            {
+                "Manage Customers",
+                "Manage Users", "Generate QR Codes", "Exchange Permissions"
+            };
+
+            foreach (var permissionName in permissions)
+            {
+                var permission = await context.Permissions
+                    .FirstOrDefaultAsync(p => p.Name == permissionName);
+                if (permission == null)
+                {
+                    permission = new Permission { Name = permissionName };
+                    context.Permissions.Add(permission);
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
+
+        // Add this helper method to assign permissions to roles
+        private static async Task AssignPermissionsToRolesAsync(
+    RoleManager<IdentityRole> roleManager,
+    ApplicationDbContext context)
+        {
+            var roleNamesToPermissions = new Dictionary<string, List<string>>
+            {
+                { "Admin", new List<string> { "Manage Customers",  "Manage Users", "Generate QR Codes", "Exchange Permissions" } },
+                { "HR", new List<string> { "Manage Users" } },
+                { "Representative", new List<string> { "Manage Customers" } },
+                { "Storekeeper", new List<string> { "Exchange Permissions" } },
+                { "Accountant", new List<string> { "Manage Users" } },
+                { "SuperAdmin", new List<string> { "Manage Customers",  "Manage Users", "Generate QR Codes", "Exchange Permissions", "Scan QR Codes" , "Deliver From Representative to Customer" } }
+            };
+
+            foreach (var roleName in roleNamesToPermissions)
+            {
+                var role = await roleManager.FindByNameAsync(roleName.Key);
+                if (role != null)
+                {
+                    foreach (var permissionName in roleName.Value)
+                    {
+                        var permission = await context.Permissions
+                            .FirstOrDefaultAsync(p => p.Name == permissionName);  // Ensure column name matches
+                        if (permission != null)
+                        {
+                            var existingRolePermission = await context.RolePermissions
+                                .FirstOrDefaultAsync(rp => rp.RoleId == role.Id && rp.PermissionId == permission.Id);
+
+                            if (existingRolePermission == null)
+                            {
+                                var rolePermission = new RolePermission
+                                {
+                                    RoleId = role.Id,
+                                    PermissionId = permission.Id,
+                                };
+                                context.RolePermissions.Add(rolePermission);
+                            }
+                        }
+                    }
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
+        private static async Task AssignPermissionsToUsersWithRoleAsync(
+    RoleManager<IdentityRole> roleManager,
+    UserManager<ApplicationUser> userManager,
+    ApplicationDbContext context)
+        {
+            var roleNamesToPermissions = new Dictionary<string, List<string>>
+    {
+        { "Admin", new List<string> { "Manage Customers",  "Manage Users", "Generate QR Codes", "Exchange Permissions" } },
+        { "HR", new List<string> { "Manage Users" } },
+        { "Representative", new List<string> { "Manage Customers" } },
+        { "Storekeeper", new List<string> { "Exchange Permissions" } },
+        { "Accountant", new List<string> { "Manage Users" } },
+        { "SuperAdmin", new List<string> { "Manage Customers",  "Manage Users", "Generate QR Codes", "Exchange Permissions", "Scan QR Codes" , "Deliver From Representative to Customer" } }
+    };
+
+            foreach (var roleName in roleNamesToPermissions)
+            {
+                var role = await roleManager.FindByNameAsync(roleName.Key);
+                if (role != null)
+                {
+                    // Get all users who have the role
+                    var usersWithRole = await userManager.GetUsersInRoleAsync(role.Name);
+
+                    foreach (var user in usersWithRole)
+                    {
+                        foreach (var permissionName in roleName.Value)
+                        {
+                            var permission = await context.Permissions
+                                .FirstOrDefaultAsync(p => p.Name == permissionName);
+
+                            if (permission != null)
+                            {
+                                var existingUserPermission = await context.UserPermissions
+                                    .FirstOrDefaultAsync(up => up.UserId == user.Id && up.PermissionId == permission.Id);
+
+                                if (existingUserPermission == null)
+                                {
+                                    var userPermission = new UserPermission
+                                    {
+                                        UserId = user.Id,
+                                        PermissionId = permission.Id,
+                                    };
+                                    context.UserPermissions.Add(userPermission);
+                                }
+                            }
+                        }
+                    }
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
+
 
     }
 }

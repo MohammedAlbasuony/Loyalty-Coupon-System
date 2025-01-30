@@ -16,6 +16,11 @@ namespace LoyaltyCouponsSystem.BLL.Service.Abstraction
         Task<bool> DeleteUserAsync(string userId);
         Task<bool> AssignRoleToUserAsync(string userId, string roleName);
         Task<bool> UpdateUserRoleName(string userId, string roleName);
-        Task<bool> AssignPermissionToRoleAsync(string roleName, string permission);
+        Task AssignPermissionsToRoleAsync(string roleName, List<string> permissionNames);
+        Task AssignPermissionsToUserAsync(string userId, List<string> permissionNames);
+        Task<bool> UserHasPermissionAsync(string username, string permissionName);
+        Task<List<UserPermissionsModel>> GetUsersWithPermissionsAsync(string roleName);
+        Task<List<string>> GetPermissionsForRoleAsync(string roleName);
+
     }
 }

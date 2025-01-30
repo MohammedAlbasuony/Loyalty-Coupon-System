@@ -2,6 +2,7 @@
 using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.Service.Implementation;
 using LoyaltyCouponsSystem.DAL.DB;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
@@ -16,7 +17,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _service = service;
             _context = context;
         }
-
+        [Authorize(Policy = "Exchange Permissions")]
         public async Task<IActionResult> GetCustomerDetails(string customerCodeOrName)
         {
             var model = await _service.GetCustomerDetailsAsync(customerCodeOrName);
