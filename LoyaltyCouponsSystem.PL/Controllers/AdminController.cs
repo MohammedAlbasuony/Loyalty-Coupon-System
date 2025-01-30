@@ -10,12 +10,14 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 {
     public class AdminController : Controller
     {
+        private readonly ApplicationDbContext dbContext;
         private readonly IAdminService _adminService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AdminController(IAdminService adminService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public AdminController(ApplicationDbContext dbContext, IAdminService adminService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
+            this.dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
             _adminService = adminService;
@@ -23,7 +25,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
 
 
-        [Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "Manage Users")]
         public async Task<IActionResult> ManageUsers()
         {
             var users = _userManager.Users.ToList();
@@ -47,7 +49,9 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     City = user.City,
                     Role = roles.FirstOrDefault(),
                     EmailConfirmed = user.EmailConfirmed,
-                    IsActive = user.IsActive // Assuming IsActive is part of the ApplicationUser class
+                    IsActive = user.IsActive, // Assuming IsActive is part of the ApplicationUser class
+                    CreatedDate = user.CreatedDate // Ensure this is assigned
+
                 };
 
                 if (user.EmailConfirmed == true)
@@ -65,7 +69,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             return View(model);
         }
-
+        [Authorize(Policy = "Manage Users")]
         [HttpPost]
         public async Task<IActionResult> ToggleActivation(string userId)
         {
@@ -83,6 +87,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
 
         // Edit user
+        [Authorize(Policy = "Manage Users")]
         public async Task<IActionResult> EditUser(string id)
         {
             var user = await _adminService.GetUserByIdAsync(id);
@@ -90,7 +95,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             user.EmailConfirmed = true;
             return View(user);
         }
-
+        [Authorize(Policy = "Manage Users")]
         [HttpPost]
         public async Task<IActionResult> EditUser(AdminUserViewModel model)
         {
@@ -121,7 +126,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 return NotFound();  // Return 404 if the user is not found or deletion fails
             }
         }
-
+        [Authorize(Policy = "Manage Users")]
         [HttpGet]
         public async Task<IActionResult> AssignRoleForm()
         {
@@ -135,10 +140,18 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             return View(users);
         }
-
+        [Authorize(Policy = "Manage Users")]
         [HttpPost]
         public async Task<IActionResult> AssignRole(string userId, string roleName)
         {
+            // Check if the user has the permission to assign roles
+            var hasPermission = await _adminService.UserHasPermissionAsync(userId, "Assign Role");
+            if (!hasPermission)
+            {
+                TempData["ErrorMessage"] = "You do not have permission to assign roles.";
+                return RedirectToAction("ManageUsers");
+            }
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
@@ -146,25 +159,21 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 return RedirectToAction("ManageUsers");
             }
 
-            var currentRoles = await _userManager.GetRolesAsync(user);
-            var resultRemove = await _userManager.RemoveFromRolesAsync(user, currentRoles);
-            if (!resultRemove.Succeeded)
+            // Proceed with role assignment logic
+            var result = await _adminService.AssignRoleToUserAsync(userId, roleName);
+            if (result)
             {
-                TempData["ErrorMessage"] = "Failed to remove existing roles.";
-                return RedirectToAction("ManageUsers");
-            }
-
-            var result = await _userManager.AddToRoleAsync(user, roleName);
-            if (result.Succeeded)
                 TempData["SuccessMessage"] = $"Role '{roleName}' has been assigned to user.";
+            }
             else
+            {
                 TempData["ErrorMessage"] = "Failed to assign the role.";
-
-            var userRoleName = await _adminService.UpdateUserRoleName(userId, roleName);
+            }
 
             return RedirectToAction("ManageUsers");
         }
 
+        [Authorize(Policy = "Manage Users")]
         [HttpPost]
         public async Task<IActionResult> ConfirmAccount(string userId)
         {
@@ -189,5 +198,87 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
             return RedirectToAction("ManageUsers");
         }
+
+
+        // Permmission 
+
+       
+        [HttpPost]
+        public async Task<IActionResult> AssignPermissionsToRole([FromBody] AssignPermissionsToRoleViewModel model)
+         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid data received.");
+            }
+
+            await _adminService.AssignPermissionsToRoleAsync(model.RoleName, model.SelectedPermissions);
+            return Ok(new { message = "Permissions assigned successfully!" });
+        }
+        [HttpPost]
+        public async Task<IActionResult> AssignPermissionsToUser([FromBody] AssignPermissionsToUserViewModel model)
+         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid data received.");
+            }
+
+            await _adminService.AssignPermissionsToUserAsync(model.UserId, model.SelectedPermissions);
+            return Ok(new { message = "Permissions assigned successfully!" });
+        }
+
+        public async Task<IActionResult> GetUsersWithRolePermissions(string roleName)
+        {
+            // Fetch all users with permissions for the specified role
+            var usersWithPermissions = await _adminService.GetUsersWithPermissionsAsync(roleName);
+
+            // Do something with this data (e.g., log, process, etc.)
+            foreach (var user in usersWithPermissions)
+            {
+                Console.WriteLine($"User: {user.UserName}, Permissions: {string.Join(", ", user.Permissions)}");
+            }
+
+            return Ok(); // Or any appropriate action result
+        }
+        public class PermissionRequirement : IAuthorizationRequirement
+        {
+            public string Permission { get; }
+
+            public PermissionRequirement(string permission)
+            {
+                Permission = permission;
+            }
+        }
+
+        public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
+        {
+            private readonly UserManager<ApplicationUser> _userManager;
+            private readonly ApplicationDbContext _dbContext;
+
+            public PermissionHandler(UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext)
+            {
+                _userManager = userManager;
+                _dbContext = dbContext;
+            }
+
+            protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
+            {
+                var user = await _userManager.GetUserAsync(context.User);
+                if (user == null) return;
+
+                // Get the roles assigned to the user
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // Check if any of the user's roles have the required permission
+                var hasPermission = await _dbContext.RolePermissions
+                    .AnyAsync(rp => roles.Contains(rp.Role.Name) && rp.Permission.Name == requirement.Permission);
+
+                if (hasPermission)
+                {
+                    context.Succeed(requirement);
+                }
+            }
+        }
+
+
     }
 }

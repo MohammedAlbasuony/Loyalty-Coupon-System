@@ -23,6 +23,7 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.Admin
         public string SelectedRole { get; set; } 
         public string FullName { get; set; }
         public bool IsActive { get; set; } = true;
+        public DateTime CreatedDate { get; set; } 
 
     }
     public class ManageUsersViewModel

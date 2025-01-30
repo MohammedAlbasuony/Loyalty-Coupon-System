@@ -1,4 +1,5 @@
 ﻿using LoyaltyCouponsSystem.DAL.Entity;
+using LoyaltyCouponsSystem.DAL.Entity.Permission;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -23,5 +24,8 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public virtual Representative Representative { get; set; }
         public bool IsActive { get; set; } = true; // Default to active
         public ICollection<TechnicianUser> TechnicianUsers { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public ICollection<UserPermission> UserPermissions { get; set; }
+
     }
 }

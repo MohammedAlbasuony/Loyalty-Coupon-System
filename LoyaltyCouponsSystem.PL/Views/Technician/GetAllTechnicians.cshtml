@@ -582,6 +582,29 @@
         // Initialize the rows on page load
         updateRows();
 
+
+            function rearrangeRows() {
+        const tableBody = document.querySelector("#technicianTable tbody");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+
+        // Separate active and inactive rows
+        const activeRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Active");
+        const inactiveRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Inactive");
+
+        // Sort active rows by TechnicianID in descending order
+        activeRows.sort((a, b) => {
+            const idA = parseInt(a.id.replace("row-", ""), 10);
+            const idB = parseInt(b.id.replace("row-", ""), 10);
+            return idB - idA; // Descending order
+        });
+
+        // Clear the table body and append rows in the new order
+        tableBody.innerHTML = "";
+        activeRows.forEach(row => tableBody.appendChild(row)); // Add active rows first
+        inactiveRows.forEach(row => tableBody.appendChild(row)); // Add inactive rows last
+    }
+
+
         // Handle toggle activation on button click
         $(document).on('click', '.toggle-activation', function () {
             const technicianId = $(this).data('technician-id');
@@ -619,6 +642,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        rearrangeRows(); // Rearrange rows after activation status change
                         console.log('Activation status updated successfully.');
 
                         // Update the row status in the UI
@@ -712,6 +736,8 @@
             });
 
             reorderRows();
+            rearrangeRows(); // Ensure rows are rearranged after styling
+
         }
 
         // Reorder rows to move inactive rows to the end of the table

@@ -157,16 +157,27 @@
         const tableBody = document.querySelector("#customerTable tbody");
 
         // Rearrange rows based on status
-        function rearrangeRows() {
-            const rows = Array.from(tableBody.querySelectorAll("tr"));
-            const activeRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Active");
-            const inactiveRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Inactive");
+            function rearrangeRows() {
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
 
-            // Clear and re-add rows
-            tableBody.innerHTML = "";
-            activeRows.forEach(row => tableBody.appendChild(row));
-            inactiveRows.forEach(row => tableBody.appendChild(row));
-        }
+        // Filter and sort active rows by CustomerID (descending, assuming "row-{ID}" is used as ID attribute)
+        const activeRows = rows
+            .filter(row => row.querySelector(".badge").textContent.trim() === "Active")
+            .sort((a, b) => {
+                const idA = parseInt(a.id.replace("row-", ""), 10);
+                const idB = parseInt(b.id.replace("row-", ""), 10);
+                return idB - idA; // Sort descending by Customer ID
+            });
+
+        // Keep inactive rows as is
+        const inactiveRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Inactive");
+
+        // Clear and re-add rows
+        tableBody.innerHTML = "";
+        activeRows.forEach(row => tableBody.appendChild(row)); // Append active rows first
+        inactiveRows.forEach(row => tableBody.appendChild(row)); // Append inactive rows
+    }
+
 
         // Style rows dynamically based on active/inactive status
         function styleRows() {

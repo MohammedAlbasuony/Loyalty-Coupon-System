@@ -1,4 +1,5 @@
-﻿@*
+﻿@using LoyaltyCouponsSystem.BLL.Service.Abstraction
+@*
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -155,7 +156,7 @@
 
         <div class="main-panel" style="padding-left: 10px;">
             <!-- Add this header section -->
-            
+
             <div>
                 @RenderBody()
             </div>
@@ -312,18 +313,18 @@
     <script src="~/assets/js/plugin/webfont/webfont.min.js"></script>
     <script>
         WebFont.load({
-            google: { families: ["Public Sans:300,400,500,600,700"] },
-            custom: {
-                families: ["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"],
-                urls: ["~/assets/css/fonts.min.css"],
-            },
-            active: function () {
-                sessionStorage.fonts = true;
-            },
+        google: { families: ["Public Sans:300,400,500,600,700"] },
+        custom: {
+        families: ["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"],
+        urls: ["~/assets/css/fonts.min.css"],
+        },
+        active: function () {
+        sessionStorage.fonts = true;
+        },
         });
     </script>
 
-       
+
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="~/assets/css/bootstrap.min.css" />
@@ -333,104 +334,106 @@
     <style>
 
         .sidebar {
-            transition: all 0.3s ease;
-            width: 250px;
-            overflow: hidden;
+        transition: all 0.3s ease;
+        width: 250px;
+        overflow: hidden;
         }
 
-            .sidebar.collapsed {
-                width: 70px;
-            }
+        .sidebar.collapsed {
+        width: 70px;
+        }
 
-            .sidebar .nav-item {
-                text-align: left;
-                transition: all 0.3s ease;
-            }
+        .sidebar .nav-item {
+        text-align: left;
+        transition: all 0.3s ease;
+        }
 
-                .sidebar .nav-item .btn,
-                .sidebar .nav-item a {
-                    padding: 10px 15px;
-                    display: flex;
-                    align-items: center;
-                    transition: all 0.3s ease;
-                }
+        .sidebar .nav-item .btn,
+        .sidebar .nav-item a {
+        padding: 10px 15px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        }
 
-                    .sidebar .nav-item .btn i,
-                    .sidebar .nav-item a i {
-                        margin-right: 10px;
-                    }
+        .sidebar .nav-item .btn i,
+        .sidebar .nav-item a i {
+        margin-right: 10px;
+        }
 
-            .sidebar.collapsed .nav-item .btn span,
-            .sidebar.collapsed .nav-item a span {
-                display: none;
-            }
+        .sidebar.collapsed .nav-item .btn span,
+        .sidebar.collapsed .nav-item a span {
+        display: none;
+        }
 
-            /* Log Out Button Specific Styling */
-            .sidebar.collapsed .logout-btn {
-                justify-content: center;
-                padding: 10px;
-                text-align: center;
-            }
+        /* Log Out Button Specific Styling */
+        .sidebar.collapsed .logout-btn {
+        justify-content: center;
+        padding: 10px;
+        text-align: center;
+        }
 
-            /* Sidebar expands temporarily on hover */
-            .sidebar:hover:not(.static) {
-                width: 250px;
-            }
+        /* Sidebar expands temporarily on hover */
+        .sidebar:hover:not(.static) {
+        width: 250px;
+        }
 
-                .sidebar:hover:not(.static) .nav-item .btn span,
-                .sidebar:hover:not(.static) .nav-item a span {
-                    display: inline-block;
-                }
+        .sidebar:hover:not(.static) .nav-item .btn span,
+        .sidebar:hover:not(.static) .nav-item a span {
+        display: inline-block;
+        }
 
-            /* Static state for the sidebar */
-            .sidebar.static {
-                width: 250px;
-            }
+        /* Static state for the sidebar */
+        .sidebar.static {
+        width: 250px;
+        }
 
         /* Collapse Button */
         #collapseSidebar {
-            background: none;
-            border: none;
-            font-size: 20px;
-            margin: 10px;
-            color: white;
-            cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 20px;
+        margin: 10px;
+        color: white;
+        cursor: pointer;
         }
 
-            #collapseSidebar:hover {
-                opacity: 0.8;
-            }
+        #collapseSidebar:hover {
+        opacity: 0.8;
+        }
 
         /* Log Out Button */
         .logout-btn {
-            background: linear-gradient(90deg, #ff4d4d, #ff3333);
-            border: none;
-            border-radius: 25px;
-            font-weight: bold;
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            width: 90%;
-            margin: 10px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        background: linear-gradient(90deg, #ff4d4d, #ff3333);
+        border: none;
+        border-radius: 25px;
+        font-weight: bold;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        width: 90%;
+        margin: 10px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         }
 
-            .logout-btn i {
-                font-size: 20px;
-            }
+        .logout-btn i {
+        font-size: 20px;
+        }
 
-            .logout-btn:hover {
-                background: linear-gradient(90deg, #ff6666, #ff4d4d);
-                box-shadow: 0 4px 15px rgba(255, 77, 77, 0.5);
-                transform: scale(1.05);
-            }
+        .logout-btn:hover {
+        background: linear-gradient(90deg, #ff6666, #ff4d4d);
+        box-shadow: 0 4px 15px rgba(255, 77, 77, 0.5);
+        transform: scale(1.05);
+        }
     </style>
 
 
 </head>
+@inject IAdminService _adminService
+
 <body>
     <div class="wrapper">
         <!-- Sidebar -->
@@ -457,31 +460,18 @@
                         </li>
 
                         <!-- QR Codes -->
-                        <li class="nav-item">
-                            <a data-bs-toggle="collapse" href="#qrCodes" aria-expanded="false" class="collapsed">
-                                <i class="fas fa-qrcode"></i>
-                                <span>QR Codes</span>
-                                <span class="caret"></span>
-                            </a>
-                            <div class="collapse" id="qrCodes">
-                                <ul class="nav nav-collapse">
-                                    <li>
-                                        <a href="@Url.Action("DetailsOfCoupones", "GenerateQRCode")">
-                                            <span class="sub-item">Generate QRs</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="@Url.Action("GetAllCoupons", "HistoryGenerated")">
-                                            <span class="sub-item">All Generated QRs</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="@Url.Action("TransactionHistory", "HistoryGenerated")">
-                                            <span class="sub-item">Transaction Generated QRs</span>
-                                        </a>
-                                    </li>
-                                    <li>
+                        @if (await _adminService.UserHasPermissionAsync(User.Identity.Name, "Generate QR Codes"))
+                        {
+                            <li class="nav-item">
+                                <a data-bs-toggle="collapse" href="#qrCodes" aria-expanded="false" class="collapsed">
+                                    <i class="fas fa-qrcode"></i>
+                                    <span>QR Codes</span>
+                                    <span class="caret"></span>
+                                </a>
+                                <div class="collapse" id="qrCodes">
+                                    <ul class="nav nav-collapse">
                                         
+
                                         <a href="@Url.Action("Index", "QrCode")">
                                             <span class="sub-item">ScanQR</span>
                                         </a>
@@ -490,28 +480,14 @@
                             </div>
                         </li>
 
-                        <!-- Exchange Permission -->
-                        <li class="nav-item">
-                            <a data-bs-toggle="collapse" href="#exchangePermission" aria-expanded="false" class="collapsed">
-                                <i class="fas fa-exchange-alt"></i>
-                                <span>Exchange Permission</span>
-                                <span class="caret"></span>
-                            </a>
-                            <div class="collapse" id="exchangePermission">
-                                <ul class="nav nav-collapse">
-                                    <li>
-                                        <a href="@Url.Action("AssignQRCode", "ExchangeOrder")">
-                                            <span class="sub-item">Generate an Exchange Permission</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="@Url.Action("AllTransactions", "Transaction")">
-                                            <span class="sub-item">Exchange All Transactions</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+                                            <li>
+                                                <a href="@Url.Action("DetailsOfCoupones", "GenerateQRCode")">
+                                                    <span class="sub-item">Generate QRs</span>
+                                                </a>
+                                            </li>
+
+
+
 
                         <!-- DeliverFromRepresititve to Coustomer -->
                         <li class="nav-item">
@@ -536,42 +512,131 @@
                             </div>
                         </li>
 
-                        <!-- Manage Users -->
-                        <li class="nav-item">
-                            <a data-bs-toggle="collapse" href="#manageUsers" aria-expanded="false" class="collapsed">
-                                <i class="fas fa-users"></i>
-                                <span>Manage Customers</span>
-                                <span class="caret"></span>
-                            </a>
-                            <div class="collapse" id="manageUsers">
-                                <ul class="nav nav-collapse">
-                                    <li>
-                                        <a href="@Url.Action("GetAllCustomers", "Customer")">
-                                            <span class="sub-item">Manage Merchant</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="@Url.Action("GetAllDistributors", "Distributor")">
-                                            <span class="sub-item">Manage Distributor</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="@Url.Action("GetAllTechnicians", "Technician")">
-                                            <span class="sub-item">Manage Technician</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+                                            <li>
+                                                <a href="@Url.Action("GetAllCoupons", "HistoryGenerated")">
+                                                    <span class="sub-item">All Generated QRs</span>
+                                                </a>
+                                            </li>
 
+
+
+                                            <li>
+                                                <a href="@Url.Action("TransactionHistory", "HistoryGenerated")">
+                                                    <span class="sub-item">Transaction Generated QRs</span>
+                                                </a>
+                                            </li>
+
+
+                                            <li>
+                                                <a href="@Url.Action("Index", "HistoryScan")">
+                                                    <span class="sub-item">ScanQR</span>
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                </div>
+                            </li>
+                        }
+
+                        <!-- Exchange Permission -->
+                        @if (await _adminService.UserHasPermissionAsync(User.Identity.Name, "Exchange Permissions"))
+                        {
+                            <li class="nav-item">
+                                <a data-bs-toggle="collapse" href="#exchangePermission" aria-expanded="false" class="collapsed">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    <span>Exchange Permission</span>
+                                    <span class="caret"></span>
+                                </a>
+                                <div class="collapse" id="exchangePermission">
+                                    <ul class="nav nav-collapse">
+                                        
+                                            <li>
+                                                <a href="@Url.Action("AssignQRCode", "ExchangeOrder")">
+                                                    <span class="sub-item">Generate an Exchange Permission</span>
+                                                </a>
+                                            </li>
+                                        
+                                        
+                                            <li>
+                                                <a href="@Url.Action("AllTransactions", "Transaction")">
+                                                    <span class="sub-item">Exchange All Transactions</span>
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                </div>
+                            </li>
+                        }
+
+                        <!-- Deliver From Representative to Customer -->
+                        @if (await _adminService.UserHasPermissionAsync(User.Identity.Name, "Deliver From Representative to Customer"))
+                        {
+                            <li class="nav-item">
+                                <a data-bs-toggle="collapse" href="#DiliverFromRepToCoust" aria-expanded="false" class="collapsed">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    <span>Deliver Representative to Customer</span>
+                                    <span class="caret"></span>
+                                </a>
+                                <div class="collapse" id="DiliverFromRepToCoust">
+                                    <ul class="nav nav-collapse">
+                                        
+                                            <li>
+                                                <a href="@Url.Action("Index", "DilverFromRepToCoust")">
+                                                    <span class="sub-item">Generate an Exchange Permission</span>
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                </div>
+                            </li>
+                        }
+
+                        <!-- Manage Users -->
+                        @if (await _adminService.UserHasPermissionAsync(User.Identity.Name, "Manage Customers"))
+                        {
+                            <li class="nav-item">
+                                <a data-bs-toggle="collapse" href="#manageUsers" aria-expanded="false" class="collapsed">
+                                    <i class="fas fa-users"></i>
+                                    <span>Manage Customers</span>
+                                    <span class="caret"></span>
+                                </a>
+                                <div class="collapse" id="manageUsers">
+                                    <ul class="nav nav-collapse">
+                                        
+                                            <li>
+                                                <a href="@Url.Action("GetAllCustomers", "Customer")">
+                                                    <span class="sub-item">Manage Merchant</span>
+                                                </a>
+                                            </li>
+                                        
+                                        
+                                            <li>
+                                                <a href="@Url.Action("GetAllDistributors", "Distributor")">
+                                                    <span class="sub-item">Manage Distributor</span>
+                                                </a>
+                                            </li>
+                                        
+                                            <li>
+                                                <a href="@Url.Action("GetAllTechnicians", "Technician")">
+                                                    <span class="sub-item">Manage Technician</span>
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                </div>
+                            </li>
+                        }
 
                         <!-- Manage Representatives -->
-                        <li class="nav-item">
-                            <a href="@Url.Action("ManageUsers", "Admin")">
-                                <i class="fas fa-user-tie"></i>
-                                <span>Manage Users</span>
-                            </a>
-                        </li>
+                        @if (await _adminService.UserHasPermissionAsync(User.Identity.Name, "Manage Users"))
+                        {
+                            <li class="nav-item">
+                                <a href="@Url.Action("ManageUsers", "Admin")">
+                                    <i class="fas fa-user-tie"></i>
+                                    <span>Manage Users</span>
+                                </a>
+                            </li>
+                        }
 
                         <!-- Log Out -->
                         <li class="nav-item mt-auto">
@@ -580,6 +645,7 @@
                                 <span>Log Out</span>
                             </button>
                         </li>
+
                     </ul>
                 </div>
             </div>

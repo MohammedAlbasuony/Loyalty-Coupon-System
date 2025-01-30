@@ -1,4 +1,5 @@
 ﻿using LoyaltyCouponsSystem.DAL.DB;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         {
             _context = context;
         }
+        [Authorize(Policy = "Exchange Permissions")]
 
         // Display all transactions with unique ExchangePermission, sorted by the latest added first
         public async Task<IActionResult> AllTransactions()

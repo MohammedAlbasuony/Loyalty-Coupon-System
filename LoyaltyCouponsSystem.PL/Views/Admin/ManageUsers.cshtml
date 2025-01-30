@@ -5,166 +5,184 @@
     Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
 }
 @*<h1>Manage Users</h1>*@
+@Html.AntiForgeryToken()
 
-@if (User.IsInRole("SuperAdmin"))
-{
-    <div class="container mt-4">
-        <h1 class="text-primary text-center"><b>Manage Users</b></h1>
-        <br />
-        <!-- Search Filters and Add Button -->
-        <div class="row mb-4 justify-content-center">
-            <div class="col-md-8">
-                <div class="input-group shadow-sm">
-                    <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, National ID, Phone Number, Governorate, City, Role or Status...">
-                    <a href="@Url.Action("AddUser", "User")" class="btn btn-add-customer input-group-text">
-                        <i class="fas fa-plus"></i> Add User
-                    </a>
-                </div>
+
+<div class="container mt-4">
+    <h1 class="text-primary text-center"><b>Manage Users</b></h1>
+    <br />
+    <!-- Search Filters and Add Button -->
+    <div class="row mb-4 justify-content-center">
+        <div class="col-md-8">
+            <div class="input-group shadow-sm">
+                <input type="text" id="searchBox" class="form-control" placeholder="Search by Name, National ID, Phone Number, Governorate, City, Role or Status...">
+                <a href="@Url.Action("AddUser", "User")" class="btn btn-add-customer input-group-text">
+                    <i class="fas fa-plus"></i> Add User
+                </a>
             </div>
         </div>
-
-        <div class="table-responsive mt-4" style="overflow-x: auto;">
-            <table id="usersTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
-                <thead class="thead-dark bg-primary text-white">
-                    <tr>
-                        <th>Username</th>
-                        <th>National ID</th>
-                        <th>Phone Number</th>
-                        <th>Optional Phone</th>
-                        <th>Governorate</th>
-                        <th>City</th>
-                        <th>Current Role</th>
-                        <th>Current Status</th>
-                        <th>Assign Role</th>
-                        <th>Permissions</th> 
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var user in Model.ConfirmedUsers)
-                    {
-                        if (user.Role.Equals("SuperAdmin", StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue; // Skip the row entirely
-                        }
-                        <tr class="@(user.IsActive ? "" : "inactive")">
-                            <td>@user.UserName</td>
-                            <td>@user.NationalID</td>
-                            <td>@user.PhoneNumber</td>
-                            <td>@(string.IsNullOrEmpty(user.OptionalPhoneNumber) ? "N/A" : user.OptionalPhoneNumber)</td>
-                            <td>@user.Governorate</td>
-                            <td>@user.City</td>
-                            <td>@user.Role</td>
-                            <td>
-                                <span class="badge @(user.IsActive ? "bg-success" : "bg-danger")">
-                                    @(user.IsActive ? "Active" : "Inactive")
-                                </span>
-                            </td>
-                            <td>
-                                @if (user.IsActive)
-                                {
-                                    <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
-                                        <input type="hidden" name="userId" value="@user.Id" />
-                                        <select name="roleName" class="form-select action-dropdown">
-                                            <option disabled selected>Select Role</option>
-                                            @foreach (var role in Model.AllRoles)
-                                            {
-                                                <option value="@role">@role</option>
-                                            }
-                                        </select>
-                                        <br />
-                                        <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
-                                            Assign Role
-                                        </button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Not Available</span>
-                                }
-                            </td>
-                            <td>
-                                @if (user.IsActive)
-                                {
-                                    <button type="button" class="btn btn-info btn-sm shadow set-permission-btn" data-userid="@user.Id">
-                                        Set Permissions
-                                    </button>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Not Available</span>
-                                }
-                            </td>
-                            <td>
-                                <form asp-action="ToggleActivation" asp-controller="Admin" method="post" class="action-form">
-                                    <input type="hidden" name="userId" value="@user.Id" />
-                                    <button type="button"
-                                            class="btn btn-sm toggle-btn shadow @(user.IsActive ? "deactivate" : "activate")"
-                                            onclick="toggleActivation(this, '@user.UserName', this.form)"
-                                            data-status="@user.IsActive">
-                                        @(user.IsActive ? "Deactivate" : "Activate")
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-
-                    @foreach (var user in Model.UnconfirmedUsers)
-                    {
-                        <tr>
-                            <td>@user.UserName</td>
-                            <td>@user.NationalID</td>
-                            <td>@user.PhoneNumber</td>
-                            <td>@(string.IsNullOrEmpty(user.OptionalPhoneNumber) ? "N/A" : user.OptionalPhoneNumber)</td>
-                            <td>@user.Governorate</td>
-                            <td>@user.City</td>
-                            <td>@user.Role</td>
-                            <td><span class="badge bg-warning text-white">Pending</span></td>
-                            <td>
-                                <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
-                                    <input type="hidden" name="userId" value="@user.Id" />
-                                    <select name="roleName" class="form-select action-dropdown">
-                                        <option disabled selected>Select Role</option>
-                                        @foreach (var role in Model.AllRoles)
-                                        {
-                                            <option value="@role">@role</option>
-                                        }
-                                    </select>
-                                    <br />
-                                    <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
-                                        Assign Role
-                                    </button>
-                                </form>
-                            </td>
-                            <td>
-                                @if (user.IsActive)
-                                {
-                                    <button type="button" class="btn btn-info btn-sm shadow set-permission-btn" data-userid="@user.Id">
-                                        Set Permissions
-                                    </button>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Not Available</span>
-                                }
-                            </td>
-                            <td>
-                                <form asp-action="ConfirmAccount" asp-controller="Admin" method="post" class="action-form">
-                                    <input type="hidden" name="userId" value="@user.Id" />
-                                    <button type="button" class="btn btn-warning btn-sm shadow confirm-btn" onclick="confirmAccount('@user.UserName', this.form)">
-                                        Confirm Account
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-
-        <div id="paginationContainer" class="mt-4 text-center"></div>
     </div>
-}
+
+    <div class="table-responsive mt-4" style="overflow-x: auto;">
+        <table id="usersTable" class="table table-hover table-striped shadow-lg rounded border-light-modern">
+            <thead class="thead-dark bg-primary text-white">
+                <tr>
+                    <th>Username</th>
+                    <th>National ID</th>
+                    <th>Phone Number</th>
+                    <th>Optional Phone</th>
+                    <th>Governorate</th>
+                    <th>City</th>
+                    <th>Current Role</th>
+                    <th>Current Status</th>
+                    <th>Assign Role</th>
+                    <th>Permissions</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.ConfirmedUsers.Where(u => u.IsActive).OrderByDescending(u => u.CreatedDate))
+                {
+                    if (user.Role.Equals("SuperAdmin", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue; // Skip the row entirely
+                    }
+                    <tr class="active-row">
+                        <td>@user.UserName</td>
+                        <td>@user.NationalID</td>
+                        <td>@user.PhoneNumber</td>
+                        <td>@(string.IsNullOrEmpty(user.OptionalPhoneNumber) ? "N/A" : user.OptionalPhoneNumber)</td>
+                        <td>@user.Governorate</td>
+                        <td>@user.City</td>
+                        <td>@user.Role</td>
+                        <td>
+                            <span class="badge bg-success">Active</span>
+                        </td>
+                        <td>
+                            <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                <select name="roleName" class="form-select action-dropdown">
+                                    <option disabled selected>Select Role</option>
+                                    @foreach (var role in Model.AllRoles)
+                                    {
+                                        <option value="@role">@role</option>
+                                    }
+                                </select>
+                                <br />
+                                <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
+                                    Assign Role
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-info btn-sm shadow set-permission-btn" data-userid="@user.FullName">
+                                Set Permissions
+                            </button>
+                        </td>
+                        <td>
+                            <form asp-action="ToggleActivation" asp-controller="Admin" method="post" class="action-form">
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                <button type="button"
+                                        class="btn btn-sm toggle-btn shadow deactivate"
+                                        onclick="toggleActivation(this, '@user.UserName', this.form)"
+                                        data-status="@user.IsActive">
+                                    Deactivate
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+
+                @foreach (var user in Model.ConfirmedUsers.Where(u => !u.IsActive))
+                {
+                    <tr class="inactive-row">
+                        <td>@user.UserName</td>
+                        <td>@user.NationalID</td>
+                        <td>@user.PhoneNumber</td>
+                        <td>@(string.IsNullOrEmpty(user.OptionalPhoneNumber) ? "N/A" : user.OptionalPhoneNumber)</td>
+                        <td>@user.Governorate</td>
+                        <td>@user.City</td>
+                        <td>@user.Role</td>
+                        <td>
+                            <span class="badge bg-danger">Inactive</span>
+                        </td>
+                        <td>
+                            <span class="text-muted">Not Available</span>
+                        </td>
+                        <td>
+                            <span class="text-muted">Not Available</span>
+                        </td>
+                        <td>
+                            <form asp-action="ToggleActivation" asp-controller="Admin" method="post" class="action-form">
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                <button type="button"
+                                        class="btn btn-sm toggle-btn shadow activate"
+                                        onclick="toggleActivation(this, '@user.UserName', this.form)"
+                                        data-status="@user.IsActive">
+                                    Activate
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+
+                @foreach (var user in Model.UnconfirmedUsers)
+                {
+                    <tr>
+                        <td>@user.UserName</td>
+                        <td>@user.NationalID</td>
+                        <td>@user.PhoneNumber</td>
+                        <td>@(string.IsNullOrEmpty(user.OptionalPhoneNumber) ? "N/A" : user.OptionalPhoneNumber)</td>
+                        <td>@user.Governorate</td>
+                        <td>@user.City</td>
+                        <td>@user.Role</td>
+                        <td><span class="badge bg-warning text-white">Pending</span></td>
+                        <td>
+                            <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                <select name="roleName" class="form-select action-dropdown">
+                                    <option disabled selected>Select Role</option>
+                                    @foreach (var role in Model.AllRoles)
+                                    {
+                                        <option value="@role">@role</option>
+                                    }
+                                </select>
+                                <br />
+                                <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
+                                    Assign Role
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            @if (user.IsActive)
+                            {
+                                <button type="button" class="btn btn-info btn-sm shadow set-permission-btn" data-userid="@user.Id">
+                                    Set Permissions
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not Available</span>
+                            }
+                        </td>
+                        <td>
+                            <form asp-action="ConfirmAccount" asp-controller="Admin" method="post" class="action-form">
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                <button type="button" class="btn btn-warning btn-sm shadow confirm-btn" onclick="confirmAccount('@user.UserName', this.form)">
+                                    Confirm Account
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div id="paginationContainer" class="mt-4 text-center"></div>
+</div>
+
+
 
 
 
@@ -636,18 +654,23 @@
 
 
 
-    // Set Permission
-         document.addEventListener("DOMContentLoaded", function () {
+            document.addEventListener("DOMContentLoaded", function () {
+        debugger;
         const permissions = [
-            { id: "generateQRCoupons", label: "Generate QRs Coupons", icon: "fa-qrcode", color: "#007bff" },
-            { id: "scanQRCoupons", label: "Scan QRs Coupons", icon: "fa-camera", color: "#28a745" },
-            { id: "generateExchange", label: "Generate Exchange Permission", icon: "fa-file-invoice", color: "#ffc107" },
-            { id: "manageCustomers", label: "Manage Customers", icon: "fa-users", color: "#17a2b8" },
+            { id: "Generate QR Codes", label: "Generate QRs Coupons", icon: "fa-qrcode", color: "#007bff" },
+            { id: "Exchange Permissions", label: "Generate Exchange Permission", icon: "fa-file-invoice", color: "#ffc107" },
+            { id: "Manage Customers", label: "Manage Customers", icon: "fa-users", color: "#17a2b8" },
+            { id: "Deliver From Representative to Customer", label: "Deliver From Representative to Customer", icon: "fa-users", color: "#17a2b8" },
+            { id: "Manage Users", label: "Manage Users", icon: "fa-users", color: "#17a2b8" },
+            { id: "scanQRCoupons", label: "xxx", icon: "fa-camera", color: "#28a745" },
+            { id: "Manage Customers", label: "xxx", icon: "fa-users", color: "#17a2b8" },
         ];
 
         document.querySelectorAll(".set-permission-btn").forEach(button => {
             button.addEventListener("click", function () {
-                const userName = this.closest("tr").querySelector("td").textContent.trim(); // Fetch username from the row
+                const userRow = this.closest("tr");
+                const userName = userRow.querySelector("td:nth-child(1)").textContent.trim();  // Capture the username
+                const userId = userRow.querySelector("input[name='userId']").value;  // Capture the user ID
 
                 let cardHTML = permissions.map(permission => `
                     <div class="col-md-6 mb-4">
@@ -664,14 +687,14 @@
                 `).join("");
 
                 Swal.fire({
-                    title: `<h3 style="color: #007bff; font-weight: bold;">Set Permissions for ${userName}</h3>`,
+                    title: `<h3 style="color: #007bff; font-weight: bold;">Set Permissions for User: ${userName}</h3>`, // Display username here
                     html: `
                         <div class="container text-center">
                             <div class="row">
                                 ${cardHTML}
                             </div>
                             <div class="mt-4">
-                                <button class="btn btn-primary save-permissions-btn" data-username="${userName}">Save Permissions</button>
+                                <button class="btn btn-primary save-permissions-btn" data-userid="${userId}">Save Permissions</button>
                                 <button class="btn btn-secondary cancel-btn">Cancel</button>
                             </div>
                         </div>
@@ -693,9 +716,30 @@
                         document.querySelector(".save-permissions-btn").addEventListener("click", function () {
                             const selectedPermissions = Array.from(document.querySelectorAll(".permission-checkbox:checked"))
                                 .map(checkbox => checkbox.id.replace("-checkbox", ""));
+                            const userId = this.getAttribute("data-userid");  // Get user ID from button
 
-                            // Simulate saving permissions (no real backend needed)
-                            Swal.fire("Success!", "Permissions updated successfully.", "success");
+                            fetch("/Admin/AssignPermissionsToUser", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "RequestVerificationToken": document.querySelector("input[name=__RequestVerificationToken]").value
+                                },
+                                body: JSON.stringify({ UserId: userId, SelectedPermissions: selectedPermissions })
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    return response.json();
+                                }
+                                throw new Error("Failed to assign permissions.");
+                            })
+                            .then(data => {
+                                Swal.fire("Success!", "Permissions assigned successfully.", "success").then(() => {
+                                    location.reload();
+                                });
+                            })
+                            .catch(error => {
+                                Swal.fire("Error!", error.message, "error");
+                            });
                         });
 
                         document.querySelector(".cancel-btn").addEventListener("click", function () {
@@ -707,4 +751,8 @@
         });
     });
 
+
+       
+
+    
 </script>
