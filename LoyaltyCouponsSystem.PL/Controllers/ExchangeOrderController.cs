@@ -44,19 +44,63 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         [HttpPost]
         public async Task<IActionResult> AssignQRCode(string selectedCustomerCode, string selectedDistributorCode, string selectedGovernate, string selectedCity, List<AssignmentViewModel> transactions)
         {
-            ServiceToManageStatues serviceToManageStatues=new ServiceToManageStatues(_context);
+            var assignmentMapping = new AssignmentViewModel
+            {
+                SelectedCustomerCode = selectedCustomerCode,
+                SelectedDistributorCode = selectedDistributorCode,
+                SelectedGovernate = selectedGovernate,
+                SelectedCity = selectedCity
+            };
+
+            ServiceToManageStatues serviceToManageStatues = new ServiceToManageStatues(_context);
+
+            // Validate required fields
+            if (string.IsNullOrEmpty(selectedCustomerCode))
+            {
+                ModelState.AddModelError("selectedCustomerCode", "Customer is required.");
+            }
+            if (string.IsNullOrEmpty(selectedDistributorCode))
+            {
+                ModelState.AddModelError("selectedDistributorCode", "Distributor is required.");
+            }
+            if (string.IsNullOrEmpty(selectedGovernate))
+            {
+                ModelState.AddModelError("selectedGovernate", "Governate is required.");
+            }
+            if (string.IsNullOrEmpty(selectedCity))
+            {
+                ModelState.AddModelError("selectedCity", "City is required.");
+            }
+
             foreach (var transaction in transactions)
             {
+                // Fetch the last recorded sequence number for the specific coupon type
+                var lastSequence = _context.Transactions
+                    .Where(t => t.CouponType == transaction.SelectedCouponType)
+                    .OrderByDescending(t => t.TransactionID)
+                    .Select(t => t.SequenceEnd)
+                    .FirstOrDefault() ?? "0"; // Default to "0" if no records exist for that coupon type
 
-                // Update Statues , Represintitive, Customer
-                serviceToManageStatues.ManageStatuesEcxhangeOrder(transaction.SequenceStart, transaction.SequenceEnd, selectedCustomerCode, selectedDistributorCode); 
+                // Validate that SequenceStart is greater than the last recorded sequence for this coupon type
+                if (string.Compare(transaction.SequenceStart, lastSequence) <= 0)
+                {
+                    ModelState.AddModelError(nameof(transaction.SequenceStart),
+                        $"SequenceStart must be greater than the last recorded sequence number for coupon type {transaction.SelectedCouponType}: {lastSequence}");
+                }
+
+                // Update Status, Representative, Customer
+                serviceToManageStatues.ManageStatuesEcxhangeOrder(
+                    transaction.SequenceStart, transaction.SequenceEnd,
+                    selectedCustomerCode, selectedDistributorCode);
 
                 var couponIdentifier = GetCouponIdentifier(transaction.SelectedCouponType);
 
                 // Validate that SequenceStart and SequenceEnd start with the correct prefix
-                if (!transaction.SequenceStart.StartsWith(couponIdentifier) || !transaction.SequenceEnd.StartsWith(couponIdentifier))
+                if (!transaction.SequenceStart.StartsWith(couponIdentifier) ||
+                    !transaction.SequenceEnd.StartsWith(couponIdentifier))
                 {
-                    ModelState.AddModelError(string.Empty, $"Start and End Sequences must start with '{couponIdentifier}' for the selected coupon type.");
+                    ModelState.AddModelError(string.Empty,
+                        $"Start and End Sequences must start with '{couponIdentifier}' for the selected coupon type.");
                 }
 
                 // Ensure unique sequence range
@@ -67,25 +111,28 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
                 if (isDuplicate)
                 {
-                    ModelState.AddModelError(string.Empty, $"The sequence range {transaction.SequenceStart}-{transaction.SequenceEnd} is already used.");
+                    ModelState.AddModelError(string.Empty,
+                        $"The sequence range {transaction.SequenceStart}-{transaction.SequenceEnd} is already used for coupon type {transaction.SelectedCouponType}.");
                 }
 
                 // Check for duplicate Exchange Permission
                 if (await _service.IsExchangePermissionDuplicateAsync(transaction.ExchangePermission))
                 {
-                    ModelState.AddModelError("ExchangePermission", $"Exchange Permission Number {transaction.ExchangePermission} is already used.");
+                    ModelState.AddModelError("ExchangePermission",
+                        $"Exchange Permission Number {transaction.ExchangePermission} is already used.");
                 }
             }
 
+            // If there are validation errors, return to the view with the model
+            if (!ModelState.IsValid)
+            {
+                // Return the assignmentMapping with selected values to the view
+                return View(assignmentMapping);
+            }
 
+            // Call the service to assign QR codes after validation
             await _service.AssignQRCodeAsync(selectedCustomerCode, selectedDistributorCode, selectedGovernate, selectedCity, transactions);
             TempData["SuccessMessage"] = "All assignments saved successfully.";
-
-            //if (!ModelState.IsValid)
-            //{
-            //    var model = await _service.GetAssignmentDetailsAsync();
-            //    return View(model);
-            //}
 
             return RedirectToAction("AllTransactions", "Transaction");
         }
@@ -106,6 +153,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
         }
 
 
+
         // New action for AJAX validation
         [Route("ExchangeOrder/CheckExchangePermission")]
         [HttpPost]
@@ -122,6 +170,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 return Json(false); // Return false to indicate an issue
             }
         }
+       
 
     }
 }
