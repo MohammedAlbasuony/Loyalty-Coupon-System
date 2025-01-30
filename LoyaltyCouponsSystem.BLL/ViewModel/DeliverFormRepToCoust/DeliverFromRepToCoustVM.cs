@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using LoyaltyCouponsSystem.DAL.Entity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,19 +12,31 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.DeliverFormRepToCoust
 {
     public class DeliverFromRepToCoustVM
     {
-        public List<SelectListItem> Customers { get; set; } = new List<SelectListItem>();
-        public List<SelectListItem> Technicians { get; set; } = new List<SelectListItem>();
+       
 
 
         [Required(ErrorMessage = "Customer is required.")]
         public string? SelectedCustomerCode { get; set; }
 
+        [Required(ErrorMessage = "Represintitive is required.")]
+        public string? SelectedRepresintitiveCode { get; set; }
+
         [Required(ErrorMessage = "Technician is required.")]
         public string? SelectedTechnicianCode { get; set; }
 
-        public string? Governorate { get; set; }
-        public string? Area { get; set; }
-       
+        [Display(Name = "Governorate")]
+        public int? GovernorateId { get; set; }
+
+
+
+        public IEnumerable<Governorate>? governorates { get; set; }
+
+        [Display(Name = "Area")]
+
+        public int? AreaId { get; set; }
+        public IEnumerable<Area>? Areas { get; set; } = new List<Area>();
+
+
 
 
         [Required(ErrorMessage = "Exchange permission is required.")]
@@ -32,6 +46,8 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.DeliverFormRepToCoust
         public string CustomerDetails { get; set; }
         public string TechnicianDetails { get; set; }
         public string? CreatedBy { get; set; }
-        
+        public IFormFile image { get; set; } 
+
+
     }
 }

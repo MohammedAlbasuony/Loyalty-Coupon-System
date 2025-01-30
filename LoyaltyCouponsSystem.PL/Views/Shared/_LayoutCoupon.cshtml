@@ -471,6 +471,15 @@
                                 <div class="collapse" id="qrCodes">
                                     <ul class="nav nav-collapse">
                                         
+
+                                        <a href="@Url.Action("Index", "QrCode")">
+                                            <span class="sub-item">ScanQR</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
                                             <li>
                                                 <a href="@Url.Action("DetailsOfCoupones", "GenerateQRCode")">
                                                     <span class="sub-item">Generate QRs</span>
@@ -478,11 +487,37 @@
                                             </li>
 
 
+
+
+                        <!-- DeliverFromRepresititve to Coustomer -->
+                        <li class="nav-item">
+                            <a data-bs-toggle="collapse" href="#DiliverFromRepToCoust" aria-expanded="false" class="collapsed">
+                                <i class="fas fa-exchange-alt"></i>
+                                <span> Merchant receipt from the representative.</span>
+                                <span class="caret"></span>
+                            </a>
+                            <div class="collapse" id="DiliverFromRepToCoust">
+                                <ul class="nav nav-collapse">
+                                    <li>
+                                        <a href="@Url.Action("Index", "DilverFromRepToCoust")">
+                                            <span class="sub-item">Merchant receipt from the representative.</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Transaction", "DilverFromRepToCoust")">
+                                            <span class="sub-item"> All Transactions</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
                                             <li>
                                                 <a href="@Url.Action("GetAllCoupons", "HistoryGenerated")">
                                                     <span class="sub-item">All Generated QRs</span>
                                                 </a>
                                             </li>
+
 
 
                                             <li>

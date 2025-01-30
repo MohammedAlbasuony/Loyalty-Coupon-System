@@ -1,0 +1,32 @@
+﻿using LoyaltyCouponsSystem.DAL.Entity;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LoyaltyCouponsSystem.BLL.ViewModel.DeliverFormRepToCoust
+{
+    public class TransactionForRecieptFromRepToCustVM
+    {
+
+        
+        public string CustomerCode { get; set; }
+
+        public string TechnitionCode { get; set; }
+
+        public string ReprsentitiveCode { get; set; }
+
+        public string ExchangePermissionNumber { get; set; }
+
+
+
+
+        public string? GovernorateName { get; set; }
+
+        public string? AreaName { get; set; }
+        public DateTime CreationDateTime { get; set; }
+        public string? GeneratedBy { get; set; }
+    }
+}

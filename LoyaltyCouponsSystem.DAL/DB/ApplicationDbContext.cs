@@ -35,6 +35,8 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public DbSet<UserPermission> UserPermissions { get; set; }
 
         public DbSet<QRCodeTransactionGenerated> qRCodeTransactionGenerateds { get; set; }
+        public DbSet<TransactionForRecieptFromRepToCust> TransactionForRecieptFromRepToCusts { get; set; }
+
 
         public DbSet<DeliverFromRepToCoust> DeliverFromRepToCousts { get; set; }
 

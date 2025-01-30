@@ -96,7 +96,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             ViewBag.Governorates = GetGovernorates();
 
             return View(paginatedCoupons);
-
+                
            
         }
 
