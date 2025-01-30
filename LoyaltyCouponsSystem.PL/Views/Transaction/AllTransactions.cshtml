@@ -255,26 +255,27 @@
                 const response = await fetch(`/Transaction/GetCoupons?exchangePermission=${exchangePermission}`);
                 const coupons = await response.json();
 
-                // Dynamically create a card for each coupon
-                if (coupons.length > 0) {
-                    coupons.forEach(coupon => {
-                        const card = `
-                            <div class="col-md-4">
-                                <div class="card custom-card">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title"><b>Coupon Sort:</b> ${coupon.couponSort || "N/A"}</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted"><b>Coupon Type:</b> ${coupon.couponType || "N/A"}</h6>
-                                        <p class="card-text"><b>Start Sequence:</b> ${coupon.sequenceStart}</p>
-                                        <p class="card-text"><b>End Sequence:</b> ${coupon.sequenceEnd}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        modalContent.innerHTML += card;
-                    });
-                } else {
-                    modalContent.innerHTML = "<p class='text-center'>No coupons found for this Exchange Permission.</p>";
-                }
+                // // Dynamically create a card for each coupon
+                // if (coupons.length > 0) {
+                //     coupons.forEach(coupon => {
+                //         const card = `
+                //             <div class="col-md-4">
+                //                 <div class="card custom-card">
+                //                     <div class="card-body text-center">
+                //                         <h5 class="card-title"><b>Coupon Sort:</b> ${coupon.couponSort || "N/A"}</h5>
+                //                         <h6 class="card-subtitle mb-2 text-muted"><b>Coupon Type:</b> ${coupon.couponType || "N/A"}</h6>
+                //                         <p class="card-text"><b>Start Sequence:</b> ${coupon.sequenceStart}</p>
+                //                         <p class="card-text"><b>End Sequence:</b> ${coupon.sequenceEnd}</p>
+                //                     </div>
+                //                 </div>
+                //             </div>
+                //         `;
+                //         modalContent.innerHTML += card;
+                //     });
+                // } else {
+                //     modalContent.innerHTML = "<p class='text-center'>No coupons found for this Exchange Permission.</p>";
+                // }
+
             });
         });
     });

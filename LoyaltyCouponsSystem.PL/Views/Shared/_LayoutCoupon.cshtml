@@ -482,7 +482,7 @@
                                     </li>
                                     <li>
                                         
-                                        <a href="@Url.Action("Index", "HistoryScan")">
+                                        <a href="@Url.Action("Index", "QrCode")">
                                             <span class="sub-item">ScanQR</span>
                                         </a>
                                     </li>
@@ -517,21 +517,21 @@
                         <li class="nav-item">
                             <a data-bs-toggle="collapse" href="#DiliverFromRepToCoust" aria-expanded="false" class="collapsed">
                                 <i class="fas fa-exchange-alt"></i>
-                                <span> Deliver Representitive to Coustomer</span>
+                                <span> Merchant receipt from the representative.</span>
                                 <span class="caret"></span>
                             </a>
                             <div class="collapse" id="DiliverFromRepToCoust">
                                 <ul class="nav nav-collapse">
                                     <li>
                                         <a href="@Url.Action("Index", "DilverFromRepToCoust")">
-                                            <span class="sub-item">Generate an Exchange Permission</span>
+                                            <span class="sub-item">Merchant receipt from the representative.</span>
                                         </a>
                                     </li>
-                                    @* <li>
-                                        <a href="@Url.Action("AllTransactions", "Transaction")">
-                                            <span class="sub-item">Exchange All Transactions</span>
+                                    <li>
+                                        <a href="@Url.Action("Transaction", "DilverFromRepToCoust")">
+                                            <span class="sub-item"> All Transactions</span>
                                         </a>
-                                    </li> *@
+                                    </li>
                                 </ul>
                             </div>
                         </li>

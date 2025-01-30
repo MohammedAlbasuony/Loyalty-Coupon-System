@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250130194238_ReciptFromRepToCust")]
+    partial class ReciptFromRepToCust
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -370,7 +373,10 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AreaId")
+                    b.Property<string>("AreaName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("AreasId")
                         .HasColumnType("int");
 
                     b.Property<string>("CostomerCode")
@@ -379,14 +385,17 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CustomerID")
+                    b.Property<int>("CustomerID")
                         .HasColumnType("int");
 
                     b.Property<string>("ExchangePermission")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("GovernorateId")
+                    b.Property<string>("GovernorateName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("GovernoratesId")
                         .HasColumnType("int");
 
                     b.Property<string>("ImagePath")
@@ -397,7 +406,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TechnicianID")
+                    b.Property<int>("TechnicianID")
                         .HasColumnType("int");
 
                     b.Property<string>("TechnitionCode")
@@ -408,11 +417,11 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AreaId");
+                    b.HasIndex("AreasId");
 
                     b.HasIndex("CustomerID");
 
-                    b.HasIndex("GovernorateId");
+                    b.HasIndex("GovernoratesId");
 
                     b.HasIndex("TechnicianID");
 
@@ -1291,19 +1300,23 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 {
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Area", "Areas")
                         .WithMany()
-                        .HasForeignKey("AreaId");
+                        .HasForeignKey("AreasId");
 
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Customer", "Customer")
                         .WithMany()
-                        .HasForeignKey("CustomerID");
+                        .HasForeignKey("CustomerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Governorate", "Governorates")
                         .WithMany()
-                        .HasForeignKey("GovernorateId");
+                        .HasForeignKey("GovernoratesId");
 
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Technician", "Technician")
                         .WithMany()
-                        .HasForeignKey("TechnicianID");
+                        .HasForeignKey("TechnicianID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Areas");
 

@@ -1,0 +1,193 @@
+﻿@using LoyaltyCouponsSystem.BLL.ViewModel.DeliverFormRepToCoust
+@model IEnumerable<TransactionForRecieptFromRepToCustVM>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
+}
+
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Transaction Of R</h4>
+            <form method="get" class="form-inline">
+                <div class="row">
+                   
+                    <div class="col">
+                        <input type="text" name="ExchangePermissionNumber" class="form-control" placeholder="ExchangePermissionNumber (String)" value="@ViewContext.HttpContext.Request.Query["ExchangePermissionNumber"]" />
+                    </div>
+                    
+                    <div class="col">
+                        <select id="governorate" name="governorate" class="form-select">
+                            <option disabled selected>Select Governorate</option>
+                            @foreach (var governorate in ViewBag.Governorates as IEnumerable<string>)
+                            {
+                                <option value="@governorate">@governorate</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select id="area" name="area" class="form-select" disabled>
+                            <option disabled selected>Select Area</option>
+                        </select>
+                    </div>
+                   
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ExchangePermissionNumber)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.CustomerCode)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ReprsentitiveCode)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(model => model.CreationDateTime)
+                            </th>
+
+                           
+
+
+                            <th>
+                                @Html.DisplayNameFor(model => model.GeneratedBy)
+                            </th>
+                           
+                            <th>
+                                @Html.DisplayNameFor(model => model.GovernorateName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.AreaName)
+                            </th>
+                           
+                            
+
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ExchangePermissionNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CustomerCode)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ReprsentitiveCode)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CreationDateTime)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.GeneratedBy)
+                                </td>
+
+
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.GovernorateName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AreaName)
+                                </td>
+                                
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <nav>
+                    <ul class="pagination">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?ExchangePermissionNumber=@ViewContext.HttpContext.Request.Query["ExchangePermissionNumber"]&governorate=@ViewContext.HttpContext.Request.Query["governorate"]&area=@ViewContext.HttpContext.Request.Query["area"]&page=@(ViewBag.CurrentPage - 1)">Previous</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage > 3)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?ExchangePermissionNumber=@ViewContext.HttpContext.Request.Query["ExchangePermissionNumber"]&governorate=@ViewContext.HttpContext.Request.Query["governorate"]&area=@ViewContext.HttpContext.Request.Query["area"]&page=1">1</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link">...</a>
+                            </li>
+                        }
+
+                        @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                        {
+                            <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                <a class="page-link" href="?ExchangePermissionNumber=@ViewContext.HttpContext.Request.Query["ExchangePermissionNumber"]&governorate=@ViewContext.HttpContext.Request.Query["governorate"]&area=@ViewContext.HttpContext.Request.Query["area"]&page=@i">@i</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages - 2)
+                        {
+                            <li class="page-item disabled">
+                                <a class="page-link">...</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?ExchangePermissionNumber=@ViewContext.HttpContext.Request.Query["ExchangePermissionNumber"]&governorate=@ViewContext.HttpContext.Request.Query["governorate"]&area=@ViewContext.HttpContext.Request.Query["area"]&page=@ViewBag.TotalPages">@ViewBag.TotalPages</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?ExchangePermissionNumber=@ViewContext.HttpContext.Request.Query["ExchangePermissionNumber"]&governorate=@ViewContext.HttpContext.Request.Query["governorate"]&area=@ViewContext.HttpContext.Request.Query["area"]&page=@(ViewBag.CurrentPage + 1)">Next</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('governorate').addEventListener('change', function () {
+            const governorate = this.value;
+            const areaDropdown = document.getElementById('area');
+
+            if (governorate) {
+                 areaDropdown.disabled = false;
+                fetch(`/DilverFromRepToCoust/GetAreas?governorate=${
+                }`)
+
+                    .then(response => response.json())
+                    .then(data => {
+                        areaDropdown.innerHTML = '<option disabled selected>Select Area</option>';
+                        data.forEach(area => {
+                            const option = document.createElement('option');
+                            option.value = area;
+                            option.textContent = area;
+                            areaDropdown.appendChild(option);
+                        });
+                        areaDropdown.disabled = false;
+                    });
+            } else {
+                areaDropdown.innerHTML = '<option value="">Select Area</option>';
+                areaDropdown.disabled = true;
+            }
+        });
+    </script>
