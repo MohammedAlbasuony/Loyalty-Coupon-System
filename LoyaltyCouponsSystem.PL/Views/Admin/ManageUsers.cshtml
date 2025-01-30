@@ -41,13 +41,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var user in Model.ConfirmedUsers)
+                    @foreach (var user in Model.ConfirmedUsers.Where(u => u.IsActive).OrderByDescending(u => u.CreatedDate))
                     {
                         if (user.Role.Equals("SuperAdmin", StringComparison.OrdinalIgnoreCase))
                         {
                             continue; // Skip the row entirely
                         }
-                        <tr class="@(user.IsActive ? "" : "inactive")">
+                        <tr class="active-row">
                             <td>@user.UserName</td>
                             <td>@user.NationalID</td>
                             <td>@user.PhoneNumber</td>
@@ -56,53 +56,70 @@
                             <td>@user.City</td>
                             <td>@user.Role</td>
                             <td>
-                                <span class="badge @(user.IsActive ? "bg-success" : "bg-danger")">
-                                    @(user.IsActive ? "Active" : "Inactive")
-                                </span>
+                                <span class="badge bg-success">Active</span>
                             </td>
                             <td>
-                                @if (user.IsActive)
-                                {
-                                    <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
-                                        <input type="hidden" name="userId" value="@user.Id" />
-                                        <select name="roleName" class="form-select action-dropdown">
-                                            <option disabled selected>Select Role</option>
-                                            @foreach (var role in Model.AllRoles)
-                                            {
-                                                <option value="@role">@role</option>
-                                            }
-                                        </select>
-                                        <br />
-                                        <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
-                                            Assign Role
-                                        </button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Not Available</span>
-                                }
-                            </td>
-                            <td>
-                                @if (user.IsActive)
-                                {
-                                    <button type="button" class="btn btn-info btn-sm shadow set-permission-btn" data-userid="@user.Id">
-                                        Set Permissions
+                                <form asp-action="AssignRole" asp-controller="Admin" method="post" class="action-form">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <select name="roleName" class="form-select action-dropdown">
+                                        <option disabled selected>Select Role</option>
+                                        @foreach (var role in Model.AllRoles)
+                                        {
+                                            <option value="@role">@role</option>
+                                        }
+                                    </select>
+                                    <br />
+                                    <button type="button" class="btn btn-primary btn-sm shadow assign-btn" onclick="confirmAssignRole('@user.UserName', this.form)">
+                                        Assign Role
                                     </button>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Not Available</span>
-                                }
+                                </form>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-info btn-sm shadow set-permission-btn" data-userid="@user.Id">
+                                    Set Permissions
+                                </button>
                             </td>
                             <td>
                                 <form asp-action="ToggleActivation" asp-controller="Admin" method="post" class="action-form">
                                     <input type="hidden" name="userId" value="@user.Id" />
                                     <button type="button"
-                                            class="btn btn-sm toggle-btn shadow @(user.IsActive ? "deactivate" : "activate")"
+                                            class="btn btn-sm toggle-btn shadow deactivate"
                                             onclick="toggleActivation(this, '@user.UserName', this.form)"
                                             data-status="@user.IsActive">
-                                        @(user.IsActive ? "Deactivate" : "Activate")
+                                        Deactivate
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+
+                    @foreach (var user in Model.ConfirmedUsers.Where(u => !u.IsActive))
+                    {
+                        <tr class="inactive-row">
+                            <td>@user.UserName</td>
+                            <td>@user.NationalID</td>
+                            <td>@user.PhoneNumber</td>
+                            <td>@(string.IsNullOrEmpty(user.OptionalPhoneNumber) ? "N/A" : user.OptionalPhoneNumber)</td>
+                            <td>@user.Governorate</td>
+                            <td>@user.City</td>
+                            <td>@user.Role</td>
+                            <td>
+                                <span class="badge bg-danger">Inactive</span>
+                            </td>
+                            <td>
+                                <span class="text-muted">Not Available</span>
+                            </td>
+                            <td>
+                                <span class="text-muted">Not Available</span>
+                            </td>
+                            <td>
+                                <form asp-action="ToggleActivation" asp-controller="Admin" method="post" class="action-form">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="button"
+                                            class="btn btn-sm toggle-btn shadow activate"
+                                            onclick="toggleActivation(this, '@user.UserName', this.form)"
+                                            data-status="@user.IsActive">
+                                        Activate
                                     </button>
                                 </form>
                             </td>

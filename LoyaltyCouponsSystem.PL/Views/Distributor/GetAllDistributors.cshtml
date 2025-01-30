@@ -393,15 +393,27 @@
         const paginationContainer = document.getElementById("paginationContainer");
 
         // Rearrange rows based on status
-        function rearrangeRows() {
-            const rows = Array.from(tableBody.querySelectorAll("tr"));
-            const activeRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Active");
-            const inactiveRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Inactive");
+            function rearrangeRows() {
+        const tableBody = document.querySelector("#distributorTable tbody");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
 
-            tableBody.innerHTML = "";
-            activeRows.forEach(row => tableBody.appendChild(row));
-            inactiveRows.forEach(row => tableBody.appendChild(row));
-        }
+        // Separate active and inactive rows
+        const activeRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Active");
+        const inactiveRows = rows.filter(row => row.querySelector(".badge").textContent.trim() === "Inactive");
+
+        // Sort active rows by DistributorID in descending order
+        activeRows.sort((a, b) => {
+            const idA = parseInt(a.id.replace("row-", ""), 10);
+            const idB = parseInt(b.id.replace("row-", ""), 10);
+            return idB - idA; // Descending order
+        });
+
+        // Clear the table body and append rows in the new order
+        tableBody.innerHTML = "";
+        activeRows.forEach(row => tableBody.appendChild(row)); // Add active rows first
+        inactiveRows.forEach(row => tableBody.appendChild(row)); // Add inactive rows last
+    }
+
 
         // Style rows dynamically
         function styleRows() {

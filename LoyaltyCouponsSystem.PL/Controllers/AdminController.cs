@@ -47,7 +47,9 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                     City = user.City,
                     Role = roles.FirstOrDefault(),
                     EmailConfirmed = user.EmailConfirmed,
-                    IsActive = user.IsActive // Assuming IsActive is part of the ApplicationUser class
+                    IsActive = user.IsActive, // Assuming IsActive is part of the ApplicationUser class
+                    CreatedDate = user.CreatedDate // Ensure this is assigned
+
                 };
 
                 if (user.EmailConfirmed == true)

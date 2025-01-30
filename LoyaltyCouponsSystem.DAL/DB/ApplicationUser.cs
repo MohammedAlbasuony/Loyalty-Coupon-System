@@ -23,5 +23,6 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public virtual Representative Representative { get; set; }
         public bool IsActive { get; set; } = true; // Default to active
         public ICollection<TechnicianUser> TechnicianUsers { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     }
 }
