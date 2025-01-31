@@ -113,8 +113,9 @@ namespace LoyaltyCouponsSystem.PL
 
                 await CreateRolesAndSuperAdminAsync(roleManager, userManager);
                 await SeedPermissionsAsync(roleManager, context); // Seed Permissions to Roles
-                await AssignPermissionsToUsersWithRoleAsync( roleManager,userManager,context); // Assign Permissions to Roles
-            
+                await AssignPermissionsToUsersWithRoleAsync(roleManager, userManager, context); // Assign Permissions to Roles
+                await AssignPermissionsToRolesAsync(roleManager, context); // Assign Permissions to Roles
+
             }
 
             app.Run();
@@ -194,7 +195,49 @@ namespace LoyaltyCouponsSystem.PL
             }
         }
 
-      
+        private static async Task AssignPermissionsToRolesAsync(
+     RoleManager<IdentityRole> roleManager,
+     ApplicationDbContext context)
+        {
+            var roleNamesToPermissions = new Dictionary<string, List<string>>
+            {
+                { "Admin", new List<string> { "Manage Customers",  "Manage Users", "Generate QR Codes", "Exchange Permissions" } },
+                { "HR", new List<string> { "Manage Users" } },
+                { "Representative", new List<string> { "Manage Customers" } },
+                { "Storekeeper", new List<string> { "Exchange Permissions" } },
+                { "Accountant", new List<string> { "Manage Users" } },
+                { "SuperAdmin", new List<string> { "Manage Customers",  "Manage Users", "Generate QR Codes", "Exchange Permissions", "Scan QR Codes" , "Deliver From Representative to Customer" } }
+            };
+
+            foreach (var roleName in roleNamesToPermissions)
+            {
+                var role = await roleManager.FindByNameAsync(roleName.Key);
+                if (role != null)
+                {
+                    foreach (var permissionName in roleName.Value)
+                    {
+                        var permission = await context.Permissions
+                            .FirstOrDefaultAsync(p => p.Name == permissionName);  // Ensure column name matches
+                        if (permission != null)
+                        {
+                            var existingRolePermission = await context.RolePermissions
+                                .FirstOrDefaultAsync(rp => rp.RoleId == role.Id && rp.PermissionId == permission.Id);
+
+                            if (existingRolePermission == null)
+                            {
+                                var rolePermission = new RolePermission
+                                {
+                                    RoleId = role.Id,
+                                    PermissionId = permission.Id,
+                                };
+                                context.RolePermissions.Add(rolePermission);
+                            }
+                        }
+                    }
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
         private static async Task AssignPermissionsToUsersWithRoleAsync(
     RoleManager<IdentityRole> roleManager,
     UserManager<ApplicationUser> userManager,
