@@ -1,12 +1,11 @@
 ﻿using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
 using LoyaltyCouponsSystem.BLL.ViewModel.Distributor;
+using LoyaltyCouponsSystem.BLL.ViewModel.ReceiveFromCustomer;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
 {
@@ -21,7 +20,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
 
         public async Task<IActionResult> ReturnItems()
         {
-            // Fetch only active customers, distributors, and technicians
+            // Prepare ViewBag for dropdowns
             ViewBag.Customers = await _DBcontext.Customers
                 .Where(c => c.IsActive)
                 .Select(c => new CustomerViewModel
@@ -52,58 +51,117 @@ namespace LoyaltyCouponsSystem.PL.Controllers
                 })
                 .ToListAsync();
 
-            return View();
-        }
+            // Fetch Governorates only
+            ViewBag.Governorates = await _DBcontext.Governorates
+                .Select(g => new { g.Id, g.Name })
+                .ToListAsync();
 
-        [HttpPost]
-        public async Task<IActionResult> SubmitReturnItems(string CustomerCode, string DistributorCode, string TechnicianCode, string Governorate, string City, string CouponReceiptNumber)
+            return View(new ReceiveFromCustomerViewModel());
+        }
+        [HttpGet("GetAreasByGovernorate/{governorateId}")]
+        public IActionResult GetAreasByGovernorate(int governorateId)
         {
-            // Validate inputs
-            if (string.IsNullOrEmpty(CustomerCode) || string.IsNullOrEmpty(DistributorCode) || string.IsNullOrEmpty(TechnicianCode) ||
-                string.IsNullOrEmpty(Governorate) || string.IsNullOrEmpty(City) || string.IsNullOrEmpty(CouponReceiptNumber))
+            var areas = _DBcontext.Areas
+                .Where(a => a.GovernateId == governorateId)
+                .Select(a => new { a.Id, a.Name })
+                .ToList();
+
+            if (!areas.Any())
             {
-                TempData["Error"] = "All fields are required!";
-                return RedirectToAction("ReturnItems");
+                return NotFound("No areas found for the selected governorate.");
             }
 
+            return Ok(areas);
+        }
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitReturnItems(ReceiveFromCustomerViewModel model)
+        {
+
+
+            
+            // Create and save the transaction
             try
             {
-                // Parse the inputs and create a new transaction
+                // Create and save the transaction
                 var transaction = new ReceiveFromCustomer
                 {
-                    CustomerCode = CustomerCode,
-                    DistributorCode = DistributorCode,
-                    TechnicianCode = TechnicianCode,
-                    Governorate = Governorate,
-                    City = City,
-                    CouponReceiptNumber = long.Parse(CouponReceiptNumber), // Still numeric
+                    CustomerCode = _DBcontext.Customers.Where(c => c.CustomerID == model.CustomerId).Select(c => c.Code).FirstOrDefault(),
+                    DistributorCode = _DBcontext.Distributors.Where(d => d.DistributorID == model.DistributorId).Select(d => d.Code).FirstOrDefault(),
+                    TechnicianCode = _DBcontext.Technicians.Where(t => t.TechnicianID == model.TechnicianId).Select(t => t.Code).FirstOrDefault(),
+                    GovernorateId = model.GovernorateId,
+                    Governorates = _DBcontext.Governorates.FirstOrDefault(g => g.Id == model.GovernorateId),
+                    AreaId = model.CityId,
+                    Areas = _DBcontext.Areas.FirstOrDefault(a => a.Id == model.CityId),
+                    CouponReceiptNumber = model.CouponReceiptNumber,
                     TransactionDate = DateTime.Now
                 };
 
-                // Save transaction to the database
                 _DBcontext.ReceiveFromCustomers.Add(transaction);
                 await _DBcontext.SaveChangesAsync();
 
-                // Success message
                 TempData["Success"] = "Transaction submitted successfully!";
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "An error occurred: " + ex.Message;
+                var customerExists = _DBcontext.Customers.Any(c => c.CustomerID == model.CustomerId);
+                if (!customerExists)
+                {
+                    TempData["Error"] = "Invalid CustomerId. Please select a valid customer.";
+                    return RedirectToAction("ReturnItems");
+                }
+                var areaExists = _DBcontext.Areas.Any(a => a.Id == model.CityId);
+                if (!areaExists)
+                {
+                    TempData["Error"] = "Invalid AreaId. Please select a valid area.";
+                    return RedirectToAction("ReturnItems");
+                }
+                TempData["Error"] = "An error occurred while submitting the transaction. Please try again.";
             }
 
-            return RedirectToAction("ReturnItems");
+            return RedirectToAction("AllTransactions");
         }
 
 
-
-
-
-
-        // AllTransactions Action
-        public IActionResult AllTransactions()
+        public async Task<IActionResult> AllTransactions(int page = 1, int pageSize = 10)
         {
-            return View(); // Create a view for this action (e.g., Views/ReceiveFromCustomer/AllTransactions.cshtml)
+            var totalTransactions = await _DBcontext.ReceiveFromCustomers
+                .CountAsync();
+
+            var transactions = await _DBcontext.ReceiveFromCustomers
+                .Include(t => t.Governorates)  // Only include related entities
+                .Include(t => t.Areas)
+                .OrderByDescending(t => t.TransactionDate)  // Latest first
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(t => new ReceiveFromCustomerViewModel
+                {
+                    CustomerCodeAndName = t.CustomerCode,  // No need to Include here
+                    DistributorCodeAndName = t.DistributorCode,
+                    TechnicianCodeAndName = t.TechnicianCode,
+                    GovernorateName = t.Governorates.Name,
+                    AreaName = t.Areas.Name,
+                    CouponReceiptNumber = t.CouponReceiptNumber,
+                    TransactionDate = t.TransactionDate
+                })
+                .ToListAsync();
+
+            var totalPages = (int)Math.Ceiling(totalTransactions / (double)pageSize);
+
+            var model = new TransactionPaginationViewModel
+            {
+                Transactions = transactions,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                PageSize = pageSize
+            };
+
+            return View(model);
         }
+
+
     }
 }

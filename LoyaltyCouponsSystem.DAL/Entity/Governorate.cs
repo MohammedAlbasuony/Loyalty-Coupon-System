@@ -16,5 +16,6 @@ namespace LoyaltyCouponsSystem.DAL.Entity
         public ICollection<Area> Areas { get; set; } // العلاقة One-to-Many
 
         public List<Coupon> CouponList { get; set; }
+        public List<ReceiveFromCustomer> receiveFromCustomer { get; set; }
     }
 }
