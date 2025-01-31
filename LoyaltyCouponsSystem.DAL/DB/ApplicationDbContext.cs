@@ -26,7 +26,7 @@ namespace LoyaltyCouponsSystem.DAL.DB
         public DbSet<TechnicianCustomer> TechnicianCustomers { get; set; }
 
         public DbSet<Governorate> Governorates { get; set; }
-
+        
         public DbSet<Area> Areas { get; set; }
 
         public DbSet<QRScanLog> QRScanLogs { get; set; }
@@ -39,6 +39,8 @@ namespace LoyaltyCouponsSystem.DAL.DB
 
 
         public DbSet<DeliverFromRepToCoust> DeliverFromRepToCousts { get; set; }
+        public DbSet<ReceiveFromCustomer> ReceiveFromCustomers { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
