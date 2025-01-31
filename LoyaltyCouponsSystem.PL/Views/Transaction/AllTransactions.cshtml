@@ -239,6 +239,8 @@
 
 <script>
 
+
+        
             //JavaScript function to Fetch and Populate Data to pop up window
        document.addEventListener("DOMContentLoaded", function () {
         const detailsButtons = document.querySelectorAll(".details-btn");
@@ -257,25 +259,48 @@
 
                 // Dynamically create a card for each coupon
                 if (coupons.length > 0) {
-                    coupons.forEach(coupon => {
-                        const card = `
-                            <div class="col-md-4">
-                                <div class="card custom-card">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title"><b>Coupon Sort:</b> ${coupon.couponSort || "N/A"}</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted"><b>Coupon Type:</b> ${coupon.couponType || "N/A"}</h6>
-                                        <p class="card-text"><b>Start Sequence:</b> ${coupon.sequenceStart}</p>
-                                        <p class="card-text"><b>End Sequence:</b> ${coupon.sequenceEnd}</p>
-                                    </div>
+                        // Generate a card for each coupon
+                coupons.forEach(coupon => {
+                    const card = `
+                        <div class="col-md-4">
+                            <div class="card custom-card"
+                                    data-coupon-type="${coupon.couponType}"
+                                    data-start-sequence="${coupon.sequenceStart}"
+                                    data-end-sequence="${coupon.sequenceEnd}">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title"><b>Coupon Sort:</b> ${coupon.couponSort || "N/A"}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted"><b>Coupon Type:</b> ${coupon.couponType || "N/A"}</h6>
+                                    <p class="card-text"><b>Start Sequence:</b> ${coupon.sequenceStart}</p>
+                                    <p class="card-text"><b>End Sequence:</b> ${coupon.sequenceEnd}</p>
                                 </div>
                             </div>
-                        `;
-                        modalContent.innerHTML += card;
-                    });
+                        </div>
+                    `;
+                    modalContent.innerHTML += card;
+                });
+
                 } else {
                     modalContent.innerHTML = "<p class='text-center'>No coupons found for this Exchange Permission.</p>";
                 }
             });
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalContent = document.getElementById("modalContent");
+
+        // Add click event listener for dynamically generated cards
+        modalContent.addEventListener("click", function (event) {
+            const card = event.target.closest(".card");
+            if (card) {
+                const typeOfCoupon = card.getAttribute("data-coupon-type");
+                const fromSequence = card.getAttribute("data-start-sequence");
+                const toSequence = card.getAttribute("data-end-sequence");
+
+                // Redirect to HistoryGeneratedController's GetAllCoupons action
+                const url = `/HistoryGenerated/GetAllCoupons?typeOfCoupon=${encodeURIComponent(typeOfCoupon)}&fromSequence=${encodeURIComponent(fromSequence)}&toSequence=${encodeURIComponent(toSequence)}`;
+                window.location.href = url;
+            }
         });
     });
 

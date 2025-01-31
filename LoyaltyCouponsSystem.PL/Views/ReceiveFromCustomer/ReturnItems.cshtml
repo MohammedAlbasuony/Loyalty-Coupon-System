@@ -1,0 +1,200 @@
+﻿@{
+    ViewData["Title"] = "Return Items";
+    Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
+}
+
+<script>
+    // Governorates and Cities Data
+    document.addEventListener("DOMContentLoaded", function () {
+        const governorates = [
+        { id: 1, name: "Cairo", cities: ["Nasr City", "Heliopolis", "Maadi", "Shubra", "Zamalek", "Downtown", "Ain Shams"] },
+        { id: 2, name: "Giza", cities: ["Dokki", "Mohandessin", "6th of October", "Sheikh Zayed", "Imbaba", "Haram"] },
+        { id: 3, name: "Alexandria", cities: ["Smouha", "Montaza", "Agamy", "Sidi Gaber", "Stanley", "Roshdy", "Mandara"] },
+        { id: 4, name: "Aswan", cities: ["Aswan City", "Edfu", "Kom Ombo", "Daraw", "Nasr City (New Aswan)"] },
+        { id: 5, name: "Asyut", cities: ["Asyut City", "Dayrout", "Manfalut", "Abnoub", "Abu Tig", "Sahel Selim", "El Quseya"] },
+        { id: 6, name: "Beheira", cities: ["Damanhour", "Kafr El Dawwar", "Rashid (Rosetta)", "Abu Hummus", "Edku", "Kom Hamada"] },
+        { id: 7, name: "Beni Suef", cities: ["Beni Suef City", "Al Wasta", "Nasser", "Ihnasia", "Biba", "Fashn", "Sumusta"] },
+        { id: 8, name: "Dakahlia", cities: ["Mansoura", "Talkha", "Mit Ghamr", "Belqas", "Sherbin", "Sinbillawin", "Gamasa"] },
+        { id: 9, name: "Damietta", cities: ["Damietta City", "New Damietta", "Faraskur", "Zarqa", "Kafr Saad", "Ras El Bar"] },
+        { id: 10, name: "Faiyum", cities: ["Faiyum City", "Tamiya", "Sinnuris", "Etsa", "Ibshaway", "New Faiyum"] },
+        { id: 11, name: "Gharbia", cities: ["Tanta", "Mahalla", "Kafr El Zayat", "Zifta", "Samannoud", "Santa", "Basion"] },
+        { id: 12, name: "Ismailia", cities: ["Ismailia City", "Qantara East", "Qantara West", "Fayed", "Abu Sultan"] },
+        { id: 13, name: "Kafr El Sheikh", cities: ["Kafr El Sheikh City", "Desouk", "Baltim", "Sidi Salem", "Biyala", "Fuwah"] },
+        { id: 14, name: "Luxor", cities: ["Luxor City", "Armant", "Esna", "New Tiba"] },
+        { id: 15, name: "Matrouh", cities: ["Marsa Matrouh", "Siwa", "El Alamein", "El Dabaa", "Salloum", "Barani"] },
+        { id: 16, name: "Minya", cities: ["Minya City", "Bani Mazar", "Maghagha", "Abu Qurqas", "Mallawi", "Deir Mawas"] },
+        { id: 17, name: "Monufia", cities: ["Shibin El Kom", "Menouf", "Quesna", "Ashmoun", "Sers El Lyan", "Bagour", "Tala"] },
+        { id: 18, name: "New Valley", cities: ["Kharga", "Dakhla", "Farafra", "Baris"] },
+        { id: 19, name: "North Sinai", cities: ["Arish", "Sheikh Zuweid", "Rafah", "Bir El Abd", "Hasana", "Nakhl"] },
+        { id: 20, name: "Port Said", cities: ["Port Said City", "Port Fouad"] },
+        { id: 21, name: "Qalyubia", cities: ["Banha", "Qalyub", "Shubra El Kheima", "Khosous", "Toukh", "Shebin El Qanater"] },
+        { id: 22, name: "Qena", cities: ["Qena City", "Nag Hammadi", "Qus", "Abu Tesht", "Farshut", "Dishna"] },
+        { id: 23, name: "Red Sea", cities: ["Hurghada", "Safaga", "Quseir", "Marsa Alam", "Ras Gharib", "Shalateen"] },
+        { id: 24, name: "Sharqia", cities: ["Zagazig", "Belbeis", "Abu Kabir", "Faqus", "10th of Ramadan City", "Minya El Qamh"] },
+        { id: 25, name: "Sohag", cities: ["Sohag City", "Tahta", "Girga", "Akhmim", "El Balyana", "Dar El Salam"] },
+        { id: 26, name: "South Sinai", cities: ["Sharm El Sheikh", "Dahab", "Nuweiba", "Taba", "Saint Catherine", "Tor"] },
+        { id: 27, name: "Suez", cities: ["Suez City", "Ataka", "Arbaeen", "Ganayen"] },
+        { id: 28, name: "Helwan", cities: ["15th of May City", "Helwan City", "El Maasara"] }
+        ];
+
+        const governorateDropdown = document.getElementById("governorateDropdown");
+        const cityDropdown = document.getElementById("cityDropdown");
+
+        // Populate governorate dropdown
+        governorates.forEach(gov => {
+            const option = document.createElement("option");
+            option.value = gov.id;
+            option.textContent = gov.name;
+            governorateDropdown.appendChild(option);
+        });
+
+        // Handle governorate change event
+        governorateDropdown.addEventListener("change", function () {
+            const selectedGovernorate = governorates.find(gov => gov.id === parseInt(this.value));
+            cityDropdown.innerHTML = '<option value="" disabled selected>Select City</option>';
+            cityDropdown.disabled = !selectedGovernorate;
+
+            if (selectedGovernorate) {
+                selectedGovernorate.cities.forEach(city => {
+                    const option = document.createElement("option");
+                    option.textContent = city;
+                    cityDropdown.appendChild(option);
+                });
+            }
+        });
+    });
+
+    // Redirect to the scan page
+    function redirectToScan() {
+        window.location.href = "/HistoryScan/Index";
+    }
+
+    // Coupon validation
+    document.addEventListener("DOMContentLoaded", function () {
+        const couponReceiptNumber = document.getElementById("couponReceiptNumber");
+        const couponError = document.getElementById("couponError");
+
+        couponReceiptNumber.addEventListener("input", function () {
+            const enteredNumber = parseInt(this.value, 10);
+            const usedCoupons = []; // Define used coupon list dynamically if needed
+
+            if (isNaN(enteredNumber) || usedCoupons.includes(enteredNumber)) {
+                couponError.classList.remove("d-none");
+            } else {
+                couponError.classList.add("d-none");
+            }
+        });
+    });
+
+    // Validation
+        document.querySelector("form").addEventListener("submit", function (event) {
+        const customerId = document.getElementById("customerDropdown").value;
+        const distributorId = document.getElementById("distributorDropdown").value;
+        const technicianId = document.getElementById("technicianDropdown").value;
+        const governorateId = document.getElementById("governorateDropdown").value;
+        const cityId = document.getElementById("cityDropdown").value;
+        const couponReceiptNumber = document.getElementById("couponReceiptNumber").value;
+
+        if (!customerId || !distributorId || !technicianId || !governorateId || !cityId || !couponReceiptNumber) {
+            alert("Please fill in all required fields.");
+            event.preventDefault(); // Prevent form submission
+        }
+    });
+
+</script>
+
+<!-- Main Content -->
+<div class="container mt-5">
+    <h1 class="text-primary text-center mb-4">Receive From Customer</h1>
+
+    <!-- Success and Error Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger text-center">@TempData["Error"]</div>
+    }
+
+    <!-- Form -->
+    <form method="post" action="@Url.Action("SubmitReturnItems", "ReceiveFromCustomer")">
+        <!-- Row 1 -->
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label for="customerDropdown" class="form-label">Customers</label>
+                <select id="customerDropdown" name="CustomerId" class="form-select" required>
+                    <option value="" disabled selected>Select Customer</option>
+                    @foreach (var customer in ViewBag.Customers)
+                    {
+                        <option value="@customer.CustomerID">@customer.Code - @customer.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label for="distributorDropdown" class="form-label">Distributors</label>
+                <select id="distributorDropdown" name="DistributorId" class="form-select" required>
+                    <option value="" disabled selected>Select Distributor</option>
+                    @foreach (var distributor in ViewBag.Distributors)
+                    {
+                        <option value="@distributor.DistributorID">@distributor.Code - @distributor.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label for="technicianDropdown" class="form-label">Technicians</label>
+                <select id="technicianDropdown" name="TechnicianId" class="form-select" required>
+                    <option value="" disabled selected>Select Technician</option>
+                    @foreach (var technician in ViewBag.Technicians)
+                    {
+                        <option value="@technician.TechnicianID">@technician.Code - @technician.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="row mt-4">
+            <div class="col-md-6 mb-3">
+                <label for="governorateDropdown" class="form-label">Governorates</label>
+                <select id="governorateDropdown" name="GovernorateId" class="form-select" required>
+                    <option value="" disabled selected>Select Governorate</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="cityDropdown" class="form-label">Cities</label>
+                <select id="cityDropdown" name="CityId" class="form-select" disabled>
+                    <option value="" disabled selected>Select City</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="row mt-4">
+            <div class="col-md-9 mb-3">
+                <label for="couponReceiptNumber" class="form-label">Coupon Receipt Number</label>
+                <input type="number" id="couponReceiptNumber" name="CouponReceiptNumber" class="form-control" placeholder="Enter Receipt Number" required>
+                <small id="couponError" class="text-danger d-none">Invalid or used coupon number.</small>
+            </div>
+            <div class="col-md-3 mb-3 d-flex align-items-end">
+                <button type="button" class="btn btn-secondary w-100" onclick="redirectToScan()">Scan</button>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        </div>
+    </form>
+</div>
+
+<!-- Styles and Scripts -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
