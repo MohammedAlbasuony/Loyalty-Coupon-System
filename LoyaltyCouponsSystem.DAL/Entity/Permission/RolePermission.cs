@@ -11,7 +11,7 @@ namespace LoyaltyCouponsSystem.DAL.Entity.Permission
     {
         public string RoleId { get; set; }  // IdentityRole's Id
         public int PermissionId { get; set; } // Permission entity's Id
-        public string PermissionName { get; set; }
+        public string? PermissionName { get; set; }
 
         public virtual IdentityRole Role { get; set; }  // Reference to IdentityRole
         public virtual Permission Permission { get; set; }  // Reference to Permission

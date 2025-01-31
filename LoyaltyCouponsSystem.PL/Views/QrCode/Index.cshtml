@@ -7,8 +7,27 @@
 <!-- QR Code Scanner Container -->
 <div id="qr-reader" style="width: 500px; margin: auto;"></div>
 
+<!-- ButtonToContinueScan -->
+
+<div>
+    <button type="button" class="btn btn-info" onclick="location.href='@Url.Action("Index", "QrCode")'">
+        Click Here To Continue Scan
+    </button>
+
+</div>
+
+
+<div>
+    Number Of Coupone that Scaned Is : @ViewBag.Counter
+
+</div>
+
+
+
+
 <!-- Display Scan Result -->
 <div id="qr-reader-results" style="margin-top: 20px; font-size: 1.2em;"></div>
+
 
 <!-- Display Saved QR Codes -->
 <h3>Saved QR Codes</h3>

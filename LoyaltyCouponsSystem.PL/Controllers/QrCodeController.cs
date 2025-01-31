@@ -13,6 +13,7 @@ namespace QrCodeScannerApp.Controllers
         {
             // Pass the list of scanned QR codes to the view
             ViewBag.ScannedQrCodes = _scannedQrCodes;
+            ViewBag.Counter=_scannedQrCodes.Count;  
             return View();
         }
 
