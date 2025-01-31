@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
 using LoyaltyCouponsSystem.BLL.ViewModel.Technician;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -27,7 +28,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _customerService = customerService;
             _userManager = userManager;
         }
-
+        [Authorize(Policy = "Manage Customers")]
         public IActionResult Index()
         {
             return View();

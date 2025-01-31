@@ -2,6 +2,7 @@ using DocumentFormat.OpenXml.InkML;
 using LoyaltyCouponsSystem.BLL.Service.Abstraction;
 using LoyaltyCouponsSystem.BLL.ViewModel.Customer;
 using LoyaltyCouponsSystem.DAL.DB;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoyaltyCouponsSystem.PL.Controllers
@@ -16,7 +17,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _DBcontext = context;
             _customerService = customerService;
         }
-
+        [Authorize(Policy = "Manage Customers")]
         public IActionResult Index()
         {
             return View();

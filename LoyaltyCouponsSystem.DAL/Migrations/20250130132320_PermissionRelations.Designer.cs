@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250130132320_PermissionRelations")]
+    partial class PermissionRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -373,7 +376,10 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AreaId")
+                    b.Property<string>("AreaName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("AreasId")
                         .HasColumnType("int");
 
                     b.Property<string>("CostomerCode")
@@ -382,14 +388,17 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CustomerID")
+                    b.Property<int>("CustomerID")
                         .HasColumnType("int");
 
                     b.Property<string>("ExchangePermission")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("GovernorateId")
+                    b.Property<string>("GovernorateName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("GovernoratesId")
                         .HasColumnType("int");
 
                     b.Property<string>("ImagePath")
@@ -400,7 +409,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TechnicianID")
+                    b.Property<int>("TechnicianID")
                         .HasColumnType("int");
 
                     b.Property<string>("TechnitionCode")
@@ -411,11 +420,11 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AreaId");
+                    b.HasIndex("AreasId");
 
                     b.HasIndex("CustomerID");
 
-                    b.HasIndex("GovernorateId");
+                    b.HasIndex("GovernoratesId");
 
                     b.HasIndex("TechnicianID");
 
@@ -602,12 +611,12 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         new
                         {
                             Id = 2,
-                            Name = "Deliver From Representative to Customer"
+                            Name = "Manage Distributors"
                         },
                         new
                         {
                             Id = 3,
-                            Name = "Scan QR Codes"
+                            Name = "Manage Technicians"
                         },
                         new
                         {
@@ -623,11 +632,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         {
                             Id = 6,
                             Name = "Exchange Permissions"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "Scan QR Codes"
                         });
                 });
 
@@ -639,7 +643,11 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<int>("PermissionId")
                         .HasColumnType("int");
 
-                    b.Property<string>("PermissionName")
+                    b.PrimitiveCollection<string>("Permissions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -648,26 +656,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.HasIndex("PermissionId");
 
                     b.ToTable("RolePermissions");
-                });
-
-            modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Permission.UserPermission", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("PermissionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("UserId", "PermissionId");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("PermissionId");
-
-                    b.ToTable("UserPermissions");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.QRCodeTransactionGenerated", b =>
@@ -763,45 +751,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.ToTable("QRScanLogs");
                 });
 
-            modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.ReceiveFromCustomer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("CouponReceiptNumber")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("CustomerCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DistributorCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Governorate")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TechnicianCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ReceiveFromCustomers");
-                });
-
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Representative", b =>
                 {
                     b.Property<string>("ApplicationUserId")
@@ -834,14 +783,9 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<int?>("QRCodeTransactionGeneratedID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TransactionForRecieptFromRepToCustID")
-                        .HasColumnType("int");
-
                     b.HasKey("ApplicationUserId");
 
                     b.HasIndex("QRCodeTransactionGeneratedID");
-
-                    b.HasIndex("TransactionForRecieptFromRepToCustID");
 
                     b.ToTable("Representatives");
                 });
@@ -866,14 +810,9 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<int?>("QRCodeTransactionGeneratedID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TransactionForRecieptFromRepToCustID")
-                        .HasColumnType("int");
-
                     b.HasKey("StoreKeeperID");
 
                     b.HasIndex("QRCodeTransactionGeneratedID");
-
-                    b.HasIndex("TransactionForRecieptFromRepToCustID");
 
                     b.ToTable("StoreKeepers");
                 });
@@ -930,9 +869,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Property<int?>("QRCodeTransactionGeneratedID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TransactionForRecieptFromRepToCustID")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -948,8 +884,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .IsUnique();
 
                     b.HasIndex("QRCodeTransactionGeneratedID");
-
-                    b.HasIndex("TransactionForRecieptFromRepToCustID");
 
                     b.ToTable("Technicians");
                 });
@@ -1051,66 +985,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.HasIndex("TechnicianID");
 
                     b.ToTable("Transactions");
-                });
-
-            modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.TransactionForRecieptFromRepToCust", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("AreaName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("AreasId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreationDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CustomerCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExchangePermissionNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GeneratedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GovernorateName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("GovernoratesId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RepresentativeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReprsentitiveCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("StorekeeperID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TechnicianId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TechnitionCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("AreasId");
-
-                    b.HasIndex("GovernoratesId");
-
-                    b.ToTable("TransactionForRecieptFromRepToCusts");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1354,19 +1228,23 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                 {
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Area", "Areas")
                         .WithMany()
-                        .HasForeignKey("AreaId");
+                        .HasForeignKey("AreasId");
 
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Customer", "Customer")
                         .WithMany()
-                        .HasForeignKey("CustomerID");
+                        .HasForeignKey("CustomerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Governorate", "Governorates")
                         .WithMany()
-                        .HasForeignKey("GovernorateId");
+                        .HasForeignKey("GovernoratesId");
 
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Technician", "Technician")
                         .WithMany()
-                        .HasForeignKey("TechnicianID");
+                        .HasForeignKey("TechnicianID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Areas");
 
@@ -1426,29 +1304,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Permission.UserPermission", b =>
-                {
-                    b.HasOne("LoyaltyCouponsSystem.DAL.DB.ApplicationUser", null)
-                        .WithMany("UserPermissions")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Permission.Permission", "Permission")
-                        .WithMany("UserPermissions")
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LoyaltyCouponsSystem.DAL.DB.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Permission");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.QRCodeTransactionGenerated", b =>
                 {
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Area", "Areas")
@@ -1476,10 +1331,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .WithMany("Representatives")
                         .HasForeignKey("QRCodeTransactionGeneratedID");
 
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.TransactionForRecieptFromRepToCust", null)
-                        .WithMany("Representatives")
-                        .HasForeignKey("TransactionForRecieptFromRepToCustID");
-
                     b.Navigation("ApplicationUser");
                 });
 
@@ -1488,10 +1339,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.QRCodeTransactionGenerated", null)
                         .WithMany("StoreKeepers")
                         .HasForeignKey("QRCodeTransactionGeneratedID");
-
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.TransactionForRecieptFromRepToCust", null)
-                        .WithMany("StoreKeepers")
-                        .HasForeignKey("TransactionForRecieptFromRepToCustID");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Technician", b =>
@@ -1499,10 +1346,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.QRCodeTransactionGenerated", null)
                         .WithMany("Technicians")
                         .HasForeignKey("QRCodeTransactionGeneratedID");
-
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.TransactionForRecieptFromRepToCust", null)
-                        .WithMany("Technicians")
-                        .HasForeignKey("TransactionForRecieptFromRepToCustID");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.TechnicianCustomer", b =>
@@ -1568,21 +1411,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Navigation("Technician");
                 });
 
-            modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.TransactionForRecieptFromRepToCust", b =>
-                {
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Area", "Areas")
-                        .WithMany()
-                        .HasForeignKey("AreasId");
-
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Governorate", "Governorates")
-                        .WithMany()
-                        .HasForeignKey("GovernoratesId");
-
-                    b.Navigation("Areas");
-
-                    b.Navigation("Governorates");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1643,8 +1471,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("TechnicianUsers");
-
-                    b.Navigation("UserPermissions");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Admin", b =>
@@ -1697,8 +1523,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Permission.Permission", b =>
                 {
                     b.Navigation("RolePermissions");
-
-                    b.Navigation("UserPermissions");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.QRCodeTransactionGenerated", b =>
@@ -1715,15 +1539,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                     b.Navigation("TechnicianCustomers");
 
                     b.Navigation("TechnicianUsers");
-                });
-
-            modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.TransactionForRecieptFromRepToCust", b =>
-                {
-                    b.Navigation("Representatives");
-
-                    b.Navigation("StoreKeepers");
-
-                    b.Navigation("Technicians");
                 });
 #pragma warning restore 612, 618
         }

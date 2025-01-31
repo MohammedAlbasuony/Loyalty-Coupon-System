@@ -8,6 +8,7 @@ using LoyaltyCouponsSystem.BLL.ViewModel.QRCode;
 using LoyaltyCouponsSystem.DAL.DB;
 using LoyaltyCouponsSystem.DAL.Entity;
 using LoyaltyCouponsSystem.PL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +40,7 @@ namespace LoyaltyCouponsSystem.PL.Controllers
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
+        [Authorize(Policy = "Generate QR Codes")]
 
         public async Task<IActionResult> GetAreas(int governorateId)
         {

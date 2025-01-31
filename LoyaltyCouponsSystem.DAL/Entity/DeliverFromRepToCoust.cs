@@ -17,19 +17,19 @@ namespace LoyaltyCouponsSystem.DAL.Entity
 
         public string RepresintitiveCode { get; set; }
 
-        public string? GovernorateName { get; set; }
+        public int? GovernorateId { get; set; }
         public Governorate? Governorates { get; set; }
         public Area? Areas { get; set; }
-        public string? AreaName { get; set; }
+        public int? AreaId { get; set; }
         public string ImagePath { get; set; }
 
 
-        public DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get; set; }= DateTime.Now;
        
-        public int CustomerID { get; set; }
-        public Customer Customer { get; set; }
-        public int TechnicianID { get; set; }
-        public Technician Technician { get; set; }
+        public int? CustomerID { get; set; }
+        public Customer? Customer { get; set; }
+        public int? TechnicianID { get; set; }
+        public Technician? Technician { get; set; }
       
         public string ExchangePermission { get; set; }
         public string? CreatedBy { get; set; }

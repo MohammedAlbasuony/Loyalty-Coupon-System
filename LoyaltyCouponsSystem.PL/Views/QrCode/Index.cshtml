@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "QR Code Scanner";
+}
+
+<h2>QR Code Scanner</h2>
+
+<!-- QR Code Scanner Container -->
+<div id="qr-reader" style="width: 500px; margin: auto;"></div>
+
+<!-- Display Scan Result -->
+<div id="qr-reader-results" style="margin-top: 20px; font-size: 1.2em;"></div>
+
+<!-- Display Saved QR Codes -->
+<h3>Saved QR Codes</h3>
+<ul id="saved-qr-codes">
+    @foreach (var qrCode in ViewBag.ScannedQrCodes)
+    {
+        <li>@qrCode</li>
+    }
+</ul>
+
+<!-- Include the html5-qrcode library -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script>
+    // Function to handle successful QR code scans
+    function onScanSuccess(decodedText, decodedResult) {
+        console.log(`Scan result: ${decodedText}`, decodedResult);
+
+        // Display the scanned result
+        document.getElementById('qr-reader-results').innerText = `Scan Result: ${decodedText}`;
+
+        // Send the scanned result to the server to save it
+        fetch('/QrCode/SaveData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(decodedText),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('QR code data saved successfully.');
+
+                // Add the new QR code to the list of saved QR codes
+                const savedQrCodesList = document.getElementById('saved-qr-codes');
+                const newQrCodeItem = document.createElement('li');
+                newQrCodeItem.innerText = decodedText;
+                savedQrCodesList.appendChild(newQrCodeItem);
+            } else {
+                console.error('Failed to save QR code data.');
+            }
+        });
+
+        // Optionally, stop the scanner after a successful scan
+        html5QrcodeScanner.clear();
+    }
+
+    // Function to handle scan failures
+    function onScanFailure(error) {
+        console.warn(`QR code scan error: ${error}`);
+    }
+
+    // Initialize the scanner
+    const html5QrcodeScanner = new Html5QrcodeScanner(
+        "qr-reader", // Container ID
+        { fps: 10, qrbox: 250 }, // Scanner configuration
+        false // Verbose mode
+    );
+
+    // Start the scanner
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+</script>
