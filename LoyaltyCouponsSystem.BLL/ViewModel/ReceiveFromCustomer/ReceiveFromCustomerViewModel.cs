@@ -23,9 +23,15 @@ namespace LoyaltyCouponsSystem.BLL.ViewModel.ReceiveFromCustomer
 
         [Required(ErrorMessage = "City is required.")]
         public int CityId { get; set; }
+        public DateTime TransactionDate { get; set; }
 
         [Required(ErrorMessage = "Coupon Receipt Number is required.")]
         [Range(1, long.MaxValue, ErrorMessage = "Coupon Receipt Number must be a valid number.")]
         public long CouponReceiptNumber { get; set; }
+        public string? CustomerCodeAndName { get; set; }
+        public string? DistributorCodeAndName { get; set; }
+        public string? TechnicianCodeAndName { get; set; }
+        public string? GovernorateName { get; set; } 
+        public string? AreaName { get; set; } 
     }
 }

@@ -1,2 +1,98 @@
-﻿<h1>Hello World</h1>
-<h1>This is All Transactions Page for Receive From Customer Page</h1>
+﻿@using LoyaltyCouponsSystem.BLL.ViewModel.ReceiveFromCustomer
+@model TransactionPaginationViewModel
+
+@{
+    ViewData["Title"] = "All Transactions";
+    Layout = "~/Views/Shared/_LayoutCoupon.cshtml";
+}
+
+<div class="container mt-5">
+    <h1 class="text-primary text-center mb-4">All Transactions</h1>
+
+    <!-- Success and Error Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger text-center">@TempData["Error"]</div>
+    }
+
+    <!-- Search Bar -->
+    <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search Transactions..." onkeyup="searchTransactions()">
+    </div>
+
+    <!-- Transactions Table -->
+    <table class="table table-striped" id="transactionsTable">
+        <thead>
+            <tr>
+                <th>Coupon Receipt Number</th>
+                <th>Customer</th>
+                <th>Distributor</th>
+                <th>Technician</th>
+                <th>Governorate</th>
+                <th>Area</th>
+                <th>Transaction Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transaction in Model.Transactions)
+            {
+                <tr>
+                    <td>@transaction.CouponReceiptNumber</td>
+                    <td>@transaction.CustomerCodeAndName</td>
+                    <td>@transaction.DistributorCodeAndName</td>
+                    <td>@transaction.TechnicianCodeAndName</td>
+                    <td>@transaction.GovernorateName</td>
+                    <td>@transaction.AreaName</td>
+                    <td>@transaction.TransactionDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        @if (Model.CurrentPage > 1)
+        {
+            <a href="@Url.Action("AllTransactions", new { page = Model.CurrentPage - 1, pageSize = Model.PageSize })">&laquo; Previous</a>
+        }
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="@Url.Action("AllTransactions", new { page = i, pageSize = Model.PageSize })" class="@(i == Model.CurrentPage ? "active" : "")">@i</a>
+        }
+
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a href="@Url.Action("AllTransactions", new { page = Model.CurrentPage + 1, pageSize = Model.PageSize })">Next &raquo;</a>
+        }
+    </div>
+</div>
+
+<!-- JavaScript for Dynamic Search -->
+<script>
+    function searchTransactions() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toLowerCase();
+        table = document.getElementById("transactionsTable");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 1; i < tr.length; i++) { // start from 1 to skip header row
+            td = tr[i].getElementsByTagName("td");
+            var match = false;
+            for (var j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                        match = true;
+                    }
+                }
+            }
+            tr[i].style.display = match ? "" : "none"; // Show/hide row
+        }
+    }
+</script>

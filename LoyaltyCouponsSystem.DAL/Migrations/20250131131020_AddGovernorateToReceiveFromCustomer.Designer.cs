@@ -4,6 +4,7 @@ using LoyaltyCouponsSystem.DAL.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoyaltyCouponsSystem.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250131131020_AddGovernorateToReceiveFromCustomer")]
+    partial class AddGovernorateToReceiveFromCustomer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -781,15 +784,9 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CustomerID")
-                        .HasColumnType("int");
-
                     b.Property<string>("DistributorCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("DistributorID")
-                        .HasColumnType("int");
 
                     b.Property<int?>("GovernorateId")
                         .HasColumnType("int");
@@ -798,9 +795,6 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TechnicianID")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
 
@@ -808,13 +802,7 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
 
                     b.HasIndex("AreaId");
 
-                    b.HasIndex("CustomerID");
-
-                    b.HasIndex("DistributorID");
-
                     b.HasIndex("GovernorateId");
-
-                    b.HasIndex("TechnicianID");
 
                     b.ToTable("ReceiveFromCustomers");
                 });
@@ -1487,31 +1475,13 @@ namespace LoyaltyCouponsSystem.DAL.Migrations
                         .WithMany("receiveFromCustomer")
                         .HasForeignKey("AreaId");
 
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerID");
-
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Distributor", "Distributor")
-                        .WithMany()
-                        .HasForeignKey("DistributorID");
-
                     b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Governorate", "Governorates")
                         .WithMany("receiveFromCustomer")
                         .HasForeignKey("GovernorateId");
 
-                    b.HasOne("LoyaltyCouponsSystem.DAL.Entity.Technician", "Technician")
-                        .WithMany()
-                        .HasForeignKey("TechnicianID");
-
                     b.Navigation("Areas");
 
-                    b.Navigation("Customer");
-
-                    b.Navigation("Distributor");
-
                     b.Navigation("Governorates");
-
-                    b.Navigation("Technician");
                 });
 
             modelBuilder.Entity("LoyaltyCouponsSystem.DAL.Entity.Representative", b =>

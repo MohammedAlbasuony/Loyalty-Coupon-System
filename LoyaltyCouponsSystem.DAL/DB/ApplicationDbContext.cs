@@ -269,11 +269,11 @@ namespace LoyaltyCouponsSystem.DAL.DB
             modelBuilder.Entity<Permission>().HasData(
                 new Permission { Id = 1, Name = "Manage Customers" },               
                 new Permission { Id = 2, Name = "Deliver From Representative to Customer" },               
-                new Permission { Id = 3, Name = "Scan QR Codes" },               
+                new Permission { Id = 3, Name = "Approve Recieved Coupons" },               
                 new Permission { Id = 4, Name = "Manage Users" },
                 new Permission { Id = 5, Name = "Generate QR Codes" },
                 new Permission { Id = 6, Name = "Exchange Permissions" },
-                new Permission { Id = 7, Name = "Scan QR Codes" }            
+                new Permission { Id = 7, Name = "Receive From Customer" }            
             );
 
         }
