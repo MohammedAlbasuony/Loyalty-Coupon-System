@@ -452,12 +452,12 @@
                 <div class="sidebar-content">
                     <ul class="nav nav-secondary">
                         <!-- Home -->
-                        <li class="nav-item">
-                            <a href="@Url.Action("Dashboard", "Admin")">
-                                <i class="fas fa-tachometer-alt"></i>
-                                <span>Home</span>
-                            </a>
-                        </li>
+                        @* <li class="nav-item"> *@
+                        @*     <a href="@Url.Action("Dashboard", "Admin")"> *@
+                        @*         <i class="fas fa-tachometer-alt"></i> *@
+                        @*         <span>Home</span> *@
+                        @*     </a> *@
+                        @* </li> *@
 
                         <!-- QR Codes -->
                         @if (await _adminService.UserHasPermissionAsync(User.Identity.Name, "Generate QR Codes"))
@@ -470,23 +470,32 @@
                                 </a>
                                 <div class="collapse" id="qrCodes">
                                     <ul class="nav nav-collapse">
-                                        
+                                        <li>
+                                            <a href="@Url.Action("DetailsOfCoupones", "GenerateQRCode")">
+                                                <span class="sub-item">Generate QRs</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="@Url.Action("GetAllCoupons", "HistoryGenerated")">
+                                                <span class="sub-item">All Generated QRs</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="@Url.Action("TransactionHistory", "HistoryGenerated")">
+                                                <span class="sub-item">Transaction Generated QRs</span>
+                                            </a>
+                                        </li>
+                                        <li>
 
-                                        <a href="@Url.Action("Index", "QrCode")">
-                                            <span class="sub-item">ScanQR</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+                                            <a href="@Url.Action("Index", "HistoryScan")">
+                                                <span class="sub-item">ScanQR</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
 
-                                            <li>
-                                                <a href="@Url.Action("DetailsOfCoupones", "GenerateQRCode")">
-                                                    <span class="sub-item">Generate QRs</span>
-                                                </a>
-                                            </li>
-
-
+                        }
 
 
                         <!-- DeliverFromRepresititve to Coustomer -->
@@ -512,32 +521,6 @@
                             </div>
                         </li>
 
-                                            <li>
-                                                <a href="@Url.Action("GetAllCoupons", "HistoryGenerated")">
-                                                    <span class="sub-item">All Generated QRs</span>
-                                                </a>
-                                            </li>
-
-
-
-                                            <li>
-                                                <a href="@Url.Action("TransactionHistory", "HistoryGenerated")">
-                                                    <span class="sub-item">Transaction Generated QRs</span>
-                                                </a>
-                                            </li>
-
-
-                                            <li>
-                                                <a href="@Url.Action("Index", "HistoryScan")">
-                                                    <span class="sub-item">ScanQR</span>
-                                                </a>
-                                            </li>
-                                        
-                                    </ul>
-                                </div>
-                            </li>
-                        }
-
                         <!-- Exchange Permission -->
                         @if (await _adminService.UserHasPermissionAsync(User.Identity.Name, "Exchange Permissions"))
                         {
@@ -550,18 +533,18 @@
                                 <div class="collapse" id="exchangePermission">
                                     <ul class="nav nav-collapse">
                                         
-                                            <li>
-                                                <a href="@Url.Action("AssignQRCode", "ExchangeOrder")">
-                                                    <span class="sub-item">Generate an Exchange Permission</span>
-                                                </a>
-                                            </li>
+                                        <li>
+                                            <a href="@Url.Action("AssignQRCode", "ExchangeOrder")">
+                                                <span class="sub-item">Generate an Exchange Permission</span>
+                                            </a>
+                                        </li>
                                         
                                         
-                                            <li>
-                                                <a href="@Url.Action("AllTransactions", "Transaction")">
-                                                    <span class="sub-item">Exchange All Transactions</span>
-                                                </a>
-                                            </li>
+                                        <li>
+                                            <a href="@Url.Action("AllTransactions", "Transaction")">
+                                                <span class="sub-item">Exchange All Transactions</span>
+                                            </a>
+                                        </li>
                                         
                                     </ul>
                                 </div>
@@ -628,24 +611,24 @@
                                 <div class="collapse" id="manageUsers">
                                     <ul class="nav nav-collapse">
                                         
-                                            <li>
-                                                <a href="@Url.Action("GetAllCustomers", "Customer")">
-                                                    <span class="sub-item">Manage Merchant</span>
-                                                </a>
-                                            </li>
+                                        <li>
+                                            <a href="@Url.Action("GetAllCustomers", "Customer")">
+                                                <span class="sub-item">Manage Merchant</span>
+                                            </a>
+                                        </li>
                                         
                                         
-                                            <li>
-                                                <a href="@Url.Action("GetAllDistributors", "Distributor")">
-                                                    <span class="sub-item">Manage Distributor</span>
-                                                </a>
-                                            </li>
+                                        <li>
+                                            <a href="@Url.Action("GetAllDistributors", "Distributor")">
+                                                <span class="sub-item">Manage Distributor</span>
+                                            </a>
+                                        </li>
                                         
-                                            <li>
-                                                <a href="@Url.Action("GetAllTechnicians", "Technician")">
-                                                    <span class="sub-item">Manage Technician</span>
-                                                </a>
-                                            </li>
+                                        <li>
+                                            <a href="@Url.Action("GetAllTechnicians", "Technician")">
+                                                <span class="sub-item">Manage Technician</span>
+                                            </a>
+                                        </li>
                                         
                                     </ul>
                                 </div>
