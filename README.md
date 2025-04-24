@@ -6,7 +6,7 @@ Key Features:
 ![image](https://github.com/user-attachments/assets/6b124ead-964d-40a9-b252-0d5113ec5c7a)
 
 •	 QR Code Integration for Scanning & Verification
-![image](https://github.com/user-attachments/assets/4d1911fc-aad9-4738-8cb6-cdcd9d90454b)
+![image](https://github.com/user-attachments/assets/d610d251-a5b6-453e-96fa-38da4fe0e43e)
 
 •	Smart Coupon Distribution Based on Purchase Thresholds
 ![image](https://github.com/user-attachments/assets/4ad459e8-5c77-4192-b306-98ccdf89e48d)
@@ -18,6 +18,7 @@ Key Features:
 •	Audit Logging and Comprehensive Reporting
 ![image](https://github.com/user-attachments/assets/187f3a0c-5213-4592-bfc6-a556a4b41f14)
 ![image](https://github.com/user-attachments/assets/4b73a70f-06e2-42a5-bc5d-5b3d101a257f)
+![image](https://github.com/user-attachments/assets/1d88e5d2-cc55-48b1-922b-e100997b2ed5)
 
 •	Email Notifications for Approval Statuses & Reminders
 ![image](https://github.com/user-attachments/assets/7e4fb7cb-1987-4afd-ada1-880f6414aff9)
