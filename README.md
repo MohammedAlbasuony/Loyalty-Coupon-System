@@ -23,4 +23,9 @@ Key Features:
 •	Email Notifications for Approval Statuses & Reminders
 ![image](https://github.com/user-attachments/assets/7e4fb7cb-1987-4afd-ada1-880f6414aff9)
 
+• Track and Manage Employees
+![image](https://github.com/user-attachments/assets/5526cbad-b0cd-4181-95ee-43b335f0ef43)
+![image](https://github.com/user-attachments/assets/7e1d753c-71e0-42f3-a1b5-909552a33c95)
+![image](https://github.com/user-attachments/assets/770a913f-2d37-4b90-9dba-f7ffdf507719)
+
 Tech Stack: ASP.NET Core, Entity Framework Core, SQL Server, Identity, LINQ, Bootstrap, MVC Pattern
